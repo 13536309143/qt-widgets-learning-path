@@ -1,25 +1,13 @@
 #include "widget.h"
-#include <QPushButton>
-#include <QPlainTextEdit>
-#include <QLabel>
+#include "ui_widget.h"
 #include <QDebug>
-#include <QString>
+#include "verify.h"
 
-// 本步重点：对值捕获、引用捕获和 mutable 先预测再运行。
-Widget::Widget(QWidget *parent) : QWidget(parent)
+Widget::Widget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
 {
-    setWindowTitle("30 Lambda 自测结果对照");
-    resize(720, 540);
-    auto *heading = new QLabel("30 Lambda 自测结果对照", this);
-    heading->setGeometry(24, 18, 670, 32);
-    QFont font = heading->font();
-    font.setPointSize(15);
-    font.setBold(true);
-    heading->setFont(font);
-    output_ = new QPlainTextEdit(this);
-    output_->setReadOnly(true);
-    output_->setGeometry(24, 140, 670, 370);
-    output_->setStyleSheet("font-size: 15px;");
+    ui->setupUi(this);
     int x = 5;
     auto value = [x]() { return x + 1; };
     x = 100;
@@ -33,22 +21,18 @@ Widget::Widget(QWidget *parent) : QWidget(parent)
     int first = state();
     int second = state();
     writeLine(QString("题三两次返回 %1、%2，外部 z = %3").arg(first).arg(second).arg(z));
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
-// 小辅助函数：同时显示在窗口和 Qt Creator 的应用程序输出中。
+Widget::~Widget()
+{
+    delete ui;
+}
+
 void Widget::writeLine(const QString &text)
 {
-    if (output_)
-        output_->appendPlainText(text);
+    ui->outputEdit->appendPlainText(text);
     qDebug().noquote() << text;
-}
-void Widget::refreshTitle()
-{
-    setWindowTitle(QString("已点击 %1 次").arg(count_));
-}
-void Widget::increase()
-{
-    ++count_;
-    refreshTitle();
-    writeLine("加一后 count_ = " + QString::number(count_));
 }

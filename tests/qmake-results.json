@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-23",
+  "configured_projects": 52,
+  "compiled_and_run_representatives": [
+    {
+      "project": "37_file_dialog",
+      "build": true,
+      "run": true
+    },
+    {
+      "project": "43_custom_widget",
+      "build": true,
+      "run": true
+    },
+    {
+      "project": "50_dialog_modes",
+      "build": true,
+      "run": true
+    }
+  ]
+}

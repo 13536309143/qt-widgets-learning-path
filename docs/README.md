@@ -1,3 +1,5 @@
+[先熟悉统一模板与 Designer 操作](project-format.md)
+
 # 学习目录
 
 [从下载到运行](getting-started.md) · [基础与 Lambda](basics.md) · [四个完整实战](practices.md)

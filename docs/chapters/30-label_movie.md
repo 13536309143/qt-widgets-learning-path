@@ -14,7 +14,7 @@ setText 接收文本，setPixmap 接收像素图，setMovie 接收动画对象�
 
 ## 按执行顺序拆解
 
-第 41 步先显示普通文本，再显示富文本，然后分别绑定 QPixmap 和 QMovie。QMovie 需要 start 才播放；停止按钮连接到 movie->stop。QMovie 的 parent 设为 root，避免标签不接管 movie 所有权所导致的泄漏。图片和 GIF 都已随 qrc 提供。
+普通文字、富文本、图片标签、动画标签和停止按钮均在 mainwindow.ui。mainwindow.cpp 只负责装载图片和 QMovie，将动画交给标签显示并调用 start。QMovie 的 parent 是当前主窗口；停止按钮显式连接 QMovie::stop。
 
 ## 参数与行为边界
 
@@ -28,58 +28,166 @@ setText 接收文本，setPixmap 接收像素图，setMovie 接收动画对象�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/41_label_movie/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("41 QLabel 文本 图片与动画");
-    auto *root = new QWidget;
-    auto *layout = new QVBoxLayout(root);
-    layout->addWidget(new QLabel("普通文字"));
-    auto *rich = new QLabel("<h2>Qt 富文本</h2><p><b>粗体</b>与颜色演示</p>");
-    layout->addWidget(rich);
-    auto *image = new QLabel;
-    image->setPixmap(QPixmap(":/images/demo.png").scaledToWidth(360));
-    layout->addWidget(image);
-    auto *animation = new QLabel;
-    auto *movie = new QMovie(":/images/demo.gif", QByteArray(), root);
-    animation->setMovie(movie);
-    movie->start();
-    layout->addWidget(animation);
-    auto *stop = new QPushButton("停止动画");
-    stop->setObjectName("run");
-    layout->addWidget(stop);
-    QObject::connect(stop, &QPushButton::clicked, movie, &QMovie::stop);
-    w.setCentralWidget(root);
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QMovie>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->imageLabel->setPixmap(QPixmap(":/images/demo.png").scaledToWidth(360));
+    auto *movie = new QMovie(":/images/demo.gif", QByteArray(), this);
+    ui->animationLabel->setMovie(movie);
+    movie->start();
+    connect(ui->run, &QPushButton::clicked, movie, &QMovie::stop);
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>41 QLabel 文本 图片与动画</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="plainLabel">
+      <property name="text">
+       <string>普通文字</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="richLabel">
+      <property name="text">
+       <string>&lt;h2&gt;Qt 富文本&lt;/h2&gt;&lt;p&gt;&lt;b&gt;粗体&lt;/b&gt;与颜色演示&lt;/p&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="imageLabel" />
+    </item>
+    <item>
+     <widget class="QLabel" name="animationLabel" />
+    </item>
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>停止动画</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="assets.qrc" />
+ </resources>
+ <connections />
+</ui>
 ```
 
 ### 41_label_movie.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 41_label_movie
-SOURCES += main.cpp
-HEADERS += verify.h
-RESOURCES += assets.qrc
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+RESOURCES += \
+    assets.qrc
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
 ### assets.qrc
@@ -88,7 +196,7 @@ RESOURCES += assets.qrc
 <RCC><qresource prefix="/images"><file alias="demo.png">assets/demo.png</file><file alias="demo.gif">assets/demo.gif</file></qresource></RCC>
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/41_label_movie/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

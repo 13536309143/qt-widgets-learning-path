@@ -25,6 +25,8 @@ foreach(lesson_dir IN LISTS lesson_directories)
         "${lesson_dir}/*.cpp" "${lesson_dir}/*.h" "${lesson_dir}/*.ui" "${lesson_dir}/*.qrc")
     qt_add_executable(${lesson} WIN32 ${lesson_sources})
     target_link_libraries(${lesson} PRIVATE Qt6::Widgets)
+    # uic 生成的头文件位于构建目录；提升控件的本地头文件位于项目源码目录。
+    target_include_directories(${lesson} PRIVATE "${lesson_dir}")
     target_compile_definitions(${lesson} PRIVATE QT_LESSON_SOURCE_DIR="${lesson_dir}")
     set_target_properties(${lesson} PROPERTIES AUTOUIC_SEARCH_PATHS "${lesson_dir}")
     if(MSVC)

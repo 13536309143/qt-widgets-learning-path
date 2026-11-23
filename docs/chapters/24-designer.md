@@ -4,17 +4,17 @@
 
 ## 本章要解决的问题
 
-Designer 编辑的是 .ui XML 界面描述，uic 在构建时生成 ui_form.h。手写代码调用 ui.setupUi(&w) 后，才能通过 ui.nameEdit 等对象指针访问设计好的控件。这里采用 Ui::Form 栈包装对象，真实控件仍由 QWidget 父子关系管理。原笔记常见的 Ui::MainWindow *ui 写法则还需要析构时 delete ui。
+Designer 将界面保存在 .ui XML 文件中，构建时 uic 生成 ui_mainwindow.h。mainwindow.h 用前向声明保存 Ui::MainWindow *ui；mainwindow.cpp 包含生成的头文件，在构造函数中创建辅助对象、调用 ui->setupUi(this)，在析构函数中 delete ui。
 
-objectName 是代码识别控件的名字，text 是界面显示文字，它们不是同一件事。常见自动槽名 on_对象名_信号名 依赖 setupUi 中的自动连接；本例使用显式 connect，便于看清触发关系，也避免重复连接。
+objectName 是代码成员和自动连接所依赖的对象名，text 是显示文字。按钮名为 runButton，槽名为 on_runButton_clicked，且在 private slots 中声明，因此 setupUi 会自动完成连接。
 
-## 设计描述 生成代码和业务代码
+## 默认模板与自动连接
 
-form.ui 是界面结构的源文件；uic 把它翻译成生成头文件；自己的 main.cpp 或窗口 .cpp 承担业务行为。setupUi 创建控件、设置属性、建立布局并登记对象名字。这个顺序解释了为什么在 setupUi 之前访问 ui.nameEdit 会得到尚未建立的对象。
+本步 main.cpp 与 Qt Creator 默认模板一致，只启动 MainWindow。控件和布局都在 mainwindow.ui，行为写在 mainwindow.cpp。不要修改 ui_mainwindow.h，也不要对已自动连接的槽再 connect 一次。Designer 中“转到槽”会帮你生成相应声明和实现。
 
 ## 按执行顺序拆解
 
-在 Qt Creator 中双击 form.ui，修改按钮文字，再构建。接着只修改 nameEdit 的 objectName，观察原来的 ui.nameEdit 代码为什么编译失败。text 只影响显示，objectName 会影响生成成员名以及自动连接。示例直接在栈上保存 Ui::Form 包装器，包装器复制的只是控件指针，不拥有另一套界面。
+main.cpp 创建 MainWindow。mainwindow.h 声明 Ui::MainWindow *ui 和 on_runButton_clicked 槽；mainwindow.cpp 在初始化列表创建 Ui 辅助对象，再调用 ui->setupUi(this)。这个调用会建立 .ui 中的控件并自动连接 runButton 的 clicked 信号。点击后只执行对应槽，析构时 delete ui。
 
 ## 参数与行为边界
 
@@ -22,60 +22,182 @@ Qt Creator 向导常用 Ui::MainWindow *ui；new 出来的包装器需要 delete
 
 ## 易错点与排查
 
-不要手动改 ui_form.h，重新构建会覆盖。应该改 form.ui 或自己的 .cpp。QMainWindow 的布局要放在 centralwidget 上。示例提供真实 .ui，可直接在 Qt Creator 中双击打开。
+不要手动改 ui_mainwindow.h，重新构建会覆盖。应该改 mainwindow.ui 或自己的 .cpp。QMainWindow 的布局要放在 centralwidget 上。示例提供真实 .ui，可直接在 Qt Creator 中双击打开。
 
 遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/35_designer/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include "ui_form.h"
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("35 Designer 与 setupUi");
-    Ui::Form ui;
-    ui.setupUi(&w);
-    QObject::connect(ui.runButton, &QPushButton::clicked, &w,
-                     [=]() { ui.resultLabel->setText("你好，" + ui.nameEdit->text()); });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private slots:
+    void on_runButton_clicked();
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    // setupUi 会按 on_对象名_信号名 规则连接下方的槽；不要再重复 connect。
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::on_runButton_clicked()
+{
+    ui->resultLabel->setText("你好，" + ui->nameEdit->text());
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>35 Designer 与 setupUi</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLineEdit" name="nameEdit">
+      <property name="placeholderText">
+       <string>请输入名字</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="runButton">
+      <property name="text">
+       <string>打招呼</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="resultLabel">
+      <property name="text">
+       <string>等待点击</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 35_designer.pro
 
 ```qmake
 QT += widgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = 35_designer
-SOURCES += main.cpp
-HEADERS += verify.h
-FORMS += form.ui
 
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-### form.ui
-
-```xml
-<ui version="4.0"><class>Form</class><widget class="QMainWindow" name="Form"><property name="windowTitle"><string>Designer 示例</string></property><widget class="QWidget" name="centralwidget"><layout class="QVBoxLayout" name="verticalLayout"><item><widget class="QLineEdit" name="nameEdit"><property name="placeholderText"><string>请输入名字</string></property></widget></item><item><widget class="QPushButton" name="runButton"><property name="text"><string>显示问候</string></property></widget></item><item><widget class="QLabel" name="resultLabel"><property name="text"><string>等待输入</string></property></widget></item></layout></widget></widget><resources/><connections/></ui>
-```
-
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/35_designer/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
@@ -83,15 +205,13 @@ FORMS += form.ui
 
 ## 自己动手
 
-给 form.ui 增加一个清空按钮，命名 clearButton。构建后用显式 connect 连接到 nameEdit->clear。再观察 setupUi 生成的结构，确认你改的是源 .ui，生成 .h 只用于理解。
-
-先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
+在 mainwindow.ui 添加 clearButton，使用“转到槽”生成 on_clearButton_clicked，在槽中调用 ui->nameEdit->clear。修改按钮的显示文字，确认自动连接仍然有效；再修改 objectName，观察为什么槽名也需要同步修改。
 
 ## 自测与答案
 
-**显式连接和 on_name_signal 能同时用吗？**
+**已经有 on_runButton_clicked，还需要再写 connect 吗？**
 
-可以存在，但容易让同一操作被执行两次。学习阶段先统一使用显式 connect；如果使用自动连接，保持对象名和槽签名准确。
+不需要。setupUi 调用 connectSlotsByName，会按对象名和槽名自动连接。再添加相同的显式连接会让一次点击执行两次。要使用另一种连接方式，应先去掉旧的连接。
 
 ## 继续阅读
 

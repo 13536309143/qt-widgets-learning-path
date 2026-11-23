@@ -14,7 +14,7 @@
 
 ## 按执行顺序拆解
 
-先观察 save 指针只创建一次，再看它被两个容器使用，最后找 triggered 的唯一连接。点击任一入口都执行相同的 Lambda。把 save->setEnabled(false) 加入初始化后，观察两个入口都禁用。快捷键也属于动作；QKeySequence::Save 比手写 Ctrl+S 更能适应平台约定。
+在 mainwindow.ui 中找到名为 action 的 QAction：菜单 menuFile 和 toolBar 的 addaction 均引用它。mainwindow.cpp 只有一次 triggered 连接，两个入口都会向 ui->textEdit 追加同一条消息。尝试 ui->action->setEnabled(false)，观察菜单与工具栏一起禁用。
 
 ## 参数与行为边界
 
@@ -28,54 +28,171 @@ triggered(bool) 通知触发，toggled(bool) 通知勾选状态变化。需要�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/32_menu_toolbar/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("32 菜单 动作与工具栏");
-    auto *edit = new QTextEdit;
-    w.setCentralWidget(edit);
-    auto *menu = w.menuBar()->addMenu("文件");
-    auto *save = new QAction("保存示例", &w);
-    save->setObjectName("action");
-    save->setShortcut(QKeySequence::Save);
-    menu->addAction(save);
-    auto *tools = w.addToolBar("文件工具");
-    tools->addAction(save);
-    tools->setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea | Qt::TopToolBarArea);
-    QObject::connect(save, &QAction::triggered, &w, [edit]()
-                     { edit->append("同一个 QAction 被触发。这里演示通知，没有写入磁盘。"); });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->action, &QAction::triggered, this, [this]()
+            { ui->textEdit->append("同一个 QAction 被触发。这里演示通知，没有写入磁盘。"); });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>32 菜单 动作与工具栏</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTextEdit" name="textEdit" />
+    </item>
+   </layout>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>保存示例</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <widget class="QMenuBar" name="menubar">
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="action" />
+   </widget>
+   <addaction name="menuFile" />
+  </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>文件工具</string>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 32_menu_toolbar.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 32_menu_toolbar
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/32_menu_toolbar/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

@@ -14,7 +14,7 @@
 
 ## 按执行顺序拆解
 
-第 40 步的根 QVBoxLayout 管理三个区域：表单、网格、底部按钮行。表单用 addRow，网格用从零开始的行列下标，底部行先 addStretch 再加按钮，让按钮靠右。new QVBoxLayout(root) 已把布局安装到 root，无需又对 root setLayout 另一份。
+打开 mainwindow.ui，在 centralwidget 下找到 verticalLayout，内部依次是 formLayout、gridLayout 和 buttonLayout。表单项设置 row/column，网格放置六个按钮，底部水平布局包含伸缩占位和确定/取消按钮。外层边距为 20、spacing 为 14。C++ 不重复创建布局。
 
 ## 参数与行为边界
 
@@ -28,60 +28,250 @@ contentsMargins 是容器内缘留白，spacing 是相邻项目间隔，addSpaci
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/40_layout/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("40 水平 垂直 网格与表单布局");
-    auto *root = new QWidget;
-    auto *outer = new QVBoxLayout(root);
-    auto *form = new QFormLayout;
-    form->addRow("用户名", new QLineEdit);
-    form->addRow("备注", new QLineEdit);
-    outer->addLayout(form);
-    auto *grid = new QGridLayout;
-    for (int i = 0; i < 6; ++i)
-        grid->addWidget(new QPushButton(QString::number(i + 1)), i / 3, i % 3);
-    outer->addLayout(grid);
-    auto *row = new QHBoxLayout;
-    row->addStretch();
-    row->addWidget(new QPushButton("确定"));
-    row->addWidget(new QPushButton("取消"));
-    outer->addLayout(row);
-    outer->setContentsMargins(20, 20, 20, 20);
-    outer->setSpacing(14);
-    w.setCentralWidget(root);
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    // 四种布局均在 mainwindow.ui 中配置，拖动窗口边缘观察空间分配。
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>40 水平 垂直 网格与表单布局</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="nameEditLabel">
+        <property name="text">
+         <string>用户名</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="nameEdit" />
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="noteEditLabel">
+        <property name="text">
+         <string>备注</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="noteEdit" />
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="number1">
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QPushButton" name="number2">
+        <property name="text">
+         <string>2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="number3">
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="number4">
+        <property name="text">
+         <string>4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="number5">
+        <property name="text">
+         <string>5</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="number6">
+        <property name="text">
+         <string>6</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="buttonLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="okButton">
+        <property name="text">
+         <string>确定</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="cancelButton">
+        <property name="text">
+         <string>取消</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <property name="leftMargin">
+     <number>20</number>
+    </property>
+    <property name="topMargin">
+     <number>20</number>
+    </property>
+    <property name="rightMargin">
+     <number>20</number>
+    </property>
+    <property name="bottomMargin">
+     <number>20</number>
+    </property>
+    <property name="spacing">
+     <number>14</number>
+    </property>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 40_layout.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 40_layout
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/40_layout/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

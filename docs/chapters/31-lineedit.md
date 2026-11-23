@@ -14,7 +14,7 @@ QLineEdit::text() 是真实字符串，displayText() 是按 EchoMode 处理后�
 
 ## 按执行顺序拆解
 
-启动第 42 步时普通框为空，掩码演示框已有固定样例值。输入名字后，textChanged 将内容和长度送到结果标签。清空输入后，提示文字出现，但结果中的真实长度应为零。密码框从来不把真实演示值复制到日志。
+在 mainwindow.ui 中查看 name 的 placeholderText、passwordEdit 的 Password 显示模式和三行表单。mainwindow.cpp 设置文本边距并连接 textChanged。输入后 resultLabel 同时显示内容和长度；清空后 placeholderText 只作提示，不属于 text()。
 
 ## 参数与行为边界
 
@@ -28,57 +28,181 @@ setMaxLength 限制长度；QValidator 可以约束可接受输入；inputMask �
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/42_lineedit/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("42 QLineEdit 输入与显示模式");
-    auto *root = new QWidget;
-    auto *form = new QFormLayout(root);
-    auto *name = new QLineEdit;
-    name->setObjectName("name");
-    name->setPlaceholderText("请输入名字");
-    name->setTextMargins(8, 0, 8, 0);
-    form->addRow("普通输入", name);
-    auto *password = new QLineEdit("demo123");
-    password->setEchoMode(QLineEdit::Password);
-    form->addRow("掩码演示", password);
-    auto *result = new QLabel("尚未输入");
-    form->addRow("实时结果", result);
-    QObject::connect(name, &QLineEdit::textChanged, result, [result](const QString &text)
-                     { result->setText(QString("内容 %1，长度 %2").arg(text).arg(text.size())); });
-    w.setCentralWidget(root);
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->name->setTextMargins(8, 0, 8, 0);
+    connect(ui->name, &QLineEdit::textChanged, this, [this](const QString &text)
+            { ui->resultLabel->setText(QString("内容 %1，长度 %2").arg(text).arg(text.size())); });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>42 QLineEdit 输入与显示模式</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QFormLayout" name="formLayout">
+    <item row="0" column="0">
+     <widget class="QLabel" name="fieldLabel0">
+      <property name="text">
+       <string>普通输入</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLineEdit" name="name">
+      <property name="placeholderText">
+       <string>请输入名字</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="fieldLabel1">
+      <property name="text">
+       <string>掩码演示</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLineEdit" name="passwordEdit">
+      <property name="text">
+       <string>demo123</string>
+      </property>
+      <property name="echoMode">
+       <enum>QLineEdit::Password</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="fieldLabel2">
+      <property name="text">
+       <string>实时结果</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="resultLabel">
+      <property name="text">
+       <string>尚未输入</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 42_lineedit.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 42_lineedit
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/42_lineedit/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

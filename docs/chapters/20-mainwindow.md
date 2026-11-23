@@ -14,7 +14,7 @@ setCentralWidget() 把一个控件交给主窗口作为工作区。主窗口负�
 
 ## 按执行顺序拆解
 
-读 main.cpp 时依次找到 QApplication、QMainWindow、QTextEdit、setCentralWidget 和 app.exec。QTextEdit 没传 parent 也不一定泄漏：setCentralWidget 会接管它。随后找出菜单栏和状态栏，它们由 QMainWindow 管理。退出时先结束事件循环，再销毁 main 中的窗口，窗口的子控件随之释放。
+main.cpp 创建 MainWindow 并显示。构造函数先调用 ui->setupUi(this)，uic 生成的代码根据 mainwindow.ui 建立 centralwidget、布局和 textEdit，并登记主窗口的中心部件。正文的 C++ 代码只设置状态消息。先在 Designer 的对象查看器中确认层级，再看 mainwindow.cpp 的初始化。
 
 ## 参数与行为边界
 
@@ -28,47 +28,151 @@ menuBar() 和 statusBar() 可以取得或按需创建对应栏，取得后无需
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/31_mainwindow/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("31 主窗口与中心部件");
-    auto *editor = new QTextEdit;
-    editor->setPlainText("中心部件就是主窗口的工作区。\n试着拖动窗口边缘。");
-    w.setCentralWidget(editor);
-    w.menuBar()->addMenu("文件");
-    w.statusBar()->showMessage("主窗口已就绪");
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->showMessage("主窗口已就绪");
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>31 主窗口与中心部件</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="plainText">
+       <string>中心部件就是主窗口的工作区。
+试着拖动窗口边缘。</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>文件</string>
+    </property>
+   </widget>
+   <addaction name="menuFile" />
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 31_mainwindow.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 31_mainwindow
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/31_mainwindow/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
@@ -76,7 +180,7 @@ HEADERS += verify.h
 
 ## 自己动手
 
-把中心编辑器改成一个容器，容器上放标签与编辑器，拖动窗口观察编辑器如何变大。再取消 setCentralWidget，观察界面变化；通过对比理解“对象已经创建”和“被安放到工作区”的区别。
+在 mainwindow.ui 的 centralwidget 布局中增加一个 QLabel，再拖动窗口观察标签与编辑器如何分配空间。对比保留布局与取消布局时的表现，理解中心工作区与内部布局的分工。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

@@ -14,7 +14,7 @@ mousePressEvent 处理按下，mouseReleaseEvent 处理释放，mouseMoveEvent �
 
 ## 按执行顺序拆解
 
-本例把事件处理放在 QLabel 子类 EventArea 上，因为鼠标实际上位于这个标签。设置 mouseTracking(true) 后，即使没有按键也收到移动事件。点击时 setFocus，后面的键盘观察才有明确目标。只在主窗口上重写鼠标函数，不保证能看到被子控件处理掉的事件。
+mainwindow.ui 将中央 QLabel 提升为 EventArea。eventarea.cpp 中启用 mouseTracking，重写 mouseMoveEvent 和 mousePressEvent，读取 position/button 并设置焦点。只保留本步鼠标处理，键盘事件的实现留到下一步。
 
 ## 参数与行为边界
 
@@ -28,99 +28,191 @@ mousePressEvent 处理按下，mouseReleaseEvent 处理释放，mouseMoveEvent �
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/46_mouse_events/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-class EventArea : public QLabel
-{
-  public:
-    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
-    {
-        setMouseTracking(true);
-        setFocusPolicy(Qt::StrongFocus);
-        setAlignment(Qt::AlignCenter);
-        setText("移动鼠标，点击后按键盘；拖动主窗口观察大小变化。");
-    }
+#include "mainwindow.h"
 
-  protected:
-    void resizeEvent(QResizeEvent *event) override
-    {
-        setText(QString("区域大小 %1 × %2").arg(event->size().width()).arg(event->size().height()));
-        QLabel::resizeEvent(event);
-    }
-    void mouseMoveEvent(QMouseEvent *event) override
-    {
-        setText(QString("鼠标位置 %1，%2").arg(event->position().x()).arg(event->position().y()));
-        QLabel::mouseMoveEvent(event);
-    }
-    void mousePressEvent(QMouseEvent *event) override
-    {
-        setFocus();
-        setText(event->button() == Qt::LeftButton ? "左键按下" : "其他鼠标键按下");
-        QLabel::mousePressEvent(event);
-    }
-    bool event(QEvent *event) override
-    {
-        if (event->type() == QEvent::KeyPress)
-        {
-            auto *key = static_cast<QKeyEvent *>(event);
-            if (key->key() == Qt::Key_Tab)
-            {
-                setText("event 已处理 Tab，阻止默认焦点切换");
-                return true;
-            }
-        }
-        return QLabel::event(event);
-    }
-};
-class CloseWindow : public QMainWindow
-{
-  protected:
-    void closeEvent(QCloseEvent *event) override
-    {
-        auto choice = QMessageBox::question(this, "关闭确认", "确定关闭窗口吗？",
-                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (choice == QMessageBox::Yes)
-            event->accept();
-        else
-            event->ignore();
-    }
-};
+#include <QApplication>
 
-#include "verify.h"
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("46 鼠标按键 坐标和跟踪");
-    w.setCentralWidget(new EventArea);
-    w.statusBar()->showMessage("本步用 QLabel 子类显示鼠标位置，Qt 6 使用 position()。");
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->showMessage("本步用 QLabel 子类显示鼠标位置，Qt 6 使用 position()。");
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>46 鼠标按键 坐标和跟踪</string>
+  </property>
+  <widget class="EventArea" name="eventArea" />
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EventArea</class>
+   <extends>QLabel</extends>
+   <header>eventarea.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources />
+ <connections />
+</ui>
+```
+
+### eventarea.cpp
+
+```cpp
+#include "eventarea.h"
+#include <QMouseEvent>
+#include <QResizeEvent>
+#include <QKeyEvent>
+
+EventArea::EventArea(QWidget *parent)
+    : QLabel(parent)
+{
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+    setAlignment(Qt::AlignCenter);
+    setText("移动鼠标或按下鼠标键，观察位置和按键。");
+}
+
+void EventArea::mouseMoveEvent(QMouseEvent *event)
+{
+    setText(QString("鼠标位置 %1，%2").arg(event->position().x()).arg(event->position().y()));
+    QLabel::mouseMoveEvent(event);
+}
+
+void EventArea::mousePressEvent(QMouseEvent *event)
+{
+    setFocus();
+    setText(event->button() == Qt::LeftButton ? "左键按下" : "其他鼠标键按下");
+    QLabel::mousePressEvent(event);
+}
+```
+
+### eventarea.h
+
+```cpp
+#ifndef EVENTAREA_H
+#define EVENTAREA_H
+#include <QLabel>
+class EventArea : public QLabel
+{
+    Q_OBJECT
+public:
+    explicit EventArea(QWidget *parent = nullptr);
+
+protected:
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+};
+#endif // EVENTAREA_H
 ```
 
 ### 46_mouse_events.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 46_mouse_events
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    eventarea.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    eventarea.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/46_mouse_events/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

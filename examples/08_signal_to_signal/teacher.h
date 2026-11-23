@@ -4,8 +4,11 @@
 class Teacher : public QObject
 {
     Q_OBJECT
-  public:
-    explicit Teacher(QObject *parent = nullptr) : QObject(parent) {}
+public:
+    explicit Teacher(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+    }
     void finishClass()
     {
         emit hungry();
@@ -14,7 +17,7 @@ class Teacher : public QObject
     {
         emit hungry(food);
     }
-  signals:
+signals:
     void hungry();
     void hungry(const QString &food);
 };

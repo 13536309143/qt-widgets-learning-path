@@ -6,7 +6,9 @@
 
 - CMake 总入口成功编译 52 个独立目标。
 - CTest 运行检查 52 项通过，0 项失败。
-- 第 37 步改动的源码目录定义另用 qmake 与 mingw32-make 构建通过。
+- 52 个项目的 qmake 配置全部生成成功，55 份 .ui 已参与 uic 编译。
+- 第 37、43、50 步另外用 qmake 与 mingw32-make 独立构建并运行通过，覆盖源码路径、自定义控件提升与多表单对话框。
+- 52 个程序均采用统一的 main / 窗口类 / .ui 结构，检查摘要见 [项目结构](../tests/project-structure.json) 与 [qmake 验证](../tests/qmake-results.json)。
 - 源码经过 clang-format 整理。
 - Markdown 本地链接和图片链接在发布前检查。
 

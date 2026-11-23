@@ -1,7 +1,25 @@
 QT += widgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = 43_custom_widget
-SOURCES += main.cpp
-HEADERS += verify.h
-HEADERS += smallwidget.h
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp \
+    smallwidget.cpp
+
+HEADERS += \
+    mainwindow.h \
+    smallwidget.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui \
+    smallwidget.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target

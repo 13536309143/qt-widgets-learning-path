@@ -12,9 +12,9 @@
 2. 在 Qt Creator 中选择“打开项目”，定位到 `examples/49_text_editor/49_text_editor.pro`。
 3. 选择与已安装 Qt 匹配的 Kit。
 4. 构建并运行。先尝试输入文本、另存为自己的测试文件，再重新打开。
-5. 回到 `main.cpp`，按章节说明逐步阅读。
+5. 双击 `mainwindow.ui` 进入设计模式；再阅读 `mainwindow.h` 与 `mainwindow.cpp`。`main.cpp` 只负责启动窗口。
 
-每个目录都是独立项目。打开第 49 步不需要先构建第 1 步；资源、头文件和 `.ui` 必须与本步源文件一起保留。
+[统一模板与 Designer 操作](project-format.md) 解释各文件的分工、自动连接和控件提升。每个目录都是独立项目。打开第 49 步不需要先构建第 1 步；资源、头文件和 `.ui` 必须与本步源文件一起保留。
 
 ## 用 CMake 构建全部项目
 

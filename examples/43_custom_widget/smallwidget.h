@@ -1,29 +1,26 @@
-#pragma once
-#include <QtWidgets>
+#ifndef SMALLWIDGET_H
+#define SMALLWIDGET_H
+
+#include <QWidget>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class SmallWidget;
+}
+QT_END_NAMESPACE
+
 class SmallWidget : public QWidget
 {
-  public:
-    explicit SmallWidget(QWidget *parent = nullptr) : QWidget(parent)
-    {
-        auto *row = new QHBoxLayout(this);
-        spin = new QSpinBox;
-        auto *slider = new QSlider(Qt::Horizontal);
-        spin->setRange(0, 100);
-        slider->setRange(0, 100);
-        row->addWidget(spin);
-        row->addWidget(slider);
-        QObject::connect(spin, &QSpinBox::valueChanged, slider, &QSlider::setValue);
-        QObject::connect(slider, &QSlider::valueChanged, spin, &QSpinBox::setValue);
-    }
-    void setValue(int value)
-    {
-        spin->setValue(value);
-    }
-    int value() const
-    {
-        return spin->value();
-    }
+    Q_OBJECT
 
-  private:
-    QSpinBox *spin;
+public:
+    explicit SmallWidget(QWidget *parent = nullptr);
+    ~SmallWidget() override;
+    void setValue(int value);
+    int value() const;
+
+private:
+    Ui::SmallWidget *ui;
 };
+#endif // SMALLWIDGET_H

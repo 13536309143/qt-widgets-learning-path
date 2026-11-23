@@ -14,7 +14,7 @@ QColorDialog::getColor 返回 QColor；取消返回无效颜色，先 isValid() 
 
 ## 按执行顺序拆解
 
-先观察编辑器当前 palette 的 Text 角色和当前 font。打开颜色框后选一个颜色并取消，确认文字保持原色；第二次选择并确认，检查文字变化。字体对话框同样先取消再确认。自动示例截图还展示了 18 号字体应用后的结果，实际可用字体会随操作系统变化。
+mainwindow.ui 配置颜色、字体按钮和 plainTextEdit。mainwindow.cpp 在按钮回调中读取编辑器当前的 palette 或 font，建立 Qt 标准对话框，确认选择后再通过 colorSelected/fontSelected 应用结果。取消时保持原状态。
 
 ## 参数与行为边界
 
@@ -28,78 +28,180 @@ QPlainTextEdit 整体字体与富文本局部字符格式是不同层级。设�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/38_color_font/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("38 选择颜色与字体");
-    auto *root = new QWidget;
-    auto *layout = new QVBoxLayout(root);
-    auto *color = new QPushButton("选择文字颜色");
-    color->setObjectName("run");
-    auto *font = new QPushButton("选择字体");
-    font->setObjectName("fontButton");
-    auto *edit = new QPlainTextEdit("选择后观察这行文字的颜色和字体。");
-    layout->addWidget(color);
-    layout->addWidget(font);
-    layout->addWidget(edit);
-    w.setCentralWidget(root);
-    QObject::connect(color, &QPushButton::clicked, &w,
-                     [&w, edit]()
-                     {
-                         auto *dialog = new QColorDialog(edit->palette().color(QPalette::Text), &w);
-                         dialog->setOption(QColorDialog::DontUseNativeDialog);
-                         dialog->setAttribute(Qt::WA_DeleteOnClose);
-                         QObject::connect(dialog, &QColorDialog::colorSelected, edit,
-                                          [edit](const QColor &value)
-                                          {
-                                              auto pal = edit->palette();
-                                              pal.setColor(QPalette::Text, value);
-                                              edit->setPalette(pal);
-                                          });
-                         dialog->open();
-                     });
-    QObject::connect(font, &QPushButton::clicked, &w,
-                     [&w, edit]()
-                     {
-                         auto *dialog = new QFontDialog(edit->font(), &w);
-                         dialog->setOption(QFontDialog::DontUseNativeDialog);
-                         dialog->setAttribute(Qt::WA_DeleteOnClose);
-                         QObject::connect(dialog, &QFontDialog::fontSelected, edit,
-                                          &QWidget::setFont);
-                         dialog->open();
-                     });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QColorDialog>
+#include <QFontDialog>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->run, &QPushButton::clicked, this,
+            [this]()
+            {
+                auto *dialog =
+                    new QColorDialog(ui->plainTextEdit->palette().color(QPalette::Text), this);
+                dialog->setOption(QColorDialog::DontUseNativeDialog);
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                connect(dialog, &QColorDialog::colorSelected, ui->plainTextEdit,
+                        [this](const QColor &value)
+                        {
+                            auto pal = ui->plainTextEdit->palette();
+                            pal.setColor(QPalette::Text, value);
+                            ui->plainTextEdit->setPalette(pal);
+                        });
+                dialog->open();
+            });
+    connect(ui->fontButton, &QPushButton::clicked, this,
+            [this]()
+            {
+                auto *dialog = new QFontDialog(ui->plainTextEdit->font(), this);
+                dialog->setOption(QFontDialog::DontUseNativeDialog);
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                connect(dialog, &QFontDialog::fontSelected, ui->plainTextEdit, &QWidget::setFont);
+                dialog->open();
+            });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>38 选择颜色与字体</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>选择文字颜色</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fontButton">
+      <property name="text">
+       <string>选择字体</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPlainTextEdit" name="plainTextEdit">
+      <property name="plainText">
+       <string>选择后观察这行文字的颜色和字体。</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 38_color_font.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 38_color_font
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/38_color_font/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

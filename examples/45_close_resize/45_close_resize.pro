@@ -1,6 +1,24 @@
 QT += widgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = 45_close_resize
-SOURCES += main.cpp
-HEADERS += verify.h
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    eventarea.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    eventarea.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target

@@ -4,9 +4,12 @@
 class Student : public QObject
 {
     Q_OBJECT
-  public:
-    explicit Student(QObject *parent = nullptr) : QObject(parent) {}
-  public slots:
+public:
+    explicit Student(QObject *parent = nullptr)
+        : QObject(parent)
+    {
+    }
+public slots:
     void treat()
     {
         emit message("请老师吃饭");
@@ -15,6 +18,6 @@ class Student : public QObject
     {
         emit message("请老师吃饭：" + food);
     }
-  signals:
+signals:
     void message(const QString &text);
 };

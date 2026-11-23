@@ -14,7 +14,7 @@ Tab 常被控件系统用来切换焦点，因此只在 keyPressEvent 中写代�
 
 ## 按执行顺序拆解
 
-事件类型确定后才能安全转换到 QKeyEvent。第 47 步在 event 中识别 KeyPress 和 Tab，返回 true 消费这个事件；其余必须交给 QLabel::event。第 51 步则先进入过滤器；过滤器返回 true 会阻止继续送到被观察对象，返回 false 或基类结果则允许默认流程继续。
+在 mainwindow.ui 查看 EventArea 提升信息，在 eventarea.h 中找到 event 声明。eventarea.cpp 先判断 KeyPress，再读取 Tab 键并返回 true；其他情况调用 QLabel::event。第 51 步则把过滤器安装在普通 QLineEdit 上，便于对比两种方式。
 
 ## 参数与行为边界
 
@@ -28,100 +28,192 @@ Tab 常被控件系统用来切换焦点，因此只在 keyPressEvent 中写代�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/47_event_tab/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-class EventArea : public QLabel
-{
-  public:
-    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
-    {
-        setMouseTracking(true);
-        setFocusPolicy(Qt::StrongFocus);
-        setAlignment(Qt::AlignCenter);
-        setText("移动鼠标，点击后按键盘；拖动主窗口观察大小变化。");
-    }
+#include "mainwindow.h"
 
-  protected:
-    void resizeEvent(QResizeEvent *event) override
-    {
-        setText(QString("区域大小 %1 × %2").arg(event->size().width()).arg(event->size().height()));
-        QLabel::resizeEvent(event);
-    }
-    void mouseMoveEvent(QMouseEvent *event) override
-    {
-        setText(QString("鼠标位置 %1，%2").arg(event->position().x()).arg(event->position().y()));
-        QLabel::mouseMoveEvent(event);
-    }
-    void mousePressEvent(QMouseEvent *event) override
-    {
-        setFocus();
-        setText(event->button() == Qt::LeftButton ? "左键按下" : "其他鼠标键按下");
-        QLabel::mousePressEvent(event);
-    }
-    bool event(QEvent *event) override
-    {
-        if (event->type() == QEvent::KeyPress)
-        {
-            auto *key = static_cast<QKeyEvent *>(event);
-            if (key->key() == Qt::Key_Tab)
-            {
-                setText("event 已处理 Tab，阻止默认焦点切换");
-                return true;
-            }
-        }
-        return QLabel::event(event);
-    }
-};
-class CloseWindow : public QMainWindow
-{
-  protected:
-    void closeEvent(QCloseEvent *event) override
-    {
-        auto choice = QMessageBox::question(this, "关闭确认", "确定关闭窗口吗？",
-                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (choice == QMessageBox::Yes)
-            event->accept();
-        else
-            event->ignore();
-    }
-};
+#include <QApplication>
 
-#include "verify.h"
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("47 重写 event 拦截 Tab");
-    w.setCentralWidget(new EventArea);
-    w.centralWidget()->setFocus();
-    w.statusBar()->showMessage("点击中央区域后按 Tab，观察默认焦点切换被拦截。");
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->showMessage("点击中央区域后按 Tab，观察默认焦点切换被拦截。");
+    ui->eventArea->setFocus();
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>47 重写 event 拦截 Tab</string>
+  </property>
+  <widget class="EventArea" name="eventArea" />
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EventArea</class>
+   <extends>QLabel</extends>
+   <header>eventarea.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources />
+ <connections />
+</ui>
+```
+
+### eventarea.cpp
+
+```cpp
+#include "eventarea.h"
+#include <QMouseEvent>
+#include <QResizeEvent>
+#include <QKeyEvent>
+
+EventArea::EventArea(QWidget *parent)
+    : QLabel(parent)
+{
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+    setAlignment(Qt::AlignCenter);
+    setText("点击此区域后按 Tab，观察事件被拦截。");
+}
+
+bool EventArea::event(QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_Tab)
+        {
+            setText("event 已处理 Tab，阻止默认焦点切换");
+            return true;
+        }
+    }
+    return QLabel::event(event);
+}
+```
+
+### eventarea.h
+
+```cpp
+#ifndef EVENTAREA_H
+#define EVENTAREA_H
+#include <QLabel>
+class EventArea : public QLabel
+{
+    Q_OBJECT
+public:
+    explicit EventArea(QWidget *parent = nullptr);
+
+protected:
+    bool event(QEvent *event) override;
+};
+#endif // EVENTAREA_H
 ```
 
 ### 47_event_tab.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 47_event_tab
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    eventarea.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    eventarea.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/47_event_tab/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

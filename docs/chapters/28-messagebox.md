@@ -14,7 +14,7 @@ information、warning、critical 分别用于信息、警告和错误提示；qu
 
 ## 按执行顺序拆解
 
-先在第 39 步学习 Yes、No、Cancel 与返回结果的对应关系，再在第 49 步查看真实控制流程。closeEvent 根据 confirmDiscard 返回值选择 accept 或 ignore。confirmDiscard 在 Yes 分支继续调用 saveCurrent，saveCurrent 可能因为选择路径被取消或写入失败而返回 false，因此这个 bool 不能只表示“点了 Yes”。
+mainwindow.ui 中的 run 按钮触发消息框，结果写入 resultEdit。查看 mainwindow.cpp 如何明确比较 Yes/No/Cancel。第 49 步将这些选择接入 closeEvent 与 confirmDiscard，只有保存成功或用户明确放弃修改时才允许继续。
 
 ## 参数与行为边界
 
@@ -28,70 +28,163 @@ about 与 aboutQt 是说明信息，不是保存决策。示例问是否保存�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/39_messagebox/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("39 消息框与三种选择结果");
-    auto *root = new QWidget;
-    auto *layout = new QVBoxLayout(root);
-    auto *button = new QPushButton("询问是否保存");
-    button->setObjectName("run");
-    auto *text = new QTextEdit;
-    layout->addWidget(button);
-    layout->addWidget(text);
-    w.setCentralWidget(root);
-    QObject::connect(button, &QPushButton::clicked, &w,
-                     [&w, text]()
-                     {
-                         auto *box = new QMessageBox(
-                             QMessageBox::Question, "保存选择", "文件已修改，是否保存？",
-                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, &w);
-                         box->setDefaultButton(QMessageBox::Cancel);
-                         box->setAttribute(Qt::WA_DeleteOnClose);
-                         QObject::connect(box, &QDialog::finished, text,
-                                          [text](int result)
-                                          {
-                                              if (result == QMessageBox::Yes)
-                                                  text->append("选择保存（仅演示）");
-                                              else if (result == QMessageBox::No)
-                                                  text->append("选择不保存");
-                                              else
-                                                  text->append("取消当前操作");
-                                          });
-                         box->open();
-                     });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QMessageBox>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->run, &QPushButton::clicked, this,
+            [this]()
+            {
+                auto *box =
+                    new QMessageBox(QMessageBox::Question, "保存选择", "文件已修改，是否保存？",
+                                    QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, this);
+                box->setDefaultButton(QMessageBox::Cancel);
+                box->setAttribute(Qt::WA_DeleteOnClose);
+                connect(box, &QDialog::finished, ui->resultEdit,
+                        [this](int result)
+                        {
+                            if (result == QMessageBox::Yes)
+                                ui->resultEdit->append("选择保存（仅演示）");
+                            else if (result == QMessageBox::No)
+                                ui->resultEdit->append("选择不保存");
+                            else
+                                ui->resultEdit->append("取消当前操作");
+                        });
+                box->open();
+            });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>39 消息框与三种选择结果</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>询问是否保存</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="resultEdit" />
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 39_messagebox.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 39_messagebox
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/39_messagebox/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

@@ -14,7 +14,7 @@
 
 ## 按执行顺序拆解
 
-打开 smallwidget.h，依次找到构造函数、范围设置、布局、双向连接、setValue/value。两端范围必须一致，否则 A 到 B 的截断可能造成显示不一致。setValue 相同值不发 valueChanged，是这里双向连接能稳定结束的原因。若自定义组件公开信号，需要 Q_OBJECT 并让 moc 参与构建。
+mainwindow.ui 中 first 和 second 已提升为 SmallWidget。分别打开 smallwidget.h、smallwidget.cpp 和 smallwidget.ui：SpinBox 与 Slider 由 .ui 创建，C++ 连接双向数值同步，并提供 setValue/value 接口。主窗口将两个实例分别初始化为 25 与 70。
 
 ## 参数与行为边界
 
@@ -28,91 +28,277 @@ Designer 中先放 QWidget 占位，提升类名填 SmallWidget，头文件填 s
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/43_custom_widget/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include "smallwidget.h"
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("43 组合控件与 Designer 提升");
-    auto *root = new QWidget;
-    auto *layout = new QVBoxLayout(root);
-    layout->addWidget(new QLabel("同一个自定义控件类，可以创建多个独立实例。"));
-    auto *first = new SmallWidget;
-    first->setObjectName("first");
-    first->setValue(25);
-    auto *second = new SmallWidget;
-    second->setValue(70);
-    layout->addWidget(first);
-    layout->addWidget(second);
-    layout->addStretch();
-    w.setCentralWidget(root);
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->first->setValue(25);
+    ui->second->setValue(70);
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>43 组合控件与 Designer 提升</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="hintLabel">
+      <property name="text">
+       <string>同一个自定义控件类，可以创建多个独立实例。</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="SmallWidget" name="first" />
+    </item>
+    <item>
+     <widget class="SmallWidget" name="second" />
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SmallWidget</class>
+   <extends>QWidget</extends>
+   <header>smallwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources />
+ <connections />
+</ui>
+```
+
+### smallwidget.cpp
+
+```cpp
+#include "smallwidget.h"
+#include "ui_smallwidget.h"
+
+SmallWidget::SmallWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SmallWidget)
+{
+    ui->setupUi(this);
+    connect(ui->spinBox, &QSpinBox::valueChanged, ui->horizontalSlider, &QSlider::setValue);
+    connect(ui->horizontalSlider, &QSlider::valueChanged, ui->spinBox, &QSpinBox::setValue);
+}
+
+SmallWidget::~SmallWidget()
+{
+    delete ui;
+}
+
+void SmallWidget::setValue(int value)
+{
+    ui->spinBox->setValue(value);
+}
+
+int SmallWidget::value() const
+{
+    return ui->spinBox->value();
+}
 ```
 
 ### smallwidget.h
 
 ```cpp
-#pragma once
-#include <QtWidgets>
+#ifndef SMALLWIDGET_H
+#define SMALLWIDGET_H
+
+#include <QWidget>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class SmallWidget;
+}
+QT_END_NAMESPACE
+
 class SmallWidget : public QWidget
 {
-  public:
-    explicit SmallWidget(QWidget *parent = nullptr) : QWidget(parent)
-    {
-        auto *row = new QHBoxLayout(this);
-        spin = new QSpinBox;
-        auto *slider = new QSlider(Qt::Horizontal);
-        spin->setRange(0, 100);
-        slider->setRange(0, 100);
-        row->addWidget(spin);
-        row->addWidget(slider);
-        QObject::connect(spin, &QSpinBox::valueChanged, slider, &QSlider::setValue);
-        QObject::connect(slider, &QSlider::valueChanged, spin, &QSpinBox::setValue);
-    }
-    void setValue(int value)
-    {
-        spin->setValue(value);
-    }
-    int value() const
-    {
-        return spin->value();
-    }
+    Q_OBJECT
 
-  private:
-    QSpinBox *spin;
+public:
+    explicit SmallWidget(QWidget *parent = nullptr);
+    ~SmallWidget() override;
+    void setValue(int value);
+    int value() const;
+
+private:
+    Ui::SmallWidget *ui;
 };
+#endif // SMALLWIDGET_H
+```
 
+### smallwidget.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SmallWidget</class>
+ <widget class="QWidget" name="SmallWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>80</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>SmallWidget</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QSpinBox" name="spinBox">
+     <property name="maximum">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="horizontalSlider">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="maximum">
+      <number>100</number>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 43_custom_widget.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 43_custom_widget
-SOURCES += main.cpp
-HEADERS += verify.h
-HEADERS += smallwidget.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp \
+    smallwidget.cpp
+
+HEADERS += \
+    mainwindow.h \
+    smallwidget.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui \
+    smallwidget.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/43_custom_widget/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

@@ -14,7 +14,7 @@ closeEvent 收到的是关闭请求，ignore 可以让窗口继续存在；resiz
 
 ## 按执行顺序拆解
 
-第 45 步用 QMessageBox 的 No/Yes 控制 ignore/accept。对照第 49 步，确认“用户同意保存”和“保存已完成”之间还存在文件错误处理。resizeEvent 中使用 event->size() 与 oldSize()，首次旧尺寸可能无效，因此不要直接按其计算有意义的比例。
+mainwindow.ui 的中央标签提升为 EventArea，eventarea.cpp 的 resizeEvent 显示区域尺寸。mainwindow.h 声明主窗口 closeEvent，mainwindow.cpp 根据 Yes/No 决定 accept/ignore。关闭逻辑在主窗口，尺寸显示逻辑在中央区域，职责分开。
 
 ## 参数与行为边界
 
@@ -28,99 +28,197 @@ override 用于检查是否真正覆盖了基类虚函数。保留原有处理�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/45_close_resize/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-class EventArea : public QLabel
-{
-  public:
-    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
-    {
-        setMouseTracking(true);
-        setFocusPolicy(Qt::StrongFocus);
-        setAlignment(Qt::AlignCenter);
-        setText("移动鼠标，点击后按键盘；拖动主窗口观察大小变化。");
-    }
+#include "mainwindow.h"
 
-  protected:
-    void resizeEvent(QResizeEvent *event) override
-    {
-        setText(QString("区域大小 %1 × %2").arg(event->size().width()).arg(event->size().height()));
-        QLabel::resizeEvent(event);
-    }
-    void mouseMoveEvent(QMouseEvent *event) override
-    {
-        setText(QString("鼠标位置 %1，%2").arg(event->position().x()).arg(event->position().y()));
-        QLabel::mouseMoveEvent(event);
-    }
-    void mousePressEvent(QMouseEvent *event) override
-    {
-        setFocus();
-        setText(event->button() == Qt::LeftButton ? "左键按下" : "其他鼠标键按下");
-        QLabel::mousePressEvent(event);
-    }
-    bool event(QEvent *event) override
-    {
-        if (event->type() == QEvent::KeyPress)
-        {
-            auto *key = static_cast<QKeyEvent *>(event);
-            if (key->key() == Qt::Key_Tab)
-            {
-                setText("event 已处理 Tab，阻止默认焦点切换");
-                return true;
-            }
-        }
-        return QLabel::event(event);
-    }
-};
-class CloseWindow : public QMainWindow
-{
-  protected:
-    void closeEvent(QCloseEvent *event) override
-    {
-        auto choice = QMessageBox::question(this, "关闭确认", "确定关闭窗口吗？",
-                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (choice == QMessageBox::Yes)
-            event->accept();
-        else
-            event->ignore();
-    }
-};
+#include <QApplication>
 
-#include "verify.h"
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    CloseWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("45 关闭事件与尺寸变化");
-    w.setCentralWidget(new EventArea);
-    w.statusBar()->showMessage("拖动边缘改变尺寸；关闭窗口会询问确认。");
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QMessageBox>
+#include <QCloseEvent>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->showMessage("拖动边缘改变尺寸；关闭窗口会询问确认。");
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    auto choice = QMessageBox::question(this, "关闭确认", "确定关闭窗口吗？",
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (choice == QMessageBox::Yes)
+        event->accept();
+    else
+        event->ignore();
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>45 关闭事件与尺寸变化</string>
+  </property>
+  <widget class="EventArea" name="eventArea" />
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>EventArea</class>
+   <extends>QLabel</extends>
+   <header>eventarea.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources />
+ <connections />
+</ui>
+```
+
+### eventarea.cpp
+
+```cpp
+#include "eventarea.h"
+#include <QMouseEvent>
+#include <QResizeEvent>
+#include <QKeyEvent>
+
+EventArea::EventArea(QWidget *parent)
+    : QLabel(parent)
+{
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+    setAlignment(Qt::AlignCenter);
+    setText("拖动主窗口边缘观察尺寸变化。");
+}
+
+void EventArea::resizeEvent(QResizeEvent *event)
+{
+    setText(QString("区域大小 %1 × %2").arg(event->size().width()).arg(event->size().height()));
+    QLabel::resizeEvent(event);
+}
+```
+
+### eventarea.h
+
+```cpp
+#ifndef EVENTAREA_H
+#define EVENTAREA_H
+#include <QLabel>
+class EventArea : public QLabel
+{
+    Q_OBJECT
+public:
+    explicit EventArea(QWidget *parent = nullptr);
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+};
+#endif // EVENTAREA_H
 ```
 
 ### 45_close_resize.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 45_close_resize
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    eventarea.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    eventarea.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/45_close_resize/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

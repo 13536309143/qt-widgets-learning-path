@@ -1,6 +1,24 @@
 QT += widgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = 09_overloaded_signal
-SOURCES += main.cpp widget.cpp
-HEADERS += widget.h verify.h teacher.h student.h
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    widget.cpp
+
+HEADERS += \
+    student.h \
+    teacher.h \
+    verify.h \
+    widget.h
+
+FORMS += \
+    widget.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target

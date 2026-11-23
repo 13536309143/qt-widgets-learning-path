@@ -16,7 +16,7 @@ QPixmap 常用于界面显示，QImage 便于像素访问，QBitmap 是一位深
 
 ## 按执行顺序拆解
 
-QPainter 在 paintEvent 中绑定 this，设置抗锯齿、画笔和画刷，再画椭圆。QPen 控制轮廓，QBrush 控制填充。update 请求未来合适时机重绘，可能合并多次请求；repaint 更直接，日常状态更新通常优先 update。不要从 paintEvent 里无条件再 update，造成持续无效绘制。
+mainwindow.ui 中 QWidget 已提升为 Canvas；mainwindow.cpp 只负责装载界面和状态提示。绘制逻辑独立在 canvas.cpp 的 paintEvent：创建局部 QPainter、设置画笔和画刷、绘制形状与文字，再绘制离屏 QImage。第 52 步继续让绘制由成员状态驱动。
 
 ## 参数与行为边界
 
@@ -30,70 +30,195 @@ QPicture 不是普通像素图片。QImage、QPixmap 上的离屏绘制可以在
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/48_painter/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
-class Canvas : public QWidget
-{
-  protected:
-    void paintEvent(QPaintEvent *) override
-    {
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.fillRect(rect(), Qt::white);
-        painter.setPen(QPen(Qt::darkGray, 2));
-        painter.drawLine(35, 35, 500, 270);
-        painter.setPen(QPen(Qt::red, 3));
-        painter.drawRect(60, 70, 360, 180);
-        painter.setPen(QPen(Qt::blue, 5));
-        painter.drawEllipse(60, 70, 360, 180);
-        painter.setPen(Qt::black);
-        painter.drawText(50, 320, "QPainter 在 paintEvent 中绘制，缩放和遮挡后仍可重绘。");
-        QImage image(180, 80, QImage::Format_ARGB32);
-        image.fill(QColor("#dbeafe"));
-        {
-            QPainter imagePainter(&image);
-            imagePainter.setPen(Qt::darkBlue);
-            imagePainter.drawText(image.rect(), Qt::AlignCenter, "QImage 离屏绘图");
-        }
-        painter.drawImage(50, 360, image);
-    }
-};
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("48 QPainter 与绘图设备");
-    w.setCentralWidget(new Canvas);
-    w.statusBar()->showMessage("红矩形 蓝椭圆 灰直线；下方是 QImage 离屏绘图。");
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->showMessage("红矩形 蓝椭圆 灰直线；下方是 QImage 离屏绘图。");
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>48 QPainter 与绘图设备</string>
+  </property>
+  <widget class="Canvas" name="canvas" />
+  <widget class="QStatusBar" name="statusbar" />
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Canvas</class>
+   <extends>QWidget</extends>
+   <header>canvas.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources />
+ <connections />
+</ui>
+```
+
+### canvas.cpp
+
+```cpp
+#include "canvas.h"
+#include <QPainter>
+
+Canvas::Canvas(QWidget *parent)
+    : QWidget(parent)
+{
+}
+
+void Canvas::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(rect(), Qt::white);
+    painter.setPen(QPen(Qt::darkGray, 2));
+    painter.drawLine(35, 35, 500, 270);
+    painter.setPen(QPen(Qt::red, 3));
+    painter.drawRect(60, 70, 360, 180);
+    painter.setPen(QPen(Qt::blue, 5));
+    painter.drawEllipse(60, 70, 360, 180);
+    painter.setPen(Qt::black);
+    painter.drawText(50, 320, "QPainter 在 paintEvent 中绘制，缩放和遮挡后仍可重绘。");
+    QImage image(180, 80, QImage::Format_ARGB32);
+    image.fill(QColor("#dbeafe"));
+    {
+        QPainter imagePainter(&image);
+        imagePainter.setPen(Qt::darkBlue);
+        imagePainter.drawText(image.rect(), Qt::AlignCenter, "QImage 离屏绘图");
+    }
+    painter.drawImage(50, 360, image);
+}
+```
+
+### canvas.h
+
+```cpp
+#ifndef CANVAS_H
+#define CANVAS_H
+#include <QWidget>
+class Canvas : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit Canvas(QWidget *parent = nullptr);
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+};
+#endif // CANVAS_H
 ```
 
 ### 48_painter.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 48_painter
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    canvas.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    canvas.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/48_painter/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

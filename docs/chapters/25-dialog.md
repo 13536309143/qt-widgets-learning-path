@@ -14,7 +14,7 @@
 
 ## 按执行顺序拆解
 
-运行第 50 步比较三个入口。show 和 open 的“调用后”会在用户关闭前出现；exec 的“调用后”要等用户确认或取消。show 非模态时可以继续操作主窗口；open 的窗口模态会限制父窗口。accepted、rejected 说明结果类型，finished(int) 同时提供结束通知与结果值。
+mainwindow.ui 提供入口按钮；dialog.ui 提供自定义 Dialog 的标签与标准按钮。点击入口后 new Dialog(this)，其构造函数加载自己的 .ui；设置 WA_DeleteOnClose 后调用 open。第 50 步进一步对照 show/open/exec，区分窗口模态和调用是否等待。
 
 ## 参数与行为边界
 
@@ -28,58 +28,265 @@ open() 和 show() 后不要让对象立即离开作用域。exec() 的栈对象�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/36_dialog/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("36 模态 非模态与对象生命期");
-    auto *button = new QPushButton("打开窗口模态对话框");
-    button->setObjectName("run");
-    w.setCentralWidget(button);
-    QObject::connect(button, &QPushButton::clicked, &w,
-                     [&w]()
-                     {
-                         auto *dialog = new QDialog(&w);
-                         dialog->setAttribute(Qt::WA_DeleteOnClose);
-                         dialog->setWindowTitle("open 立即返回");
-                         auto *layout = new QVBoxLayout(dialog);
-                         layout->addWidget(new QLabel("父窗口暂不能输入，事件循环仍在工作。"));
-                         auto *ok = new QPushButton("确定");
-                         layout->addWidget(ok);
-                         QObject::connect(ok, &QPushButton::clicked, dialog, &QDialog::accept);
-                         dialog->open();
-                     });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "dialog.h"
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->run, &QPushButton::clicked, this,
+            [this]()
+            {
+                auto *dialog = new Dialog(this);
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                dialog->setWindowTitle("open 立即返回");
+                dialog->open();
+            });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>36 模态 非模态与对象生命期</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>打开窗口模态对话框</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
+```
+
+### dialog.cpp
+
+```cpp
+#include "dialog.h"
+#include "ui_dialog.h"
+
+Dialog::Dialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::Dialog)
+{
+    ui->setupUi(this);
+}
+
+Dialog::~Dialog()
+{
+    delete ui;
+}
+```
+
+### dialog.h
+
+```cpp
+#ifndef DIALOG_H
+#define DIALOG_H
+
+#include <QDialog>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class Dialog;
+}
+QT_END_NAMESPACE
+
+class Dialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit Dialog(QWidget *parent = nullptr);
+    ~Dialog() override;
+
+private:
+    Ui::Dialog *ui;
+};
+#endif // DIALOG_H
+```
+
+### dialog.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>180</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>示例对话框</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="hintLabel">
+     <property name="text">
+      <string>父窗口暂不能输入，事件循环仍在工作。</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources />
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+  </connection>
+ </connections>
+</ui>
 ```
 
 ### 36_dialog.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 36_dialog
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    dialog.cpp \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    dialog.h \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    dialog.ui \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/36_dialog/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

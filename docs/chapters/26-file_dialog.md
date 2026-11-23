@@ -14,7 +14,7 @@ getOpenFileName 返回 QString，getOpenFileNames 返回 QStringList；取消时
 
 ## 按执行顺序拆解
 
-先运行第 37 步，只选择文件并显示路径；再运行第 49 步，完成打开、编辑、保存。loadPath 先用 QFile::open(ReadOnly) 检查错误，再 readAll，再检查读取状态；成功后才替换编辑器内容。savePath 把 QString 编码为 UTF-8，再写 QSaveFile，最后 commit。写入或提交失败时返回 false，不把未保存状态清除。
+先在 mainwindow.ui 确认 run 按钮和 resultEdit。点击后创建 QFileDialog，设置多选、过滤器、自动删除属性，再连接 filesSelected；选择文件后才将结果列表写入 resultEdit。取消不会进入选择结果逻辑。第 49 步继续实现真正的文件读取和保存。
 
 ## 参数与行为边界
 
@@ -28,67 +28,163 @@ getOpenFileName 取消返回空字符串，getOpenFileNames 返回空列表；ge
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/37_file_dialog/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("37 单文件 多文件与取消");
-    auto *run = new QPushButton("选择一个或多个示例文件");
-    run->setObjectName("run");
-    auto *root = new QWidget;
-    auto *layout = new QVBoxLayout(root);
-    auto *result = new QTextEdit;
-    result->setReadOnly(true);
-    layout->addWidget(run);
-    layout->addWidget(result);
-    w.setCentralWidget(root);
-    QObject::connect(run, &QPushButton::clicked, &w,
-                     [&w, result]()
-                     {
-                         auto *dialog = new QFileDialog(
-                             &w, "选择文件", QStringLiteral(QT_LESSON_SOURCE_DIR "/samples"));
-                         dialog->setOption(QFileDialog::DontUseNativeDialog);
-                         dialog->setFileMode(QFileDialog::ExistingFiles);
-                         dialog->setNameFilter("Text (*.txt);;Images (*.png *.jpg)");
-                         dialog->setAttribute(Qt::WA_DeleteOnClose);
-                         QObject::connect(dialog, &QFileDialog::filesSelected, result,
-                                          [result](const QStringList &files)
-                                          { result->setPlainText(files.join('\n')); });
-                         dialog->open();
-                     });
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QFileDialog>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    connect(ui->run, &QPushButton::clicked, this,
+            [this]()
+            {
+                auto *dialog = new QFileDialog(this, "选择文件",
+                                               QStringLiteral(QT_LESSON_SOURCE_DIR "/samples"));
+                dialog->setOption(QFileDialog::DontUseNativeDialog);
+                dialog->setFileMode(QFileDialog::ExistingFiles);
+                dialog->setNameFilter("Text (*.txt);;Images (*.png *.jpg)");
+                dialog->setAttribute(Qt::WA_DeleteOnClose);
+                connect(dialog, &QFileDialog::filesSelected, ui->resultEdit,
+                        [this](const QStringList &files)
+                        { ui->resultEdit->setPlainText(files.join('\n')); });
+                dialog->open();
+            });
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>37 单文件 多文件与取消</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>选择一个或多个示例文件</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="resultEdit">
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 37_file_dialog.pro
 
 ```qmake
 QT += widgets
+
 CONFIG += c++17
-TEMPLATE = app
-TARGET = 37_file_dialog
-SOURCES += main.cpp
-HEADERS += verify.h
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
 
 DEFINES += QT_LESSON_SOURCE_DIR=\\\"$$PWD\\\"
 
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/37_file_dialog/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

@@ -4,22 +4,23 @@
 
 **从第一扇窗口，到能解释、修改和验证的桌面交互。**
 
-一份中文 Qt Widgets 学习教程：完整源码、逐步讲解、运行截图与可复现检查。
+一份中文 Qt Widgets 学习教程：统一的 Qt Creator 项目模板、可编辑的 Designer 界面、完整源码、逐步讲解与运行截图。
 
 [![Build and verify](https://github.com/13536309143/qt-widgets-learning-path/actions/workflows/build.yml/badge.svg)](https://github.com/13536309143/qt-widgets-learning-path/actions/workflows/build.yml)
 ![Qt 6](https://img.shields.io/badge/Qt-6-41CD52?logo=qt&logoColor=white)
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus)
 ![Examples](https://img.shields.io/badge/examples-52-2563EB)
 
-[开始学习](docs/README.md) · [离线入口](开始学习.html) · [Word 教程](docs/print/Qt学习教程_后半部分完整版.docx) · [安装与运行](docs/getting-started.md) · [完整实战](docs/practices.md) · [验证记录](docs/validation.md)
+[开始学习](docs/README.md) · [项目模板与 UI 操作](docs/project-format.md) · [离线入口](开始学习.html) · [Word 教程](docs/print/Qt学习教程_统一模板版.docx) · [安装与运行](docs/getting-started.md) · [完整实战](docs/practices.md) · [验证记录](docs/validation.md)
 
 </div>
 
 ## 这份教程怎样学
 
-每个项目都保留一个明确的学习目标：先观察效果，再理解对象与数据怎样流动，最后修改一个条件验证自己的判断。前半部分建立窗口、对象生命周期、信号槽与 Lambda 的基础；后半部分继续进入主窗口、对话框、布局、控件、事件和绘图。
+所有项目按 Qt Creator 标准模板拆分：`main.cpp`、`widget/mainwindow.h`、对应 `.cpp` 与 `.ui`。每个项目都保留一个明确的学习目标：先观察效果，再理解对象与数据怎样流动，最后修改一个条件验证自己的判断。前半部分建立窗口、对象生命周期、信号槽与 Lambda 的基础；后半部分继续进入主窗口、对话框、布局、控件、事件和绘图。
 
-- **52 个独立项目**：每步都有完整源文件和自己的 `.pro`，可直接用 Qt Creator 打开。
+- **52 个统一模板项目**：main.cpp 只启动窗口，逻辑拆入 Widget/MainWindow 类，每步有自己的 `.pro`。
+- **55 份可编辑表单**：52 个主界面，以及组合控件和自定义对话框；固定控件、菜单和布局在 `.ui` 中，源码目录不提交生成的 `ui_*.h`。
 - **18 章深入讲解**：对后半部分补齐执行过程、参数边界、错误原因、动手练习与自测答案。
 - **4 个操作闭环**：文件读写与保存、对话框调用对比、事件过滤、状态驱动绘图。
 - **两种构建入口**：保留 qmake 单步学习，也提供 CMake 批量构建与 CTest 检查。
@@ -44,7 +45,7 @@
 git clone https://github.com/13536309143/qt-widgets-learning-path.git
 ```
 
-打开 `examples/01_first_window/01_first_window.pro`，选择与已安装 Qt 配套的 Kit，构建并运行。想直接看完整应用交互，可以打开 `examples/49_text_editor/49_text_editor.pro`。
+打开 `examples/01_first_window/01_first_window.pro`，选择与已安装 Qt 配套的 Kit，构建并运行。双击项目树中的 `widget.ui` 进入 Designer；按每个项目 README 的控件清单修改界面。想直接看完整应用交互，可以打开 `examples/49_text_editor/49_text_editor.pro`。
 
 ### 用 CMake 构建全部项目
 

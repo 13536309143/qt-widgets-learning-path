@@ -4,9 +4,9 @@
 
 ## 49 UTF-8 文本编辑器
 
-[完整代码](../examples/49_text_editor/main.cpp)
+[完整项目与 UI 步骤](../examples/49_text_editor/README.md) · [窗口逻辑](../examples/49_text_editor/mainwindow.cpp) · [界面表单](../examples/49_text_editor/mainwindow.ui)
 
-这个例子真正执行打开、编辑和保存，不仅显示一个文件路径。核心状态是当前路径与 QTextDocument 的 modified 标记。打开新文档前和关闭窗口时共用 confirmDiscard：没有修改则直接继续，有修改则分别处理保存、不保存、取消。
+这个例子真正执行打开、编辑和保存，不仅显示一个文件路径。界面由 mainwindow.ui 创建，文件操作在 mainwindow.cpp。核心状态是当前路径与 QTextDocument 的 modified 标记。打开新文档前和关闭窗口时共用 confirmDiscard：没有修改则直接继续，有修改则分别处理保存、不保存、取消。
 
 读取先检查 QFile::open，读取完成再检查错误，成功后才替换界面文本；保存先将 QString 转成 UTF-8，再写 QSaveFile，检查写入字节数并 commit。只有确认保存成功，才清除修改标记。路径对话框取消或磁盘写入失败，都应该保留原文档。
 
@@ -18,9 +18,9 @@
 
 ## 50 对话框三种调用方式
 
-[完整代码](../examples/50_dialog_modes/main.cpp)
+[完整项目与 UI 步骤](../examples/50_dialog_modes/README.md) · [窗口逻辑](../examples/50_dialog_modes/widget.cpp) · [界面表单](../examples/50_dialog_modes/widget.ui)
 
-分别点击 show、open、exec，然后观察调用前、调用后与结果通知的先后顺序。show 和 open 会立即返回，exec 等到关闭后返回结果；但 exec 内部仍在处理事件，因此按钮可以点击，自动检查中的 QTimer 也能工作。
+按钮和输出区在 widget.ui，自定义对话框在 dialog.ui，执行逻辑在 widget.cpp。分别点击 show、open、exec，然后观察调用前、调用后与结果通知的先后顺序。show 和 open 会立即返回，exec 等到关闭后返回结果；但 exec 内部仍在处理事件，因此按钮可以点击，自动检查中的 QTimer 也能工作。
 
 异步对象通过 parent 与 WA_DeleteOnClose 管理，exec 示例使用栈对象，函数返回后自动析构。两者都不是“new 永远更好”或“栈永远不能用”，关键是对象必须活到最后一次使用结束。
 
@@ -30,9 +30,9 @@
 
 ## 51 不继承输入框也能处理事件
 
-[完整代码](../examples/51_event_filter/main.cpp)
+[完整项目与 UI 步骤](../examples/51_event_filter/README.md) · [窗口逻辑](../examples/51_event_filter/widget.cpp) · [界面表单](../examples/51_event_filter/widget.ui)
 
-ReturnFilter 继承 QObject，安装在普通 QLineEdit 上。收到事件时先判断 KeyPress，再读取键值；识别 Return 或小键盘 Enter 后更新结果标签并返回 true，消费事件。其余情况交给 QObject::eventFilter。
+输入框和结果标签在 widget.ui。returnfilter.h/.cpp 中的 ReturnFilter 继承 QObject，安装在普通 QLineEdit 上。收到事件时先判断 KeyPress，再读取键值；识别 Return 或小键盘 Enter 后更新结果标签并返回 true，消费事件。其余情况交给 QObject::eventFilter。
 
 过滤器与目标控件放在同一窗口管理下。这里的 QLabel 指针在过滤器工作期间持续有效；如果将过滤器移到另一个更长寿的对象上，需要重新检查结果标签的生命期。
 
@@ -42,9 +42,9 @@ ReturnFilter 继承 QObject，安装在普通 QLineEdit 上。收到事件时先
 
 ## 52 交互绘图在重绘后保持状态
 
-[完整代码](../examples/52_interactive_paint/main.cpp)
+[完整项目与 UI 步骤](../examples/52_interactive_paint/README.md) · [窗口逻辑](../examples/52_interactive_paint/widget.cpp) · [界面表单](../examples/52_interactive_paint/widget.ui)
 
-DrawingArea 只保存 color_，按钮调用 setColor 改状态并 update；paintEvent 根据当前颜色和当前 rect 重新绘图。没有把 QPainter 保存成长期成员，也没有让按钮直接在屏幕上临时画一次。
+widget.ui 将绘图占位控件提升为 DrawingArea；drawingarea.h/.cpp 中的 DrawingArea 只保存 color_，按钮调用 setColor 改状态并 update；paintEvent 根据当前颜色和当前 rect 重新绘图。没有把 QPainter 保存成长期成员，也没有让按钮直接在屏幕上临时画一次。
 
 QPen 控制轮廓，带透明度的 QColor 作为画刷控制填充。绘制区域从窗口矩形缩进得到，因此缩放时仍能适应。自动检查既确认成员颜色变红，也检查真实渲染图像中存在红色轮廓像素，避免只修改数据而没有更新显示。
 

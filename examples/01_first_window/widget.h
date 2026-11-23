@@ -1,16 +1,24 @@
-#pragma once
+#ifndef WIDGET_H
+#define WIDGET_H
+
 #include <QWidget>
-class QPlainTextEdit;
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class Widget;
+}
+QT_END_NAMESPACE
+
 class Widget : public QWidget
 {
     Q_OBJECT
-  public:
-    explicit Widget(QWidget *parent = nullptr);
-    void writeLine(const QString &text);
 
-  private:
-    void refreshTitle();
-    void increase();
-    int count_ = 0;
-    QPlainTextEdit *output_ = nullptr;
+public:
+    explicit Widget(QWidget *parent = nullptr);
+    ~Widget() override;
+
+private:
+    Ui::Widget *ui;
 };
+#endif // WIDGET_H

@@ -14,7 +14,7 @@ QPixmap 加载失败时 isNull() 为 true，先检查路径大小写、前缀、
 
 ## 按执行顺序拆解
 
-先打开 assets.qrc，找到 prefix=/images 和 alias=demo.png，然后核对 main.cpp 的 :/images/demo.png。再打开 .pro，确认 RESOURCES 包含 qrc；使用 CMake 时确认 qrc 加入目标且启用 AUTORCC。构建以后，图片可以从资源中读取，不需要跟着 exe 另外寻找源码目录。
+先打开 assets.qrc 确认 prefix、alias 与素材，再打开 mainwindow.ui 查看 imageLabel。mainwindow.cpp 用资源路径读取 QPixmap，失败时显示提示，成功时设置缩放后的图像，并用同一资源设置窗口图标。资源由构建系统打包，不依赖运行工作目录。
 
 ## 参数与行为边界
 
@@ -28,47 +28,149 @@ Qt 6 中 QPalette::Window 是窗口背景角色。用图片刷填充可能出现
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/34_resources/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("34 资源路径 图片与背景");
-    auto *label = new QLabel;
-    QPixmap picture(":/images/demo.png");
-    Q_ASSERT(!picture.isNull());
-    label->setAlignment(Qt::AlignCenter);
-    label->setPixmap(picture.scaled(600, 360, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    w.setCentralWidget(label);
-    w.setWindowIcon(QIcon(":/images/demo.png"));
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QPixmap>
+#include <QIcon>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    QPixmap picture(":/images/demo.png");
+    if (picture.isNull())
+        ui->imageLabel->setText("图片加载失败，请检查 qrc 资源路径。");
+    else
+        ui->imageLabel->setPixmap(
+            picture.scaled(600, 360, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    setWindowIcon(QIcon(":/images/demo.png"));
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>34 资源路径 图片与背景</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="imageLabel">
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="assets.qrc" />
+ </resources>
+ <connections />
+</ui>
 ```
 
 ### 34_resources.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 34_resources
-SOURCES += main.cpp
-HEADERS += verify.h
-RESOURCES += assets.qrc
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+RESOURCES += \
+    assets.qrc
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
 ### assets.qrc
@@ -77,7 +179,7 @@ RESOURCES += assets.qrc
 <RCC><qresource prefix="/images"><file alias="demo.png">assets/demo.png</file><file alias="demo.gif">assets/demo.gif</file></qresource></RCC>
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/34_resources/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

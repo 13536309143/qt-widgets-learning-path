@@ -14,7 +14,7 @@ QDockWidget 是可停靠面板的外壳，用 setWidget() 设置它内部的控�
 
 ## 按执行顺序拆解
 
-启动后先看临时消息遮住普通区域而 UTF-8 仍在右侧；等待三秒，再观察普通状态内容恢复。然后拖动左侧停靠面板，把它移动到其他允许区域。停靠部件的 setWidget 管内部内容，主窗口的 addDockWidget 管外部位置。列表和编辑器不是兄弟功能的替代品，而是辅助区与工作区的分工。
+停靠面板 dockWidget、其内容列表 documentList，以及 statusbar 都定义在 mainwindow.ui 中。mainwindow.cpp 在 setupUi 后用 addWidget 和 addPermanentWidget 加入两种状态标签，再显示 3000 毫秒的临时消息。移动停靠面板观察主窗口内部的区域分配。
 
 ## 参数与行为边界
 
@@ -28,51 +28,175 @@ QDockWidget 是可停靠面板的外壳，用 setWidget() 设置它内部的控�
 
 ## 完整示例与配套文件
 
-以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/33_status_dock/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
 ```cpp
-#include <QtWidgets>
-#include <QMouseEvent>
-#include <QKeyEvent>
+#include "mainwindow.h"
 
-#include "verify.h"
+#include <QApplication>
+
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    QMainWindow w;
-    w.resize(800, 580);
-    w.setWindowTitle("33 状态栏和停靠面板");
-    w.setCentralWidget(new QTextEdit("这是主编辑区域"));
-    w.statusBar()->addWidget(new QLabel("普通状态"));
-    w.statusBar()->addPermanentWidget(new QLabel("UTF-8"));
-    w.statusBar()->showMessage("临时消息 3 秒后消失", 3000);
-    auto *dock = new QDockWidget("文档列表", &w);
-    auto *list = new QListWidget;
-    list->addItems({"第一章", "第二章", "第三章"});
-    dock->setWidget(list);
-    w.addDockWidget(Qt::LeftDockWidgetArea, dock);
+    QApplication a(argc, argv);
+    MainWindow w;
     w.show();
-    scheduleVerification(&w);
-    return app.exec();
+    return QApplication::exec();
+}
+```
+
+### mainwindow.h
+
+```cpp
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QMainWindow>
+
+QT_BEGIN_NAMESPACE
+namespace Ui
+{
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent = nullptr);
+    ~MainWindow() override;
+
+private:
+    Ui::MainWindow *ui;
+};
+#endif // MAINWINDOW_H
+```
+
+### mainwindow.cpp
+
+```cpp
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QLabel>
+#include "verify.h"
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->statusbar->addWidget(new QLabel("普通状态", this));
+    ui->statusbar->addPermanentWidget(new QLabel("UTF-8", this));
+    ui->statusbar->showMessage("临时消息 3 秒后消失", 3000);
+
+    // 仅带 --verify 参数时安排检查；正常学习时不会执行。
+    scheduleVerification(this);
 }
 
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+```
+
+### mainwindow.ui
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>33 状态栏和停靠面板</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="plainText">
+       <string>这是主编辑区域</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="windowTitle">
+    <string>文档列表</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="dockLayout">
+     <item>
+      <widget class="QListWidget" name="documentList">
+       <item>
+        <property name="text">
+         <string>第一章</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>第二章</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>第三章</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources />
+ <connections />
+</ui>
 ```
 
 ### 33_status_dock.pro
 
 ```qmake
 QT += widgets
-CONFIG += c++17
-TEMPLATE = app
-TARGET = 33_status_dock
-SOURCES += main.cpp
-HEADERS += verify.h
 
+CONFIG += c++17
+
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000
+
+SOURCES += \
+    main.cpp \
+    mainwindow.cpp
+
+HEADERS += \
+    mainwindow.h \
+    verify.h
+
+FORMS += \
+    mainwindow.ui
+
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 ```
 
-自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。
+[verify.h](../../examples/33_status_dock/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 

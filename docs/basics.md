@@ -1,3 +1,5 @@
+> 本版的 01—30 步已统一为 main.cpp + widget.h + widget.cpp + widget.ui + .pro。Designer 控件通过 ui->访问，Lambda 逻辑在 widget.cpp；下文的短代码用于解释 C++ 概念，每一步完整可运行版本以 examples 对应目录为准。先看[统一模板说明](project-format.md)。
+
 # Qt Widgets 入门学习笔记
 ## 第一阶段 从创建项目到 Lambda
 这份笔记围绕一个问题展开：怎样用 C++ 创建一个窗口，让按钮触发自己的代码，并把对象的生命周期管理清楚。前半部分建立 Qt Widgets 的基本概念，后半部分专门拆解 Lambda，适合边看边敲代码。
