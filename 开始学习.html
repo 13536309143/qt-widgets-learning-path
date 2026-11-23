@@ -1,0 +1,1889 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Qt Widgets Learning Path</title><style>body{margin:0;font:16px/1.85 "Microsoft YaHei",sans-serif;background:#f3f6fa;color:#203247}aside{position:fixed;inset:0 auto 0 0;width:260px;overflow:auto;padding:22px;background:white}aside a{display:block;font-size:13px;padding:6px;color:#285c92;text-decoration:none}main{margin-left:290px;max-width:1100px;padding:28px}section,header{background:white;padding:28px;margin-bottom:24px;border-radius:9px}h1{font-size:29px}h2{margin-top:30px}pre{overflow:auto;background:#f5f8fc;padding:20px;font:14px/1.7 Consolas,monospace}img{max-width:100%;max-height:560px;object-fit:contain}a{color:#245c96}section{scroll-margin-top:20px}@media(max-width:900px){aside{position:static;width:auto;max-height:250px}main{margin:0;padding:15px}}</style><aside><h3>学习导航</h3><a href="#basics">基础与 Lambda</a><a href="#chapter20">第20章 主窗口与中心部件</a><a href="#chapter21">第21章 菜单 动作与工具栏</a><a href="#chapter22">第22章 状态栏和停靠面板</a><a href="#chapter23">第23章 资源路径 图片与背景</a><a href="#chapter24">第24章 Designer 与 setupUi</a><a href="#chapter25">第25章 模态 非模态与对象生命期</a><a href="#chapter26">第26章 单文件 多文件与取消</a><a href="#chapter27">第27章 选择颜色与字体</a><a href="#chapter28">第28章 消息框与三种选择结果</a><a href="#chapter29">第29章 水平 垂直 网格与表单布局</a><a href="#chapter30">第30章 QLabel 文本 图片与动画</a><a href="#chapter31">第31章 QLineEdit 输入与显示模式</a><a href="#chapter32">第32章 组合控件与 Designer 提升</a><a href="#chapter33">第33章 堆叠页面与窗口切换</a><a href="#chapter34">第34章 关闭事件与尺寸变化</a><a href="#chapter35">第35章 鼠标按键 坐标和跟踪</a><a href="#chapter36">第36章 重写 event 拦截 Tab</a><a href="#chapter37">第37章 QPainter 与绘图设备</a><a href="#practices">四个完整实战</a></aside><main><header><h1>Qt Widgets Learning Path</h1><p>后半部分详细讲解、52 个独立项目与 4 个完整实战。</p><p>本页为离线阅读入口。Markdown 原文与全部源码位于 docs 和 examples；构建方法见 README 与 docs/getting-started.md。</p></header><section id="basics"><h1>Qt Widgets 入门学习笔记</h1>
+<h1>1 开发工具与第一个项目</h1>
+<h1>2 项目文件与程序入口</h1>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = qt_notes
+SOURCES += main.cpp widget.cpp
+HEADERS += widget.h
+</code></pre>
+<h2>2.2 main.cpp 的执行顺序</h2>
+<pre><code>#include &quot;widget.h&quot;
+#include &lt;QApplication&gt;
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    Widget w;
+    w.show();
+    return app.exec();
+}
+</code></pre>
+<p>① QApplication 必须在创建 QWidget 对象之前建立，它管理 GUI 应用的公共资源与事件处理。② Widget w 创建自定义窗口，这时会执行构造函数。③ show() 让窗口显示出来。④ exec() 启动事件循环，程序才会持续处理点击、键盘输入和重绘等事件。[3]<br>exec() 通常会等到应用退出才返回。如果直接 return 0，程序很快结束，窗口也就无法正常停留和交互。事件循环也不意味着需要自己写一个不断检测按钮的 while 循环。</p>
+<h1>3 窗口 按钮与坐标</h1>
+<pre><code>// widget.h
+#pragma once
+#include &lt;QWidget&gt;
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit Widget(QWidget *parent = nullptr);
+};
+</code></pre>
+<pre><code>// widget.cpp
+#include &quot;widget.h&quot;
+#include &lt;QPushButton&gt;
+
+Widget::Widget(QWidget *parent) : QWidget(parent)
+{
+    setWindowTitle(&quot;我的第一个窗口&quot;);
+    resize(600, 400);
+    auto *button = new QPushButton(&quot;第一个按钮&quot;, this);
+    button-&gt;move(100, 80);
+    button-&gt;resize(140, 40);
+}
+</code></pre>
+<p>this 指向当前 Widget 对象。在成员函数中，setWindowTitle(...) 与 this-&gt;setWindowTitle(...) 含义相同。new QPushButton(&quot;文字&quot;, this) 同时设置按钮文字和父控件；构造时传父对象比先创建再 setParent(this) 更直接。<br>## 3.2 大小和位置分别控制什么<br>resize(w, h) 设置当前大小，通常仍允许后续调整；setFixedSize(w, h) 把最小和最大尺寸限制为同一个大小，用户无法继续拖动改变尺寸。move(x, y) 改变位置，setGeometry(x, y, w, h) 同时改变位置和大小。[4]<br>子控件坐标以父控件内容区域左上角为原点，x 向右增加，y 向下增加。因此 move(100, 80) 表示按钮左上角距离父控件左侧 100、上侧 80 个逻辑像素。高 DPI 环境下，逻辑像素不一定等于屏幕物理像素。<br>顶层窗口和子控件的定位参考系不同。不要用桌面左上角去理解子按钮的 move()。固定坐标适合初学；后续学习布局管理器后，应让布局处理窗口缩放、字体变化和不同屏幕尺寸。</p>
+<h1>4 对象树与内存管理</h1>
+<pre><code>auto *button = new QPushButton(&quot;按钮&quot;, this);
+// this 析构时负责删除 button 指向的对象
+// 局部指针 button 离开作用域 不会删除按钮对象
+</code></pre>
+<p>局部指针变量和它指向的对象是两回事。构造函数结束后，button 这个局部变量消失了，但堆上的按钮继续存在。后面还要访问它，可以把指针保存为成员变量。<br>没有 parent 的 new QObject 或 new Teacher 不会因为“使用了 Qt”就自动回收。初学时，让属于窗口的 QObject 在创建时接收 this 作为父对象。这个机制不管理所有 C++ 类型，例如 QString 是值类型，按自己的 C++ 生命周期管理。<br>## 4.2 栈对象必须注意构造顺序</p>
+<pre><code>// 安全示例 先构造父对象 再构造子对象
+QWidget window;
+QPushButton button(&quot;退出&quot;, &amp;window);
+</code></pre>
+<p>离开作用域时逆序析构：先析构 button，并从 window 的子列表移除；再析构 window。此时 window 不会重复删除 button。</p>
+<pre><code>// 错误示例 不要运行这段来作为正常写法
+QPushButton quit(&quot;Quit&quot;);
+QWidget window;
+quit.setParent(&amp;window);
+</code></pre>
+<p>这里 window 后构造、先析构，会试图删除作为子对象的 quit；但 quit 的存储属于栈，不能由父对象用 delete 释放，随后还存在自动析构问题，属于未定义行为，可能崩溃。Qt 的父子管理不能替代 C++ 的存储期规则。[5]<br>## 4.3 用日志观察析构<br>可以定义继承 QPushButton 的 MyButton，在构造函数打印 qDebug() &lt;&lt; &quot;MyButton&quot;，在析构函数打印 qDebug() &lt;&lt; &quot;~MyButton&quot;。把它 new 出来并传 this，正常结束程序时观察构造与析构输出。<br>关闭窗口不一定立刻删除窗口对象。main 中的栈窗口通常在 exec() 返回后析构；堆窗口是否随关闭删除还受 WA_DeleteOnClose 等设置影响。判断释放时机时，应追踪对象析构，不能只看窗口是否消失。[4]</p>
+<h1>5 信号与槽的基本连接</h1>
+<pre><code>auto *button = new QPushButton(&quot;关闭窗口&quot;, this);
+connect(button, &amp;QPushButton::clicked,
+        this, &amp;QWidget::close);
+</code></pre>
+<p>这行代码可以读成：button 发出 clicked 时，调用当前窗口的 close。connect 建立连接时不会立刻关闭窗口；真正触发 clicked 后才调用处理函数。&amp;QPushButton::clicked 是成员函数指针，写连接时不加 ()，否则就变成调用函数。<br>## 5.2 四个位置怎样记</p>
+<pre><code>connect(发送对象, &amp;发送类::信号,
+        接收对象, &amp;接收类::处理函数);
+</code></pre>
+<p>前两个参数回答“谁发出什么通知”，后两个参数回答“由哪个对象执行哪个函数”。在 Widget 成员函数中可以直接写 connect；在普通函数如 main 中通常写 QObject::connect。<br>clicked 的签名含 bool checked 参数，而 close() 不接收参数。这仍可连接，因为处理函数可以忽略信号末尾的参数。函数指针连接要求对应参数兼容，可存在允许的隐式类型转换；不能把不兼容的参数强行连起来。[6]<br>## 5.3 槽函数并不都必须返回 void<br>自定义信号通常声明为 void；槽是普通 C++ 函数，可以有返回值。但普通信号通知不用于收集槽的返回值。例如 QWidget::close() 返回 bool，也能作为这里的处理函数。入门自定义槽写成 void 最直观。<br>新式 connect 可以连接普通成员函数，也可以连接 Lambda 等可调用对象。若要声明传统元对象槽，可放在 public slots: 或 private slots: 下；不是所有被连接的成员函数都必须写在 slots 区域。[7]<br>## 5.4 一次信号与多个处理函数<br>可以一对多、多对一，也可以信号连接信号。同线程直接连接时，同一信号连接的多个处理函数按建立连接的顺序调用。跨线程或队列连接涉及事件投递，不应据此推断不同线程中处理完成的先后顺序。[6][7]</p>
+<h1>6 自定义信号与槽</h1>
+<pre><code>// teacher.h
+#pragma once
+#include &lt;QObject&gt;
+#include &lt;QString&gt;
+
+class Teacher : public QObject
+{
+    Q_OBJECT
+public:
+    explicit Teacher(QObject *parent = nullptr)
+        : QObject(parent) {}
+    void finishClass() { emit hungry(); }
+signals:
+    void hungry();
+    void hungry(const QString &amp;food);
+};
+</code></pre>
+<pre><code>// student.h
+#pragma once
+#include &lt;QObject&gt;
+#include &lt;QString&gt;
+#include &lt;QDebug&gt;
+
+class Student : public QObject
+{
+    Q_OBJECT
+public:
+    explicit Student(QObject *parent = nullptr)
+        : QObject(parent) {}
+public slots:
+    void treat() { qDebug() &lt;&lt; &quot;请老师吃饭&quot;; }
+    void treat(const QString &amp;food)
+    { qDebug() &lt;&lt; &quot;请老师吃饭&quot; &lt;&lt; food; }
+};
+</code></pre>
+<p>这是为了阅读紧凑而把普通函数实现放在头文件中的写法，也可把实现移到 .cpp。signals 下的函数只声明，不自行实现，构建时由 moc 生成相关代码。把两个头文件加入 .pro 的 HEADERS，重新运行 qmake 后构建。[7]</p>
+<h1>6 自定义信号与槽的触发过程</h1>
+<pre><code>#include &quot;widget.h&quot;
+#include &quot;teacher.h&quot;
+#include &quot;student.h&quot;
+#include &lt;QPushButton&gt;
+
+Widget::Widget(QWidget *parent) : QWidget(parent)
+{
+    resize(600, 400);
+    auto *button = new QPushButton(&quot;下课&quot;, this);
+    auto *teacher = new Teacher(this);
+    auto *student = new Student(this);
+
+    connect(teacher, qOverload&lt;&gt;(&amp;Teacher::hungry),
+            student, qOverload&lt;&gt;(&amp;Student::treat));
+    connect(button, &amp;QPushButton::clicked,
+            teacher, &amp;Teacher::finishClass);
+}
+</code></pre>
+<p>执行顺序：点击按钮 → clicked 发出 → Teacher::finishClass() 被调用 → emit hungry() → Student::treat() 被调用 → 输出“请老师吃饭”。这里的 emit 是 Qt 提供的宏，用来清楚表达发出信号的意图，不是创建新线程的指令。<br>teacher 和 student 都传入 this，由窗口负责释放。原来只写 new Teacher()、new Student() 而不另行释放的写法，应补上明确的生命周期管理。<br>## 6.3 信号也能连接另一个信号</p>
+<pre><code>// 另一种接法 替换上面第二个 connect
+connect(button, &amp;QPushButton::clicked,
+        teacher, qOverload&lt;&gt;(&amp;Teacher::hungry));
+</code></pre>
+<p>按钮 clicked 发出时会触发老师的无参 hungry。两种接法选一种即可；同时保留会让一次点击走两条路径，学生可能被调用两次。<br>较复杂的业务更适合先进入 Teacher 的普通方法，再由 Teacher 自己判断和发出信号。这样“什么时候算饿了”的规则集中在 Teacher 中，窗口只负责组织界面。<br>## 6.4 没有反应时怎样检查<br>先确认按钮存在且没有被遮挡；再确认 connect 在触发之前执行；确认发送者、接收者仍然存活；最后在中间函数和槽里分别加日志，判断链路停在哪里。加入 Q_OBJECT 后出现 vtable 或信号的链接错误时，检查类是否加入构建、moc 是否生成，以及是否需要重新运行 qmake。[7]</p>
+<h1>7 重载连接与断开连接</h1>
+<pre><code>// 在拥有 teacher 和 student 的作用域中
+connect(teacher,
+        qOverload&lt;const QString &amp;&gt;(&amp;Teacher::hungry),
+        student,
+        qOverload&lt;const QString &amp;&gt;(&amp;Student::treat));
+</code></pre>
+<p>qOverload&lt;&gt;() 选择无参版本；qOverload&lt;const QString &amp;&gt;() 选择参数为 const QString &amp; 的版本。这里模板参数必须与函数真实声明相符，不能把 QString 与 const QString &amp; 当成同一个成员函数类型。<br>原笔记使用成员函数指针变量的思路也成立：</p>
+<pre><code>void (Teacher::*sig)(const QString &amp;) = &amp;Teacher::hungry;
+void (Student::*slot)(const QString &amp;) = &amp;Student::treat;
+connect(teacher, sig, student, slot);
+</code></pre>
+<p>左边从中间读：sig 是 Teacher 类的成员函数指针，该函数接收 const QString &amp;，返回 void。qOverload 只是让选择版本的表达更紧凑，两个示例是替代写法，不要重复连接。<br>## 7.2 保存连接句柄再断开</p>
+<pre><code>QMetaObject::Connection c = connect(
+    teacher, qOverload&lt;&gt;(&amp;Teacher::hungry),
+    student, qOverload&lt;&gt;(&amp;Student::treat));
+
+QObject::disconnect(c);
+</code></pre>
+<p>disconnect 是函数，不是 C++ 关键字。保存返回的句柄，能准确断开这一条连接，尤其适合 Lambda。句柄变量离开作用域本身不会自动断开连接。[6]<br>发送者或接收者销毁时，相关连接会被自动清理。Lambda 使用带 context 的 connect 时，context 销毁也会使该连接断开；但 Lambda 捕获的其他对象是否仍然存活，仍要自己保证。<br>## 7.3 重复输出不一定是信号发了两次<br>同一条连接代码执行两次，默认会建立两条连接，信号发出一次也可能让处理函数运行两次。优先检查初始化函数是否重复调用，避免在反复进入的函数中不断 connect。Qt::UniqueConnection 有适用限制，不能当成所有 Lambda 连接的通用去重开关。[6]</p>
+<h1>8 Lambda 先从普通函数开始</h1>
+<pre><code>int add(int a, int b)
+{
+    return a + b;
+}
+int result = add(3, 4);  // result 为 7
+</code></pre>
+<p>改写成 Lambda 后：</p>
+<pre><code>auto add = [](int a, int b) -&gt; int {
+    return a + b;
+};
+int result = add(3, 4);  // 仍然为 7
+</code></pre>
+<p>auto 让编译器推导 add 的类型。Lambda 产生的是一个可调用的函数对象，可用 add(...) 调用；它不只是“没有名字的普通函数”。结尾的分号结束变量定义，不能漏掉。<br>## 8.2 一段语法分成五部分</p>
+<pre><code>[捕获列表](参数列表) mutable -&gt; 返回值类型 {
+    函数体
+}
+</code></pre>
+<p>捕获列表回答“如何使用外部局部变量”；参数列表回答“调用时需要传什么”；mutable 决定是否允许修改值捕获的副本；返回类型回答“返回什么”；函数体写实际执行的语句。[8]<br>最开始只用最简单的 []() { ... }。不要把 mutable 和返回类型当成每次必填的内容。返回类型通常可以由 return 推导，上面的 -&gt; int 可以省略。<br>## 8.3 定义和执行是两件事</p>
+<pre><code>auto say = []() { qDebug() &lt;&lt; &quot;你好&quot;; };
+// 到这里还没有输出
+say();  // 此时才执行函数体并输出
+</code></pre>
+<p>写出 Lambda 只是创建可调用对象。调用 say() 才运行它的函数体。connect 中也是先登记这段行为，等信号触发后再执行。</p>
+<h1>9 捕获列表和参数列表</h1>
+<pre><code>int base = 10;
+auto addBase = [base](int x) {
+    return base + x;
+};
+qDebug() &lt;&lt; addBase(3);  // 13
+qDebug() &lt;&lt; addBase(8);  // 18
+</code></pre>
+<p>base 在 Lambda 外部定义，创建 Lambda 时通过 [base] 保存一个副本。x 是每次调用时传入的参数，addBase(3) 中 x 是 3，addBase(8) 中 x 是 8。二者都能在函数体里使用，但来源和进入函数体的时间不同。<br>| 观察点 | 捕获列表 [base] | 参数列表 (int x) |<br>| --- | --- | --- |<br>| 数据来源 | 外部作用域中已有的局部变量 | 调用者本次提供的实参 |<br>| 进入时机 | 创建 Lambda 时建立捕获 | 每次调用时初始化参数 |<br>| 外面怎样写 | [base] 或 [&amp;base] 等 | addBase(3) 中的 3 |<br>| 主要用途 | 保留这段行为所需的上下文 | 处理每次调用不同的输入 |<br>## 9.2 没捕获就不能随便用外面的局部变量</p>
+<pre><code>int base = 10;
+// 错误示意 base 是外部自动存储期局部变量
+// auto f = [](int x) { return base + x; };
+
+auto f = [base](int x) { return base + x; }; // 正确
+</code></pre>
+<p>[] 表示没有捕获，不等于函数体什么都不能做。它仍能使用自己的参数、函数体内新建的局部变量，以及无需捕获就可访问的全局变量或静态变量等。<br>## 9.3 Qt 中两种来源同时出现</p>
+<pre><code>QString tag = &quot;保存按钮&quot;;
+connect(button, &amp;QPushButton::clicked, this,
+        [tag](bool checked) {
+    qDebug() &lt;&lt; tag &lt;&lt; checked;
+});
+</code></pre>
+<p>tag 来自创建连接时所在的作用域；checked 来自按钮每次发出的信号。不要把 checked 也写进捕获列表来替代参数，那会改变它的数据来源。普通按钮默认不可勾选，若要观察 checked 切换，可先 button-&gt;setCheckable(true)。</p>
+<h1>10 值捕获 保存创建时的副本</h1>
+<pre><code>int n = 10;
+auto read = [n]() { return n; };
+n = 20;
+qDebug() &lt;&lt; read();  // 10
+qDebug() &lt;&lt; n;       // 20
+</code></pre>
+<p>执行到 [n] 时，Lambda 保存了当时 n 的值 10。之后 n = 20 修改的是外面的变量。调用 read() 读取的是自己的副本，因此结果仍然是 10。<br>可以把值捕获理解为“拍下当时的值”，但这只是帮助理解的比喻：实际复制什么、复制后共享什么，由被捕获类型自己的复制语义决定。对 int 而言就是保存一个独立数值。<br>## 10.2 默认不能给值捕获的普通变量赋值</p>
+<pre><code>int n = 10;
+auto read = [n]() {
+    // n = 30;  // 编译失败 当前不能修改这个副本
+    return n;
+};
+</code></pre>
+<p>这是 Lambda 默认调用运算符的 const 限制。之后可以用 mutable 允许修改副本，但 mutable 不会把值捕获变成引用捕获。[8]<br>## 10.3 捕获指针复制的是地址</p>
+<pre><code>int number = 10;
+int *ptr = &amp;number;
+auto change = [ptr]() { *ptr = 30; };
+change();
+qDebug() &lt;&lt; number;  // 30
+</code></pre>
+<p>副本 ptr 和外面的 ptr 都指向同一个 number。虽然复制了指针，但没有复制它指向的 int。*ptr = 30 改变目标对象，所以外部 number 也变了。这也解释了为什么捕获 this 后可以修改窗口成员。<br>值捕获不自动延长指针目标的生命。如果捕获的是某个 QWidget*，后面控件先被删除，再使用这个地址仍然危险。学习时要分别问两件事：“复制了什么”和“目标对象还活着吗”。<br>## 10.4 什么时候适合值捕获<br>希望保存创建连接时的一段文字、一个编号或一个固定配置时，可以显式值捕获。例如 [tag] 比默认 [=] 更容易看清这段代码依赖了什么。需要读取不断变化的状态时，应考虑引用或对象成员，而不是误以为旧副本会自动更新。</p>
+<h1>11 引用捕获 使用外面的变量本身</h1>
+<pre><code>int n = 10;
+auto increase = [&amp;n]() { ++n; };
+increase();
+qDebug() &lt;&lt; n;  // 11
+n = 40;
+increase();
+qDebug() &lt;&lt; n;  // 41
+</code></pre>
+<p>[&amp;n] 让函数体通过引用访问外面的 n，因而既能看到外部后续变化，也能修改外部值。这种修改不需要 mutable，因为修改的不是值捕获副本。<br>## 11.2 看懂常见捕获写法<br>| 写法 | 含义 |<br>| --- | --- |<br>| [] | 不捕获外部局部变量 |<br>| [n] | 按值捕获 n |<br>| [&amp;n] | 按引用捕获 n |<br>| [n &amp;m] 的正确写法为 [n, &amp;m] | n 用副本 m 用引用 |<br>| [=] | 对需要捕获的外部局部变量默认按值捕获 |<br>| [&amp;] | 对需要捕获的外部局部变量默认按引用捕获 |<br>| [this] | 保存当前对象的 this 指针 可访问对象成员 |<br>混合捕获时，逗号分隔每一项。入门优先把所需变量显式写出来，例如 [count, &amp;total]，便于发现外部依赖。默认捕获不等于无条件捕获所在作用域的一切。[8]<br>## 11.3 最大的风险是变量已经不存在</p>
+<pre><code>// 错误示意 不要这样给按钮长期保存回调
+void Widget::setupButton()
+{
+    int count = 0;
+    auto *button = new QPushButton(&quot;计数&quot;, this);
+    connect(button, &amp;QPushButton::clicked, this,
+            [&amp;count]() { ++count; });
+}
+</code></pre>
+<p>setupButton() 返回后，局部 count 已结束生命周期。按钮以后被点击时才执行 Lambda，这时引用已经悬空，访问它属于未定义行为。即使 connect 写了 this 作为上下文，也不能保护这个局部 count。</p>
+<h1>12 mutable 修改的是哪个变量</h1>
+<pre><code>int m = 10;
+auto fun = [m](int a, int b) mutable {
+    qDebug() &lt;&lt; &quot;lambda is running!&quot;;
+    m = 300;
+    return a + b;
+};
+int sum = fun(100, 200);
+qDebug() &lt;&lt; sum;
+qDebug() &lt;&lt; m;
+</code></pre>
+<p>依次输出的内容是 lambda is running!、300、10。第一行来自函数体的日志；第二行的 300 是 a + b 的返回值；第三行的 10 来自外部 m。注意这里“内部 m 被赋为 300”和“返回值也是 300”只是数值恰好相同，没有因果关系。<br>执行过程：① 外部 m 初始化为 10。② [m] 复制 10 进入函数对象。③ mutable 允许给内部副本重新赋值。④ 调用时 a 为 100，b 为 200。⑤ m = 300 改变内部副本。⑥ return a + b 返回 300。⑦ 外部 m 始终没有改变。<br>## 12.2 改写一下 就能看出副本会保留</p>
+<pre><code>int m = 10;
+auto next = [m]() mutable { return ++m; };
+qDebug() &lt;&lt; next();  // 11
+qDebug() &lt;&lt; next();  // 12
+qDebug() &lt;&lt; m;       // 10
+</code></pre>
+<p>对同一个 next 对象连续调用，使用的是同一个内部副本，所以从 10 增到 11，再增到 12，并不是每次调用都重新从外部复制 10。创建 Lambda 和调用 Lambda 要分开理解。<br>## 12.3 如果想改变外面的 m</p>
+<pre><code>int m = 10;
+auto next = [&amp;m]() { return ++m; };
+qDebug() &lt;&lt; next();  // 11
+qDebug() &lt;&lt; m;       // 11
+</code></pre>
+<p>这里使用引用捕获，不需要 mutable。记忆时分开两条：值或引用决定“访问的是副本还是外部变量”；mutable 决定“能否修改值捕获副本”。它们解决的是不同问题。<br>本笔记采用 C++17，带 mutable 的 Lambda 保留空参数列表 ()，写作 [m]() mutable { ... }。这样也能避免混淆不同 C++ 标准下的省略规则。</p>
+<h1>13 this 和窗口成员</h1>
+<pre><code>// widget.h 中 Widget 类的 private 区域
+int count_ = 0;
+</code></pre>
+<pre><code>// Widget 构造函数中
+auto *button = new QPushButton(&quot;点击计数&quot;, this);
+connect(button, &amp;QPushButton::clicked, this, [this]() {
+    ++count_;
+    setWindowTitle(QString(&quot;已点击 %1 次&quot;).arg(count_));
+});
+</code></pre>
+<p>count_ 等价于 this-&gt;count_，setWindowTitle(...) 等价于 this-&gt;setWindowTitle(...)。通过保存的 this 指针访问当前窗口，所以不需要把每个成员都单独放进捕获列表。<br>## 13.2 为什么不用 mutable 也能修改成员<br>[this] 保存的是 this 指针，修改的是它指向的窗口对象的成员，并不是改写这个指针副本。可以联系上一章 [ptr] 修改 *ptr 的例子理解。<br>不能因此说“值捕获永远不会改变外部状态”。准确说法是：复制 int 后修改副本不会改变原 int；复制指针后，经指针访问的仍可能是同一个对象。<br>## 13.3 两个 this 扮演不同角色</p>
+<pre><code>connect(button, &amp;QPushButton::clicked, this, [this]() {
+    close();
+});
+</code></pre>
+<p>第三个参数 this 是连接的上下文对象，参与自动断开和线程上下文选择；[this] 是 C++ Lambda 的捕获，让函数体能访问窗口成员。二者不能相互替代：有 context 不代表自动完成 C++ 捕获；有捕获也不代表自动建立 Qt 生命周期保护。[6]<br>## 13.4 不要把 this 当成窗口副本<br>[this] 不复制窗口，也不让窗口永远存活。对于异步保存的回调，要保证对象还存在；Qt 的带 context 连接会在 context 销毁时断开，但保护范围不包括任意捕获对象。<br>C++17 还有 [*this]，表示复制当前对象。QObject 及其子类通常不可复制，Widget 也不适合这样捕获。Qt 初学阶段优先使用显式 [this]，不依赖 [=] 隐式捕获 this。</p>
+<h1>14 把 Lambda 交给 connect</h1>
+<pre><code>auto *button = new QPushButton(&quot;点击&quot;, this);
+connect(button, &amp;QPushButton::clicked, this, []() {
+    qDebug() &lt;&lt; &quot;按钮被按下&quot;;
+});
+</code></pre>
+<p>这里不需要外部变量，因此捕获列表是 []。点击后，Qt 调用保存的函数对象；建立连接时不会执行日志。clicked 虽带 bool 参数，但这个 Lambda 不需要，便可以省略这个参数。<br>## 14.2 需要窗口成员时改成显式捕获</p>
+<pre><code>connect(button, &amp;QPushButton::clicked, this, [this]() {
+    setWindowTitle(&quot;已经点击&quot;);
+});
+</code></pre>
+<p>判断捕获的方法是读函数体：如果只做独立计算或输出固定文本，可能 [] 就够；如果访问窗口成员，使用 [this]；如果只需要创建连接时的一段局部文字，使用 [text]；如果需要临时引用局部变量，先确认生命周期再写 [&amp;value]。<br>## 14.3 Lambda 为什么适合 Qt 初学<br>简单处理逻辑可以紧靠连接代码阅读，不必为了两行代码单独声明和实现一个槽函数。当处理流程变长、需要复用、需要单独测试时，应提取成成员函数，再由 Lambda 调用，或直接连接到该成员函数。</p>
+<pre><code>// 如果已经声明并实现 Widget::saveData()
+connect(button, &amp;QPushButton::clicked,
+        this, &amp;Widget::saveData);
+</code></pre>
+<p>上面是替代写法，不必同时保留两个连接。选择槽成员函数还是 Lambda，依据逻辑是否需要命名和复用，而不是认为某一种语法总是更高级。<br>## 14.4 四个参数版优先<br>初学时优先使用带 context 的四参数连接。它让连接跟随上下文对象的生命周期，也使回调执行的线程上下文更明确。即使如此，也要检查 Lambda 捕获的每个指针和引用。[6]<br>构造界面时常写“一个 new、一个设置属性、一个 connect”。把这些初始化步骤执行一次即可，不要在每次点击后又给同一个按钮不断追加连接。</p>
+<h1>15 参数适配与重载的实际用法</h1>
+<pre><code>void finishClass(const QString &amp;food)
+{
+    emit hungry(food);
+}
+</code></pre>
+<p>将第 6 章 Widget 构造函数内创建对象与连接的代码替换为下面内容，不保留原来的连接。这样也避免 finishClass 增加重载后，原来的函数指针写法产生歧义。</p>
+<pre><code>auto *teacher = new Teacher(this);
+auto *student = new Student(this);
+auto *button = new QPushButton(&quot;请吃饭&quot;, this);
+
+connect(teacher,
+        qOverload&lt;const QString &amp;&gt;(&amp;Teacher::hungry),
+        student,
+        qOverload&lt;const QString &amp;&gt;(&amp;Student::treat));
+
+connect(button, &amp;QPushButton::clicked, this, [teacher]() {
+    teacher-&gt;finishClass(QStringLiteral(&quot;红烧排骨&quot;));
+});
+</code></pre>
+<p>执行链是 clicked → Lambda → finishClass(&quot;红烧排骨&quot;) → hungry(food) → treat(food)。Lambda 不接收 checked，因为这里用不到它。teacher 被值捕获，复制的是指针，目标仍是那位老师。<br>本例 teacher 和 button 都由窗口管理，且不提前删除 teacher。若以后加入“单独删除老师”的功能，就需要重新检查连接的上下文和捕获指针，不能原样照搬生命周期假设。<br>## 15.2 Lambda 可以把选择重载变成普通调用<br>如果需要调用 student 的带参 treat，可以写一个参数明确的 Lambda，再在里面调用 student-&gt;treat(food)。调用表达式有具体实参时，编译器可以按普通 C++ 重载规则选中版本。<br>不过发送端的重载信号仍要选清楚。Lambda 不是取消所有 qOverload 的开关；它主要让接收逻辑、参数转换、默认值填充等处理更直观。</p>
+<h1>16 延后执行时的三个常见坑</h1>
+<pre><code>// 错误示意 构造函数结束后 count 不再存在
+int count = 0;
+connect(button, &amp;QPushButton::clicked, this,
+        [&amp;count]() { ++count; });
+</code></pre>
+<p>修正方法：把状态放到 Widget 的成员 count_ 中，再用 [this] 访问。窗口还活着时，成员才存在；窗口销毁时，以它为 context 的连接也会断开。完整实现见下一章。<br>## 16.2 值捕获了循环变量 却以为会读取最终值</p>
+<pre><code>// 这段放在 Widget 构造函数中
+for (int i = 0; i &lt; 3; ++i) {
+    auto *b = new QPushButton(QString::number(i), this);
+    b-&gt;move(20, 20 + i * 50);
+    connect(b, &amp;QPushButton::clicked, this, [i]() {
+        qDebug() &lt;&lt; i;
+    });
+}
+</code></pre>
+<p>三个 Lambda 分别保存创建时的 i，点击按钮依次输出对应的 0、1、2。这正是想保留按钮编号时应有的行为。改成 [&amp;i] 会让回调引用循环局部变量，循环结束后就失效，不能用这种方式实现编号。<br>## 16.3 定义了 Lambda 却没有调用它</p>
+<pre><code>auto work = []() { qDebug() &lt;&lt; &quot;开始处理&quot;; };
+work();  // 普通 C++ 场景 自己调用
+</code></pre>
+<pre><code>connect(button, &amp;QPushButton::clicked, this,
+        []() { qDebug() &lt;&lt; &quot;开始处理&quot;; });
+// Qt 场景 等按钮发出信号时由 Qt 调用
+</code></pre>
+<p>把函数对象交给 connect 时，不要在 Lambda 后面加 () 去立即执行它。connect 需要收到“以后可以调用的行为”，不是收到这段行为现在执行后的结果。<br>## 16.4 每写一次捕获 都做一次检查<br>值捕获：我想保存创建时的值吗？引用捕获：这个变量会不会先消失？指针捕获：目标对象可能提前删除吗？this 捕获：有没有合适的 context，回调是否还被保存到其他地方？先回答这些问题，再选 [] 内的写法。</p>
+<h1>17 综合练习 点击计数窗口</h1>
+<pre><code>// widget.h
+#pragma once
+#include &lt;QWidget&gt;
+
+class Widget : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit Widget(QWidget *parent = nullptr);
+
+private:
+    void refreshTitle();
+    int count_ = 0;
+};
+</code></pre>
+<pre><code>// widget.cpp
+#include &quot;widget.h&quot;
+#include &lt;QPushButton&gt;
+#include &lt;QString&gt;
+#include &lt;QDebug&gt;
+
+Widget::Widget(QWidget *parent) : QWidget(parent)
+{
+    resize(440, 240);
+    auto *add = new QPushButton(&quot;点击加一&quot;, this);
+    auto *reset = new QPushButton(&quot;清零&quot;, this);
+    add-&gt;setGeometry(50, 80, 140, 40);
+    reset-&gt;setGeometry(230, 80, 140, 40);
+
+    connect(add, &amp;QPushButton::clicked, this, [this]() {
+        ++count_;
+        refreshTitle();
+        qDebug() &lt;&lt; &quot;当前次数&quot; &lt;&lt; count_;
+    });
+
+    connect(reset, &amp;QPushButton::clicked, this, [this]() {
+        count_ = 0;
+        refreshTitle();
+    });
+    refreshTitle();
+}
+
+void Widget::refreshTitle()
+{
+    setWindowTitle(QString(&quot;已点击 %1 次&quot;).arg(count_));
+}
+</code></pre>
+<h1>17 综合练习的执行过程</h1>
+<h1>18 Lambda 自测</h1>
+<pre><code>int x = 5;
+auto f = [x]() { return x + 1; };
+x = 100;
+qDebug() &lt;&lt; f();
+qDebug() &lt;&lt; x;
+</code></pre>
+<p>题目二：修改捕获列表并补全函数体，让调用 f() 后外面的 x 变成 6。</p>
+<pre><code>int x = 5;
+auto f = [x]() { /* 在这里让 x 加一 */ };
+f();
+qDebug() &lt;&lt; x;
+</code></pre>
+<p>题目三：内部副本会不会每次调用都重新初始化？预测三次输出。</p>
+<pre><code>int x = 5;
+auto f = [x]() mutable { return ++x; };
+qDebug() &lt;&lt; f();
+qDebug() &lt;&lt; f();
+qDebug() &lt;&lt; x;
+</code></pre>
+<h2>18.2 把语法放回 Qt 场景</h2>
+<pre><code>connect(button, &amp;QPushButton::clicked, this, [this]() {
+    setWindowTitle(&quot;完成&quot;);
+});
+</code></pre>
+<p>题目六：已知 clicked(bool) 的参数是 bool，Teacher::finishClass(const QString &amp;) 需要菜名。请写出用 Lambda 传入“面条”的 connect。<br>做题时不要求背出所有术语。只要能说清“何时保存数据”“函数体何时执行”“访问的是哪个变量”“它还活着吗”，就掌握了最关键的部分。</p>
+<h1>18 自测参考答案</h1>
+<pre><code>int x = 5;
+auto f = [&amp;x]() { ++x; };
+f();
+qDebug() &lt;&lt; x;  // 6
+</code></pre>
+<p>题目三：依次为 6、7、5。同一个 f 对象保留着自己的 x 副本，两次调用连续修改副本，外部 x 没有改变。<br>## 18.4 Qt 场景答案<br>题目四：connect 只是保存回调，构造函数返回前不一定触发点击。等用户点击时，局部 count 已结束生命周期，引用失效。把计数改成 Widget 的成员 int count_ = 0;，然后以窗口为 context，使用 [this] 访问。<br>题目五：第三个 this 是 Qt 的 context，窗口销毁时相关连接会自动断开；[this] 是 C++ 捕获，让函数体能够访问窗口成员。删除捕获而保留 [] 时，这里的 setWindowTitle() 缺少可用的当前对象，不能这样调用。<br>题目六：在 teacher 和 button 已经创建、并保证 teacher 在回调执行时仍然存活的前提下：</p>
+<pre><code>connect(button, &amp;QPushButton::clicked, this, [teacher]() {
+    teacher-&gt;finishClass(QStringLiteral(&quot;面条&quot;));
+});
+</code></pre>
+<p>该 Lambda 忽略信号的 bool 参数，自己提供 QString 业务参数。它捕获的是 teacher 指针的副本，不会复制 Teacher 对象。<br>## 18.5 遇到新 Lambda 时的阅读顺序<br>先看函数体，确定它要做什么；再看参数列表，确定每次输入来自哪里；然后看捕获列表，确认外部依赖的来源与生命期；最后找调用位置，区分立即调用、保存后调用、由 Qt 信号触发调用。<br>如果读不懂复杂写法，可以先把它保存为 auto task = ...，再单独写 task(...) 测试普通 C++ 行为。理解后再放回 connect，不必同时理解所有语法和事件机制。</p>
+<h1>19 易错点回顾与后续笔记结构</h1>
+<h1>参考资料</h1></section><section id="chapter20"><h1>第 20 章 主窗口与中心部件</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/31_mainwindow">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QMainWindow 自带主窗口区域的组织规则：顶部菜单栏、可停靠工具栏、停靠面板、底部状态栏，以及中间的中心部件。中心部件是工作区，例如记事本的编辑器。它也继承 QWidget，但通常不直接在 QMainWindow 本体上再安装普通布局。</p>
+<p>setCentralWidget() 把一个控件交给主窗口作为工作区。主窗口负责这个控件的所有权。若工作区含多个控件，先创建普通 QWidget 容器，把布局安装到容器，再把容器设为中心部件。窗口缩放时，这块区域会自动适应剩余空间。</p>
+<h2>窗口并不只是一个大 QWidget</h2>
+<p>先建立工作区，再把工作区交给主窗口。主窗口有自己管理菜单、工具栏和停靠区域的内部布局；调用 setCentralWidget 的意思是登记工作区，不是设置任意 child 的坐标。如果同时需要编辑器、查询栏和按钮，应先建一个 QWidget 容器，把 QVBoxLayout 安装到容器，再把整个容器作为中心部件。这样各部分会自然分工。</p>
+<h2>按执行顺序拆解</h2>
+<p>读 main.cpp 时依次找到 QApplication、QMainWindow、QTextEdit、setCentralWidget 和 app.exec。QTextEdit 没传 parent 也不一定泄漏：setCentralWidget 会接管它。随后找出菜单栏和状态栏，它们由 QMainWindow 管理。退出时先结束事件循环，再销毁 main 中的窗口，窗口的子控件随之释放。</p>
+<h2>参数与行为边界</h2>
+<p>QWidget 是普通控件与容器的基础；QMainWindow 适合带菜单、工具栏与停靠面板的应用；QDialog 适合短时交互。不要为了“功能更多”让所有小组件都继承 QMainWindow。</p>
+<h2>易错点与排查</h2>
+<p>menuBar() 和 statusBar() 可以取得或按需创建对应栏，取得后无需再调用 setMenuBar(menuBar())。setCentralWidget 会接管部件；替换时不要把旧部件当成仍可随意使用的对象。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;31 主窗口与中心部件&quot;);
+    auto *editor = new QTextEdit;
+    editor-&gt;setPlainText(&quot;中心部件就是主窗口的工作区。\n试着拖动窗口边缘。&quot;);
+    w.setCentralWidget(editor);
+    w.menuBar()-&gt;addMenu(&quot;文件&quot;);
+    w.statusBar()-&gt;showMessage(&quot;主窗口已就绪&quot;);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>31_mainwindow.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 31_mainwindow
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/31_mainwindow/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/31_mainwindow/screenshots/03_result.png" alt="主窗口与中心部件 03_result"></a></p>
+<h2>自己动手</h2>
+<p>把中心编辑器改成一个容器，容器上放标签与编辑器，拖动窗口观察编辑器如何变大。再取消 setCentralWidget，观察界面变化；通过对比理解“对象已经创建”和“被安放到工作区”的区别。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>为什么没给 QTextEdit 传 parent 也能被释放？</strong></p>
+<p>因为主窗口在 setCentralWidget 时取得所有权。不要再给同一个对象叠加另一个独立的所有者。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qmainwindow.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter21"><h1>第 21 章 菜单 动作与工具栏</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/32_menu_toolbar">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>菜单栏 QMenuBar 容纳菜单 QMenu，菜单里放 QAction。QAction 表示一项可执行操作，保存操作可以同时出现在菜单和工具栏，它们共享文字、启用状态、勾选状态及 triggered 信号。QAction 不是另一个窗口。</p>
+<p>把同一个 QAction 加到 QMenu 和 QToolBar 后，只需连接一次 triggered，用户从任一入口操作都进入同一段业务代码。快捷键也可以设置到动作上。工具栏可设置初始区域、允许区域、能否移动、能否浮动；这些是不同属性。</p>
+<h2>先定义动作 再提供多个入口</h2>
+<p>动作是“保存”这项命令，菜单项和工具栏按钮只是触发它的入口。若两个入口各自创建一份 QAction，即使文字相同，也不是同一个动作：启用状态、快捷键和勾选状态都要分别同步。把一个 QAction 分别 addAction 到菜单和工具栏，可以直接共享这些状态。</p>
+<h2>按执行顺序拆解</h2>
+<p>先观察 save 指针只创建一次，再看它被两个容器使用，最后找 triggered 的唯一连接。点击任一入口都执行相同的 Lambda。把 save-&gt;setEnabled(false) 加入初始化后，观察两个入口都禁用。快捷键也属于动作；QKeySequence::Save 比手写 Ctrl+S 更能适应平台约定。</p>
+<h2>参数与行为边界</h2>
+<p>triggered(bool) 通知触发，toggled(bool) 通知勾选状态变化。需要开关操作时先 setCheckable(true)，再决定监听哪个信号。构造动作时把父对象设为主窗口；添加到菜单不应成为你推断所有权的唯一依据。</p>
+<h2>易错点与排查</h2>
+<p>使用 Qt::LeftToolBarArea | Qt::RightToolBarArea 组合区域标志；这是按位或。setMovable(false) 控制移动把手，setFloatable(false) 控制是否可浮动，两者不应混为一谈。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;32 菜单 动作与工具栏&quot;);
+    auto *edit = new QTextEdit;
+    w.setCentralWidget(edit);
+    auto *menu = w.menuBar()-&gt;addMenu(&quot;文件&quot;);
+    auto *save = new QAction(&quot;保存示例&quot;, &amp;w);
+    save-&gt;setObjectName(&quot;action&quot;);
+    save-&gt;setShortcut(QKeySequence::Save);
+    menu-&gt;addAction(save);
+    auto *tools = w.addToolBar(&quot;文件工具&quot;);
+    tools-&gt;addAction(save);
+    tools-&gt;setAllowedAreas(Qt::LeftToolBarArea | Qt::RightToolBarArea | Qt::TopToolBarArea);
+    QObject::connect(save, &amp;QAction::triggered, &amp;w, [edit]()
+                     { edit-&gt;append(&quot;同一个 QAction 被触发。这里演示通知，没有写入磁盘。&quot;); });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>32_menu_toolbar.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 32_menu_toolbar
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/32_menu_toolbar/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/32_menu_toolbar/screenshots/03_result.png" alt="菜单 动作与工具栏 03_result"></a></p>
+<h2>自己动手</h2>
+<p>增加一个“显示日志”可勾选动作，菜单和工具栏共用它，连接 toggled 控制日志区域显隐。把动作禁用，再分别从鼠标和快捷键尝试触发，比较行为。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>setMovable 和 setFloatable 为什么分开？</strong></p>
+<p>前者控制工具栏在主窗口中的移动，后者控制能否离开主窗口浮动。初始停靠位置和允许停靠的区域又是另外两个设置。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qaction.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter22"><h1>第 22 章 状态栏和停靠面板</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/33_status_dock">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QStatusBar 的临时消息用 showMessage(text, timeout) 展示，timeout 单位毫秒，0 表示保持到被清除或替换。addWidget 放置普通状态控件，临时消息出现时可能被遮住；addPermanentWidget 放置永久区域控件，不会被临时消息遮盖。永久指显示区域性质，不是对象永不销毁。</p>
+<p>QDockWidget 是可停靠面板的外壳，用 setWidget() 设置它内部的控件，用 addDockWidget() 指定初始停靠区域。setAllowedAreas() 决定允许停靠在哪些位置，features 决定是否可关闭、移动和浮动。</p>
+<h2>状态反馈和辅助面板各有职责</h2>
+<p>状态栏回答“现在发生了什么”，停靠面板提供持续可操作的辅助区。showMessage 的临时文字适合“打开成功”，普通状态控件适合当前工具，永久状态控件适合编码或连接状态。showMessage 的超时单位是毫秒；传 3000 表示约三秒，不是三千秒。</p>
+<h2>按执行顺序拆解</h2>
+<p>启动后先看临时消息遮住普通区域而 UTF-8 仍在右侧；等待三秒，再观察普通状态内容恢复。然后拖动左侧停靠面板，把它移动到其他允许区域。停靠部件的 setWidget 管内部内容，主窗口的 addDockWidget 管外部位置。列表和编辑器不是兄弟功能的替代品，而是辅助区与工作区的分工。</p>
+<h2>参数与行为边界</h2>
+<p>关闭停靠面板通常是隐藏，面板不一定被销毁。用 dock-&gt;toggleViewAction() 可以把恢复显示的开关放进“视图”菜单。需要保存界面排列时可进一步学习 saveState/restoreState，但恢复时需要稳定 objectName。</p>
+<h2>易错点与排查</h2>
+<p>标准术语是停靠部件，而不是铆接部件。QDockWidget 与普通非模态 QDialog 不同：前者能参与主窗口的停靠布局。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;33 状态栏和停靠面板&quot;);
+    w.setCentralWidget(new QTextEdit(&quot;这是主编辑区域&quot;));
+    w.statusBar()-&gt;addWidget(new QLabel(&quot;普通状态&quot;));
+    w.statusBar()-&gt;addPermanentWidget(new QLabel(&quot;UTF-8&quot;));
+    w.statusBar()-&gt;showMessage(&quot;临时消息 3 秒后消失&quot;, 3000);
+    auto *dock = new QDockWidget(&quot;文档列表&quot;, &amp;w);
+    auto *list = new QListWidget;
+    list-&gt;addItems({&quot;第一章&quot;, &quot;第二章&quot;, &quot;第三章&quot;});
+    dock-&gt;setWidget(list);
+    w.addDockWidget(Qt::LeftDockWidgetArea, dock);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>33_status_dock.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 33_status_dock
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/33_status_dock/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/33_status_dock/screenshots/03_result.png" alt="状态栏和停靠面板 03_result"></a></p>
+<h2>自己动手</h2>
+<p>给停靠面板设置 objectName，把 toggleViewAction 加入视图菜单。先关闭面板，再从菜单重新显示。给状态栏添加当前字数，并在编辑器内容变化时更新。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>隐藏面板后为何不能再 new 一个作为恢复方式？</strong></p>
+<p>这样会创建不同实例并可能重复占用资源。优先保留原实例并调用 show，或者使用 toggleViewAction。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qstatusbar.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter23"><h1>第 23 章 资源路径 图片与背景</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/34_resources">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>qrc 是资源清单，prefix 是资源前缀，alias 是资源在程序里的名字。例如前缀 /images 加别名 demo.png，运行时路径为 :/images/demo.png。这个路径与程序当前工作目录无关。qmake 项目还需要 RESOURCES += assets.qrc，构建时 rcc 才会把资源编入程序。</p>
+<p>QPixmap 加载失败时 isNull() 为 true，先检查路径大小写、前缀、别名以及资源是否加入构建。QLabel 显示图片时，按目标区域调用 scaled(..., Qt::KeepAspectRatio, Qt::SmoothTransformation) 可以等比适应。若要做随窗口变化的背景，在 paintEvent 中基于当前 rect 绘制更直接；构造时只缩放一次不会跟随未来窗口变化。</p>
+<h2>磁盘路径 资源路径和显示尺寸</h2>
+<p>磁盘文件依赖部署位置和文件权限，:/ 开头的资源路径指向 Qt 资源系统。qrc 用 prefix 与 alias 构成运行时名字；XML 中 file 的内容是构建时要读取的源文件位置。因此“源码磁盘文件名”和“程序访问名字”可以不同，改了 alias 后代码也要同步。</p>
+<h2>按执行顺序拆解</h2>
+<p>先打开 assets.qrc，找到 prefix=/images 和 alias=demo.png，然后核对 main.cpp 的 :/images/demo.png。再打开 .pro，确认 RESOURCES 包含 qrc；使用 CMake 时确认 qrc 加入目标且启用 AUTORCC。构建以后，图片可以从资源中读取，不需要跟着 exe 另外寻找源码目录。</p>
+<h2>参数与行为边界</h2>
+<p>isNull 用于检查图片是否加载成功。Q_ASSERT 常在 Release 被关闭，不能把生产错误处理只写成断言；要用普通 if 处理并提示。scaled 返回新图片，不会原地修改原对象。KeepAspectRatio 保持比例，KeepAspectRatioByExpanding 会铺满但可能裁剪，IgnoreAspectRatio 可能变形。</p>
+<h2>易错点与排查</h2>
+<p>Qt 6 中 QPalette::Window 是窗口背景角色。用图片刷填充可能出现平铺；IgnoreAspectRatio 会拉伸变形。资源文件通常打包进程序，但资源系统也支持外部 rcc，并非所有资源都必须内嵌。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;34 资源路径 图片与背景&quot;);
+    auto *label = new QLabel;
+    QPixmap picture(&quot;:/images/demo.png&quot;);
+    Q_ASSERT(!picture.isNull());
+    label-&gt;setAlignment(Qt::AlignCenter);
+    label-&gt;setPixmap(picture.scaled(600, 360, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    w.setCentralWidget(label);
+    w.setWindowIcon(QIcon(&quot;:/images/demo.png&quot;));
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>34_resources.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 34_resources
+SOURCES += main.cpp
+HEADERS += verify.h
+RESOURCES += assets.qrc
+
+</code></pre>
+<h3>assets.qrc</h3>
+<pre><code>&lt;RCC&gt;&lt;qresource prefix=&quot;/images&quot;&gt;&lt;file alias=&quot;demo.png&quot;&gt;assets/demo.png&lt;/file&gt;&lt;file alias=&quot;demo.gif&quot;&gt;assets/demo.gif&lt;/file&gt;&lt;/qresource&gt;&lt;/RCC&gt;
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/34_resources/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/34_resources/screenshots/03_result.png" alt="资源路径 图片与背景 03_result"></a></p>
+<h2>自己动手</h2>
+<p>把别名故意写错，用 if (picture.isNull()) 显示失败提示。恢复路径后把缩放策略改成 IgnoreAspectRatio，对比图片是否变形。最后试着改变窗口大小，观察构造时只缩放一次的局限。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>背景图为什么不会跟着缩放？</strong></p>
+<p>构造函数只执行一次。若背景依赖当前窗口尺寸，应在 resizeEvent 更新缓存，或在 paintEvent 根据当前 rect 绘制，并避免每次重绘都从磁盘重新加载。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/resources.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter24"><h1>第 24 章 Designer 与 setupUi</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/35_designer">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>Designer 编辑的是 .ui XML 界面描述，uic 在构建时生成 ui_form.h。手写代码调用 ui.setupUi(&amp;w) 后，才能通过 ui.nameEdit 等对象指针访问设计好的控件。这里采用 Ui::Form 栈包装对象，真实控件仍由 QWidget 父子关系管理。原笔记常见的 Ui::MainWindow *ui 写法则还需要析构时 delete ui。</p>
+<p>objectName 是代码识别控件的名字，text 是界面显示文字，它们不是同一件事。常见自动槽名 on_对象名_信号名 依赖 setupUi 中的自动连接；本例使用显式 connect，便于看清触发关系，也避免重复连接。</p>
+<h2>设计描述 生成代码和业务代码</h2>
+<p>form.ui 是界面结构的源文件；uic 把它翻译成生成头文件；自己的 main.cpp 或窗口 .cpp 承担业务行为。setupUi 创建控件、设置属性、建立布局并登记对象名字。这个顺序解释了为什么在 setupUi 之前访问 ui.nameEdit 会得到尚未建立的对象。</p>
+<h2>按执行顺序拆解</h2>
+<p>在 Qt Creator 中双击 form.ui，修改按钮文字，再构建。接着只修改 nameEdit 的 objectName，观察原来的 ui.nameEdit 代码为什么编译失败。text 只影响显示，objectName 会影响生成成员名以及自动连接。示例直接在栈上保存 Ui::Form 包装器，包装器复制的只是控件指针，不拥有另一套界面。</p>
+<h2>参数与行为边界</h2>
+<p>Qt Creator 向导常用 Ui::MainWindow *ui；new 出来的包装器需要 delete ui。这个 delete 释放包装器，不是要求你手动逐个 delete 其所有子控件。ui_*.h 每次构建可能重新生成，不应手动修补它来解决错误。</p>
+<h2>易错点与排查</h2>
+<p>不要手动改 ui_form.h，重新构建会覆盖。应该改 form.ui 或自己的 .cpp。QMainWindow 的布局要放在 centralwidget 上。示例提供真实 .ui，可直接在 Qt Creator 中双击打开。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+#include &quot;ui_form.h&quot;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;35 Designer 与 setupUi&quot;);
+    Ui::Form ui;
+    ui.setupUi(&amp;w);
+    QObject::connect(ui.runButton, &amp;QPushButton::clicked, &amp;w,
+                     [=]() { ui.resultLabel-&gt;setText(&quot;你好，&quot; + ui.nameEdit-&gt;text()); });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>35_designer.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 35_designer
+SOURCES += main.cpp
+HEADERS += verify.h
+FORMS += form.ui
+
+</code></pre>
+<h3>form.ui</h3>
+<pre><code>&lt;ui version=&quot;4.0&quot;&gt;&lt;class&gt;Form&lt;/class&gt;&lt;widget class=&quot;QMainWindow&quot; name=&quot;Form&quot;&gt;&lt;property name=&quot;windowTitle&quot;&gt;&lt;string&gt;Designer 示例&lt;/string&gt;&lt;/property&gt;&lt;widget class=&quot;QWidget&quot; name=&quot;centralwidget&quot;&gt;&lt;layout class=&quot;QVBoxLayout&quot; name=&quot;verticalLayout&quot;&gt;&lt;item&gt;&lt;widget class=&quot;QLineEdit&quot; name=&quot;nameEdit&quot;&gt;&lt;property name=&quot;placeholderText&quot;&gt;&lt;string&gt;请输入名字&lt;/string&gt;&lt;/property&gt;&lt;/widget&gt;&lt;/item&gt;&lt;item&gt;&lt;widget class=&quot;QPushButton&quot; name=&quot;runButton&quot;&gt;&lt;property name=&quot;text&quot;&gt;&lt;string&gt;显示问候&lt;/string&gt;&lt;/property&gt;&lt;/widget&gt;&lt;/item&gt;&lt;item&gt;&lt;widget class=&quot;QLabel&quot; name=&quot;resultLabel&quot;&gt;&lt;property name=&quot;text&quot;&gt;&lt;string&gt;等待输入&lt;/string&gt;&lt;/property&gt;&lt;/widget&gt;&lt;/item&gt;&lt;/layout&gt;&lt;/widget&gt;&lt;/widget&gt;&lt;resources/&gt;&lt;connections/&gt;&lt;/ui&gt;
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/35_designer/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/35_designer/screenshots/03_result.png" alt="Designer 与 setupUi 03_result"></a></p>
+<h2>自己动手</h2>
+<p>给 form.ui 增加一个清空按钮，命名 clearButton。构建后用显式 connect 连接到 nameEdit-&gt;clear。再观察 setupUi 生成的结构，确认你改的是源 .ui，生成 .h 只用于理解。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>显式连接和 on_name_signal 能同时用吗？</strong></p>
+<p>可以存在，但容易让同一操作被执行两次。学习阶段先统一使用显式 connect；如果使用自动连接，保持对象名和槽签名准确。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/designer-using-custom-widgets.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter25"><h1>第 25 章 模态 非模态与对象生命期</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/36_dialog">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>模态决定其他窗口能否接受输入；阻塞决定调用处代码是否等待返回。exec() 显示模态对话框并等待返回，它会运行嵌套事件循环，因此对话框本身仍能响应。open() 默认按窗口模态显示并立即返回，通常连接 finished、accepted 或 rejected 处理结果。show() 通常用于非模态显示，但也会受事先设置的 modality 属性影响。</p>
+<p>局部栈对象 dialog.show() 一闪而过的根本原因是函数返回后对象立即析构。异步显示应让对象持续存在，例如 new QDialog(&amp;w)，并设置 WA_DeleteOnClose。仅有 parent 能在父窗口销毁时回收，不等于每次关掉对话框立即回收。</p>
+<h2>是否模态和是否等待是两条轴</h2>
+<p>一个对话框可能限制其他窗口的输入，却不阻塞调用处代码。open 就属于这种情况。exec 等待结果，但内部仍继续处理对话框事件，所以“阻塞代码”不等于整个 GUI 线程停止工作。嵌套事件循环会带来重入，调用之前保存的对象状态可能在对话框打开期间被其他事件改变。</p>
+<h2>按执行顺序拆解</h2>
+<p>运行第 50 步比较三个入口。show 和 open 的“调用后”会在用户关闭前出现；exec 的“调用后”要等用户确认或取消。show 非模态时可以继续操作主窗口；open 的窗口模态会限制父窗口。accepted、rejected 说明结果类型，finished(int) 同时提供结束通知与结果值。</p>
+<h2>参数与行为边界</h2>
+<p>栈对象不是永远不能用：局部 QDialog dialog; dialog.exec(); 可以活到 exec 返回。问题出在局部对象配 show/open 后函数马上返回。异步版本应使用能存活的对象，合理设置 parent 和 WA_DeleteOnClose。持有可能被关闭删除的指针时，可用 QPointer 检测对象是否仍存在。</p>
+<h2>易错点与排查</h2>
+<p>open() 和 show() 后不要让对象立即离开作用域。exec() 的栈对象可活到返回，但新代码通常优先考虑 open() 加结果信号，减少嵌套事件循环。对话框有 parent 仍可作为独立顶层对话框显示，不是普通嵌入控件。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;36 模态 非模态与对象生命期&quot;);
+    auto *button = new QPushButton(&quot;打开窗口模态对话框&quot;);
+    button-&gt;setObjectName(&quot;run&quot;);
+    w.setCentralWidget(button);
+    QObject::connect(button, &amp;QPushButton::clicked, &amp;w,
+                     [&amp;w]()
+                     {
+                         auto *dialog = new QDialog(&amp;w);
+                         dialog-&gt;setAttribute(Qt::WA_DeleteOnClose);
+                         dialog-&gt;setWindowTitle(&quot;open 立即返回&quot;);
+                         auto *layout = new QVBoxLayout(dialog);
+                         layout-&gt;addWidget(new QLabel(&quot;父窗口暂不能输入，事件循环仍在工作。&quot;));
+                         auto *ok = new QPushButton(&quot;确定&quot;);
+                         layout-&gt;addWidget(ok);
+                         QObject::connect(ok, &amp;QPushButton::clicked, dialog, &amp;QDialog::accept);
+                         dialog-&gt;open();
+                     });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>36_dialog.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 36_dialog
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/36_dialog/screenshots/02_dialog.png"><img loading="lazy" src="docs/chapters/../../examples/36_dialog/screenshots/02_dialog.png" alt="模态 非模态与对象生命期 02_dialog"></a></p>
+<p><a href="docs/chapters/../../examples/36_dialog/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/36_dialog/screenshots/03_result.png" alt="模态 非模态与对象生命期 03_result"></a></p>
+<h2>自己动手</h2>
+<p>打开第 50 步，按 show、open、exec 分别测试确定和取消，观察日志顺序。再把 open 改成 show，比较父窗口是否可操作。不要对设置 DeleteOnClose 的对象关闭后继续调用成员。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>异步对话框必须写完 result=dialog-&gt;open() 吗？</strong></p>
+<p>不可以。open 不用返回值传递选择结果，应提前 connect 到结果信号，并在 Lambda 中读取仍然存活的目标状态。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qdialog.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter26"><h1>第 26 章 单文件 多文件与取消</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/37_file_dialog">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>getOpenFileName 返回 QString，getOpenFileNames 返回 QStringList；取消时分别得到空字符串或空列表。parent 用于归属，caption 是标题，dir 是起始目录，filter 是过滤规则。Images (*.png *.jpg);;Text (*.txt) 中 ;; 分隔多组过滤器。</p>
+<p>文件选择只返回路径，不会把文件内容读到编辑框里。要读取还需 QFile 打开、检查错误、读取内容和处理编码。本项目明确只显示选中的路径。示例使用 QFileDialog 对象加 open() 与 filesSelected 信号，因此能以同样方式展示多个文件，取消时不执行选择后的逻辑。</p>
+<h2>选择路径与文件读写要分成两步</h2>
+<p>文件选择对话框只解决“用户要哪个路径”，QFile 才负责“这个路径能否打开、读到什么”。过滤器主要帮助用户选择，不是对文件内容的真实性验证。扩展名是 txt 也不保证内容就是 UTF-8 文本。读取后还要决定编码、大小限制和失败时是否保留当前文档。</p>
+<h2>按执行顺序拆解</h2>
+<p>先运行第 37 步，只选择文件并显示路径；再运行第 49 步，完成打开、编辑、保存。loadPath 先用 QFile::open(ReadOnly) 检查错误，再 readAll，再检查读取状态；成功后才替换编辑器内容。savePath 把 QString 编码为 UTF-8，再写 QSaveFile，最后 commit。写入或提交失败时返回 false，不把未保存状态清除。</p>
+<h2>参数与行为边界</h2>
+<p>getOpenFileName 取消返回空字符串，getOpenFileNames 返回空列表；getSaveFileName 返回目标路径，不会自动完成写入。读取现有文件用 QFile，整份文档覆盖保存优先考虑 QSaveFile。文本内容从 QString 到字节数组需要明确编码，不要把本地编码和 UTF-8 混用。</p>
+<h2>易错点与排查</h2>
+<p>./ 依赖当前工作目录，未必是源码所在目录。示例用构建时提供的 QT_LESSON_SOURCE_DIR 定位源码中的 samples；发布应用时应改用用户目录或部署后的资源位置。为了截图可复现，使用 Qt 非原生对话框；实际程序可以根据平台选择原生外观。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;37 单文件 多文件与取消&quot;);
+    auto *run = new QPushButton(&quot;选择一个或多个示例文件&quot;);
+    run-&gt;setObjectName(&quot;run&quot;);
+    auto *root = new QWidget;
+    auto *layout = new QVBoxLayout(root);
+    auto *result = new QTextEdit;
+    result-&gt;setReadOnly(true);
+    layout-&gt;addWidget(run);
+    layout-&gt;addWidget(result);
+    w.setCentralWidget(root);
+    QObject::connect(run, &amp;QPushButton::clicked, &amp;w,
+                     [&amp;w, result]()
+                     {
+                         auto *dialog = new QFileDialog(
+                             &amp;w, &quot;选择文件&quot;, QStringLiteral(QT_LESSON_SOURCE_DIR &quot;/samples&quot;));
+                         dialog-&gt;setOption(QFileDialog::DontUseNativeDialog);
+                         dialog-&gt;setFileMode(QFileDialog::ExistingFiles);
+                         dialog-&gt;setNameFilter(&quot;Text (*.txt);;Images (*.png *.jpg)&quot;);
+                         dialog-&gt;setAttribute(Qt::WA_DeleteOnClose);
+                         QObject::connect(dialog, &amp;QFileDialog::filesSelected, result,
+                                          [result](const QStringList &amp;files)
+                                          { result-&gt;setPlainText(files.join(&#x27;\n&#x27;)); });
+                         dialog-&gt;open();
+                     });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>37_file_dialog.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 37_file_dialog
+SOURCES += main.cpp
+HEADERS += verify.h
+
+DEFINES += QT_LESSON_SOURCE_DIR=\\\&quot;$$PWD\\\&quot;
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/37_file_dialog/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/37_file_dialog/screenshots/03_result.png" alt="单文件 多文件与取消 03_result"></a></p>
+<h2>自己动手</h2>
+<p>用第 49 步创建含中文和换行的文本，另存到自己的测试目录，关闭后重新打开。再选择不可写目录观察错误。对未保存内容发起打开或关闭，分别选择保存、不保存和取消，确认取消不会丢掉当前内容。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>保存后能立即把 modified 设成 false 吗？</strong></p>
+<p>只有写入完整并且 commit 成功后才可以。用户取消路径选择或者磁盘写入失败时，保存未完成，当前文档仍应标记为修改过。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qfiledialog.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter27"><h1>第 27 章 选择颜色与字体</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/38_color_font">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QColorDialog::getColor 返回 QColor；取消返回无效颜色，先 isValid() 再应用。QFontDialog::getFont 使用 bool *ok 告诉调用者是否确认选择；只在 ok 为 true 时使用返回字体。把取消也当成有效结果，会意外改变用户当前设置。</p>
+<p>颜色要应用到合适的调色板角色。QPlainTextEdit 的文字使用 QPalette::Text，普通 QLabel 的文字通常是 WindowText。先取原有 palette，仅改所需角色，再 setPalette，能够保留其他颜色。字体同样先从控件 font() 取得当前值。本项目用对象形式的颜色和字体对话框，以 open() 连接 colorSelected、fontSelected，确认后再更新编辑器。</p>
+<h2>区分用户正在选和已经确认</h2>
+<p>颜色对话框的 currentColorChanged 描述选择过程，colorSelected 通常用于最终确认；如果把预览直接永久应用，用户点取消时还需要恢复原值。字体也要区分预览、确认与取消。初学时先只连接最终选择信号，能更容易保证取消后原状态不变。</p>
+<h2>按执行顺序拆解</h2>
+<p>先观察编辑器当前 palette 的 Text 角色和当前 font。打开颜色框后选一个颜色并取消，确认文字保持原色；第二次选择并确认，检查文字变化。字体对话框同样先取消再确认。自动示例截图还展示了 18 号字体应用后的结果，实际可用字体会随操作系统变化。</p>
+<h2>参数与行为边界</h2>
+<p>QPalette::Text 用于输入类控件的文字；WindowText 常用于标签类文字；Base 用于文本输入区背景；Window 用于窗口背景。主题或样式表可能覆盖调色板效果，遇到颜色没变时也要检查这些设置。setFont 改整体字体，QTextEdit 选区格式则需要字符格式相关 API。</p>
+<h2>易错点与排查</h2>
+<p>QPlainTextEdit 整体字体与富文本局部字符格式是不同层级。设置整体 font 不等于给 QTextEdit 当前选区设置字符格式。对话框取消应该保持原显示。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;38 选择颜色与字体&quot;);
+    auto *root = new QWidget;
+    auto *layout = new QVBoxLayout(root);
+    auto *color = new QPushButton(&quot;选择文字颜色&quot;);
+    color-&gt;setObjectName(&quot;run&quot;);
+    auto *font = new QPushButton(&quot;选择字体&quot;);
+    font-&gt;setObjectName(&quot;fontButton&quot;);
+    auto *edit = new QPlainTextEdit(&quot;选择后观察这行文字的颜色和字体。&quot;);
+    layout-&gt;addWidget(color);
+    layout-&gt;addWidget(font);
+    layout-&gt;addWidget(edit);
+    w.setCentralWidget(root);
+    QObject::connect(color, &amp;QPushButton::clicked, &amp;w,
+                     [&amp;w, edit]()
+                     {
+                         auto *dialog = new QColorDialog(edit-&gt;palette().color(QPalette::Text), &amp;w);
+                         dialog-&gt;setOption(QColorDialog::DontUseNativeDialog);
+                         dialog-&gt;setAttribute(Qt::WA_DeleteOnClose);
+                         QObject::connect(dialog, &amp;QColorDialog::colorSelected, edit,
+                                          [edit](const QColor &amp;value)
+                                          {
+                                              auto pal = edit-&gt;palette();
+                                              pal.setColor(QPalette::Text, value);
+                                              edit-&gt;setPalette(pal);
+                                          });
+                         dialog-&gt;open();
+                     });
+    QObject::connect(font, &amp;QPushButton::clicked, &amp;w,
+                     [&amp;w, edit]()
+                     {
+                         auto *dialog = new QFontDialog(edit-&gt;font(), &amp;w);
+                         dialog-&gt;setOption(QFontDialog::DontUseNativeDialog);
+                         dialog-&gt;setAttribute(Qt::WA_DeleteOnClose);
+                         QObject::connect(dialog, &amp;QFontDialog::fontSelected, edit,
+                                          &amp;QWidget::setFont);
+                         dialog-&gt;open();
+                     });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>38_color_font.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 38_color_font
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/38_color_font/screenshots/02_dialog.png"><img loading="lazy" src="docs/chapters/../../examples/38_color_font/screenshots/02_dialog.png" alt="选择颜色与字体 02_dialog"></a></p>
+<p><a href="docs/chapters/../../examples/38_color_font/screenshots/02_font_dialog.png"><img loading="lazy" src="docs/chapters/../../examples/38_color_font/screenshots/02_font_dialog.png" alt="选择颜色与字体 02_font_dialog"></a></p>
+<p><a href="docs/chapters/../../examples/38_color_font/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/38_color_font/screenshots/03_result.png" alt="选择颜色与字体 03_result"></a></p>
+<h2>自己动手</h2>
+<p>增加一个重置按钮，恢复启动时缓存的 QPalette 和 QFont。再尝试同时修改背景与文字，避免低对比度。比较只改 Text 与只改 WindowText 对 QPlainTextEdit 的不同结果。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>为什么取消返回值仍看起来像某种字体？</strong></p>
+<p>字体对象本身不能替代确认状态。使用静态 getFont 时看 ok；对象形式则把最终应用连接到 fontSelected，不把任意当前预览值当作确认。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qfontdialog.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter28"><h1>第 28 章 消息框与三种选择结果</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/39_messagebox">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>information、warning、critical 分别用于信息、警告和错误提示；question 用于请求决策。它们返回 QMessageBox::StandardButton，应该与 Yes、No、Cancel 等标准按钮枚举比较，不能把任何非零返回值都当成确认。</p>
+<p>文件已修改时，“保存”“不保存”“取消”代表三种不同的控制流程：保存成功后继续，不保存则继续但放弃改动，取消则中止当前关闭或切换。示例只演示分支，把选择结果写到编辑器，不会真正保存或删除文件。defaultButton 应明确指定，本例选择 Cancel，避免随手回车就放弃改动。</p>
+<h2>按钮结果必须落实到控制流程</h2>
+<p>“是否保存”不是只打印三种文本。保存意味着成功写入后继续；不保存意味着放弃当前修改后继续；取消意味着停止正在进行的关闭或切换。如果保存过程失败，后续关闭仍不能继续。这个分支可以抽成 confirmDiscard()，供打开新文档与关闭窗口共同使用。</p>
+<h2>按执行顺序拆解</h2>
+<p>先在第 39 步学习 Yes、No、Cancel 与返回结果的对应关系，再在第 49 步查看真实控制流程。closeEvent 根据 confirmDiscard 返回值选择 accept 或 ignore。confirmDiscard 在 Yes 分支继续调用 saveCurrent，saveCurrent 可能因为选择路径被取消或写入失败而返回 false，因此这个 bool 不能只表示“点了 Yes”。</p>
+<h2>参数与行为边界</h2>
+<p>information、warning、critical 的图标表达不同严重程度，不会自动抛异常、记录日志或者退出程序。question 返回标准按钮枚举，默认按钮应有意识选择。键盘 Enter 触发默认按钮，Esc 的行为还与逃逸按钮和平台约定相关，不能把所有关闭方式当作 Yes。</p>
+<h2>易错点与排查</h2>
+<p>about 与 aboutQt 是说明信息，不是保存决策。示例问是否保存并不构成已经实现文件保存；真正保存要检查写入是否成功。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;39 消息框与三种选择结果&quot;);
+    auto *root = new QWidget;
+    auto *layout = new QVBoxLayout(root);
+    auto *button = new QPushButton(&quot;询问是否保存&quot;);
+    button-&gt;setObjectName(&quot;run&quot;);
+    auto *text = new QTextEdit;
+    layout-&gt;addWidget(button);
+    layout-&gt;addWidget(text);
+    w.setCentralWidget(root);
+    QObject::connect(button, &amp;QPushButton::clicked, &amp;w,
+                     [&amp;w, text]()
+                     {
+                         auto *box = new QMessageBox(
+                             QMessageBox::Question, &quot;保存选择&quot;, &quot;文件已修改，是否保存？&quot;,
+                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, &amp;w);
+                         box-&gt;setDefaultButton(QMessageBox::Cancel);
+                         box-&gt;setAttribute(Qt::WA_DeleteOnClose);
+                         QObject::connect(box, &amp;QDialog::finished, text,
+                                          [text](int result)
+                                          {
+                                              if (result == QMessageBox::Yes)
+                                                  text-&gt;append(&quot;选择保存（仅演示）&quot;);
+                                              else if (result == QMessageBox::No)
+                                                  text-&gt;append(&quot;选择不保存&quot;);
+                                              else
+                                                  text-&gt;append(&quot;取消当前操作&quot;);
+                                          });
+                         box-&gt;open();
+                     });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>39_messagebox.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 39_messagebox
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/39_messagebox/screenshots/02_dialog.png"><img loading="lazy" src="docs/chapters/../../examples/39_messagebox/screenshots/02_dialog.png" alt="消息框与三种选择结果 02_dialog"></a></p>
+<p><a href="docs/chapters/../../examples/39_messagebox/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/39_messagebox/screenshots/03_result.png" alt="消息框与三种选择结果 03_result"></a></p>
+<h2>自己动手</h2>
+<p>修改第 39 步默认按钮，按 Enter 测试哪个分支被触发。再到第 49 步编辑文本后关闭，选择 Yes 后取消保存路径，确认编辑器仍然打开且文本未丢失。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>为什么 if(result) 不够？</strong></p>
+<p>Yes、No、Cancel 都是枚举值，并不把只有 Yes 定义为 true。必须显式与相应 StandardButton 比较，才能保持业务语义。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qmessagebox.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter29"><h1>第 29 章 水平 垂直 网格与表单布局</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/40_layout">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>绝对定位要给控件逐个设置坐标和尺寸；布局则描述控件关系，由布局管理器在可用区域改变时重新安排。QHBoxLayout 从左到右，QVBoxLayout 从上到下，QGridLayout 按行列定位，QFormLayout 适合标签与输入框成对排列。</p>
+<p>父布局用 addLayout 嵌入子布局，控件用 addWidget 加入。addStretch 放可伸缩空白；setContentsMargins 控制布局与外边界间距；setSpacing 控制相邻项目间距。stretch 是分配额外空间的权重，不是承诺最终宽高严格按比例分配，还会受 sizeHint、最小尺寸和 sizePolicy 约束。</p>
+<h2>布局管理的是空间约束</h2>
+<p>布局会综合 available space、sizeHint、minimumSize、maximumSize、sizePolicy 和 stretch 来分配空间。它不是简单把窗口按比例切成几个盒子。一个按钮即使 stretch 为 1，也可能由于样式或尺寸策略不愿竖向拉高；多行编辑器通常适合承担更多可伸缩空间。</p>
+<h2>按执行顺序拆解</h2>
+<p>第 40 步的根 QVBoxLayout 管理三个区域：表单、网格、底部按钮行。表单用 addRow，网格用从零开始的行列下标，底部行先 addStretch 再加按钮，让按钮靠右。new QVBoxLayout(root) 已把布局安装到 root，无需又对 root setLayout 另一份。</p>
+<h2>参数与行为边界</h2>
+<p>contentsMargins 是容器内缘留白，spacing 是相邻项目间隔，addSpacing 是固定间隔，addStretch 是可伸缩空白。QGridLayout 的 rowSpan 和 columnSpan 允许跨行列。QFormLayout 不等于 QTableWidget：前者安排控件，后者显示可编辑表格数据。</p>
+<h2>易错点与排查</h2>
+<p>布局不是可见控件。控件加入布局后不要再依赖 move()/resize() 固定摆放。不要给同一 QWidget 安装两个顶层布局；QMainWindow 先设置 centralWidget，再给这个容器安装布局。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;40 水平 垂直 网格与表单布局&quot;);
+    auto *root = new QWidget;
+    auto *outer = new QVBoxLayout(root);
+    auto *form = new QFormLayout;
+    form-&gt;addRow(&quot;用户名&quot;, new QLineEdit);
+    form-&gt;addRow(&quot;备注&quot;, new QLineEdit);
+    outer-&gt;addLayout(form);
+    auto *grid = new QGridLayout;
+    for (int i = 0; i &lt; 6; ++i)
+        grid-&gt;addWidget(new QPushButton(QString::number(i + 1)), i / 3, i % 3);
+    outer-&gt;addLayout(grid);
+    auto *row = new QHBoxLayout;
+    row-&gt;addStretch();
+    row-&gt;addWidget(new QPushButton(&quot;确定&quot;));
+    row-&gt;addWidget(new QPushButton(&quot;取消&quot;));
+    outer-&gt;addLayout(row);
+    outer-&gt;setContentsMargins(20, 20, 20, 20);
+    outer-&gt;setSpacing(14);
+    w.setCentralWidget(root);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>40_layout.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 40_layout
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/40_layout/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/40_layout/screenshots/03_result.png" alt="水平 垂直 网格与表单布局 03_result"></a></p>
+<h2>自己动手</h2>
+<p>把编辑器放到垂直布局中，设置 addWidget(editor,1)，底部按钮行不设置伸展。把窗口拉宽拉高，观察谁吸收额外空间。再把某个按钮 setFixedSize，检查它如何限制布局，理解固定大小不应滥用。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>一个控件可以同时加入两个布局吗？</strong></p>
+<p>同一个控件只有一个实际父层级与几何位置，不能被两个布局当作两个副本使用。需要重复显示时应创建多个控件实例并同步数据。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/layout.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter30"><h1>第 30 章 QLabel 文本 图片与动画</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/41_label_movie">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QLabel 可显示普通文本、受支持的 HTML 富文本、QPixmap 图片和 QMovie 动画。并不意味着完整浏览器；复杂网页不应交给 QLabel。内容来自外部输入时，可显式设 PlainText，避免自动识别为富文本。</p>
+<p>setOpenExternalLinks(true) 会在用户点击链接后交给外部程序打开网址；本例只显示本地富文本，不自动跳转。setPixmap 绑定图片；setMovie 绑定动画，但 QLabel 不接管 QMovie 的所有权，应 new QMovie(..., parent) 指定父对象，并调用 start()。stop() 停止播放，setPaused(true) 暂停。</p>
+<h2>QLabel 的四种内容走不同接口</h2>
+<p>setText 接收文本，setPixmap 接收像素图，setMovie 接收动画对象。设置字符串 :/images/demo.png 并不会让 QLabel 读取图片。富文本采用 Qt 支持的子集，不等于浏览器完整 HTML/CSS。对用户输入使用 PlainText，可避免误把尖括号内容当作格式标签。</p>
+<h2>按执行顺序拆解</h2>
+<p>第 41 步先显示普通文本，再显示富文本，然后分别绑定 QPixmap 和 QMovie。QMovie 需要 start 才播放；停止按钮连接到 movie-&gt;stop。QMovie 的 parent 设为 root，避免标签不接管 movie 所有权所导致的泄漏。图片和 GIF 都已随 qrc 提供。</p>
+<h2>参数与行为边界</h2>
+<p>设置固定目标尺寸并等比缩放，会留下空白；scaledContents(true) 可能直接拉伸。高 DPI 图片还涉及逻辑尺寸与 devicePixelRatio，不应只按物理像素数猜显示大小。需要随容器大小调整图片时，可在尺寸变化时更新缩放结果，避免在无关事件里重复加载。</p>
+<h2>易错点与排查</h2>
+<p>显示 GIF 的 QMovie 不要漏 parent。标签不会自动把资源路径文本变成图片，必须加载 QPixmap 或 QMovie。原笔记的资源图片若未随项目提供，在其他电脑就会显示空白；本例随附 qrc、PNG 和 GIF。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;41 QLabel 文本 图片与动画&quot;);
+    auto *root = new QWidget;
+    auto *layout = new QVBoxLayout(root);
+    layout-&gt;addWidget(new QLabel(&quot;普通文字&quot;));
+    auto *rich = new QLabel(&quot;&lt;h2&gt;Qt 富文本&lt;/h2&gt;&lt;p&gt;&lt;b&gt;粗体&lt;/b&gt;与颜色演示&lt;/p&gt;&quot;);
+    layout-&gt;addWidget(rich);
+    auto *image = new QLabel;
+    image-&gt;setPixmap(QPixmap(&quot;:/images/demo.png&quot;).scaledToWidth(360));
+    layout-&gt;addWidget(image);
+    auto *animation = new QLabel;
+    auto *movie = new QMovie(&quot;:/images/demo.gif&quot;, QByteArray(), root);
+    animation-&gt;setMovie(movie);
+    movie-&gt;start();
+    layout-&gt;addWidget(animation);
+    auto *stop = new QPushButton(&quot;停止动画&quot;);
+    stop-&gt;setObjectName(&quot;run&quot;);
+    layout-&gt;addWidget(stop);
+    QObject::connect(stop, &amp;QPushButton::clicked, movie, &amp;QMovie::stop);
+    w.setCentralWidget(root);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>41_label_movie.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 41_label_movie
+SOURCES += main.cpp
+HEADERS += verify.h
+RESOURCES += assets.qrc
+
+</code></pre>
+<h3>assets.qrc</h3>
+<pre><code>&lt;RCC&gt;&lt;qresource prefix=&quot;/images&quot;&gt;&lt;file alias=&quot;demo.png&quot;&gt;assets/demo.png&lt;/file&gt;&lt;file alias=&quot;demo.gif&quot;&gt;assets/demo.gif&lt;/file&gt;&lt;/qresource&gt;&lt;/RCC&gt;
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/41_label_movie/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/41_label_movie/screenshots/03_result.png" alt="QLabel 文本 图片与动画 03_result"></a></p>
+<h2>自己动手</h2>
+<p>把标签改为纯文本并传入 &lt;b&gt;Qt&lt;/b&gt;，观察它是否显示原始标签。分别测试 movie.stop、setPaused(true)、start，比较停止与暂停的区别。把图片目标尺寸改成长条，比较等比与拉伸结果。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>标签析构会自动 delete movie 吗？</strong></p>
+<p>setMovie 不接管动画对象。应通过 QObject parent 或其他明确的生命周期方案管理它，不要仅凭“在标签里显示”判断归属。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qlabel.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter31"><h1>第 31 章 QLineEdit 输入与显示模式</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/42_lineedit">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QLineEdit 用于单行输入，setText 写入，text() 读取真实内容。placeholderText 是空内容时的提示，不是输入值；设置它不会让 text() 返回提示。textChanged 会响应用户和代码设置的变化，textEdited 主要响应用户编辑，returnPressed 用于回车触发。</p>
+<p>四种 EchoMode 为 Normal、NoEcho、Password、PasswordEchoOnEdit。NoEcho 不显示字符；Password 显示掩码；PasswordEchoOnEdit 在编辑时显示、非编辑时掩码。显示模式只改变外观，text() 仍是实际字符串。setTextMargins 控制框内边距，不是移动控件本身。</p>
+<h2>输入值 显示值和编辑动作</h2>
+<p>QLineEdit::text() 是真实字符串，displayText() 是按 EchoMode 处理后的显示内容。placeholderText 只在空值时提示，它不会成为真实文本。代码 setText 也会触发 textChanged，但通常不属于 textEdited 所描述的用户编辑，这个差别常用于避免把程序回填当成用户输入。</p>
+<h2>按执行顺序拆解</h2>
+<p>启动第 42 步时普通框为空，掩码演示框已有固定样例值。输入名字后，textChanged 将内容和长度送到结果标签。清空输入后，提示文字出现，但结果中的真实长度应为零。密码框从来不把真实演示值复制到日志。</p>
+<h2>参数与行为边界</h2>
+<p>setMaxLength 限制长度；QValidator 可以约束可接受输入；inputMask 适合固定形状。验证器可能有 Intermediate 状态，因此输入过程中暂时不完整不一定是 Invalid。returnPressed 与 editingFinished 的触发还可能受验证状态影响，不能只看某一帧文本就提交业务。</p>
+<h2>易错点与排查</h2>
+<p>密码掩码不是加密，不应把敏感密码打印到日志。本例仅用固定的演示文本，并只显示长度。清空后 text() 是空字符串，不是 placeholder 文本。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;42 QLineEdit 输入与显示模式&quot;);
+    auto *root = new QWidget;
+    auto *form = new QFormLayout(root);
+    auto *name = new QLineEdit;
+    name-&gt;setObjectName(&quot;name&quot;);
+    name-&gt;setPlaceholderText(&quot;请输入名字&quot;);
+    name-&gt;setTextMargins(8, 0, 8, 0);
+    form-&gt;addRow(&quot;普通输入&quot;, name);
+    auto *password = new QLineEdit(&quot;demo123&quot;);
+    password-&gt;setEchoMode(QLineEdit::Password);
+    form-&gt;addRow(&quot;掩码演示&quot;, password);
+    auto *result = new QLabel(&quot;尚未输入&quot;);
+    form-&gt;addRow(&quot;实时结果&quot;, result);
+    QObject::connect(name, &amp;QLineEdit::textChanged, result, [result](const QString &amp;text)
+                     { result-&gt;setText(QString(&quot;内容 %1，长度 %2&quot;).arg(text).arg(text.size())); });
+    w.setCentralWidget(root);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>42_lineedit.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 42_lineedit
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/42_lineedit/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/42_lineedit/screenshots/03_result.png" alt="QLineEdit 输入与显示模式 03_result"></a></p>
+<h2>自己动手</h2>
+<p>添加读取按钮，同时观察 text() 与 displayText() 的差别，但仅使用固定演示内容。给姓名设置最大长度，再给另一个输入框安装 QIntValidator，尝试空值、部分输入和超范围值。提交前使用 hasAcceptableInput 检查。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>把 echoMode 改成 Password 就能安全保存密码吗？</strong></p>
+<p>它只隐藏显示，不加密内存、日志或磁盘数据。不要把输入展示策略当作数据保护或账号认证方案。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qlineedit.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter32"><h1>第 32 章 组合控件与 Designer 提升</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/43_custom_widget">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>自定义控件是把重复出现的交互封装成可创建多个实例的类。这里把 QSpinBox 和 QSlider 组合到 SmallWidget，统一数值范围，双向连接数值变化，并提供 setValue()/value()。调用者不需要知道内部布局。</p>
+<p>双向连接并不必然无限递归：这里 setValue 只有数值真正改变才发信号，回写相同值不会再次发射。若自定义 setter 每次都发信号，就要先判断是否变化，必要时使用 QSignalBlocker。封装的目标是复用定义和行为，不是让整个应用只创建一个对象。</p>
+<h2>把内部结构藏在稳定接口后面</h2>
+<p>组合控件把多个标准控件组织成一个可复用组件。外部调用者只知道 setValue 和 value，不需要知道滑块放左边还是右边。复制的是类定义和设计，不是强迫所有页面共享同一个实例。需要多处独立状态时创建多个对象即可。</p>
+<h2>按执行顺序拆解</h2>
+<p>打开 smallwidget.h，依次找到构造函数、范围设置、布局、双向连接、setValue/value。两端范围必须一致，否则 A 到 B 的截断可能造成显示不一致。setValue 相同值不发 valueChanged，是这里双向连接能稳定结束的原因。若自定义组件公开信号，需要 Q_OBJECT 并让 moc 参与构建。</p>
+<h2>参数与行为边界</h2>
+<p>Designer 提升分成五步：添加普通 QWidget，占位对象改名；右键提升；基类选 QWidget；填写 SmallWidget 和 smallwidget.h；添加后执行提升。构建器必须能够找到头文件，构造函数应支持 QWidget *parent。提升不自动生成 SmallWidget 的实现。</p>
+<h2>易错点与排查</h2>
+<p>Designer 中先放 QWidget 占位，提升类名填 SmallWidget，头文件填 smallwidget.h，再提升；类必须可包含且构造函数能接受 QWidget *parent。提升不保证设计器预览能运行自定义代码。示例附 smallwidget.h，可直接用于提升。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+#include &quot;smallwidget.h&quot;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;43 组合控件与 Designer 提升&quot;);
+    auto *root = new QWidget;
+    auto *layout = new QVBoxLayout(root);
+    layout-&gt;addWidget(new QLabel(&quot;同一个自定义控件类，可以创建多个独立实例。&quot;));
+    auto *first = new SmallWidget;
+    first-&gt;setObjectName(&quot;first&quot;);
+    first-&gt;setValue(25);
+    auto *second = new SmallWidget;
+    second-&gt;setValue(70);
+    layout-&gt;addWidget(first);
+    layout-&gt;addWidget(second);
+    layout-&gt;addStretch();
+    w.setCentralWidget(root);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>smallwidget.h</h3>
+<pre><code>#pragma once
+#include &lt;QtWidgets&gt;
+class SmallWidget : public QWidget
+{
+  public:
+    explicit SmallWidget(QWidget *parent = nullptr) : QWidget(parent)
+    {
+        auto *row = new QHBoxLayout(this);
+        spin = new QSpinBox;
+        auto *slider = new QSlider(Qt::Horizontal);
+        spin-&gt;setRange(0, 100);
+        slider-&gt;setRange(0, 100);
+        row-&gt;addWidget(spin);
+        row-&gt;addWidget(slider);
+        QObject::connect(spin, &amp;QSpinBox::valueChanged, slider, &amp;QSlider::setValue);
+        QObject::connect(slider, &amp;QSlider::valueChanged, spin, &amp;QSpinBox::setValue);
+    }
+    void setValue(int value)
+    {
+        spin-&gt;setValue(value);
+    }
+    int value() const
+    {
+        return spin-&gt;value();
+    }
+
+  private:
+    QSpinBox *spin;
+};
+
+</code></pre>
+<h3>43_custom_widget.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 43_custom_widget
+SOURCES += main.cpp
+HEADERS += verify.h
+HEADERS += smallwidget.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/43_custom_widget/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/43_custom_widget/screenshots/03_result.png" alt="组合控件与 Designer 提升 03_result"></a></p>
+<h2>自己动手</h2>
+<p>新建一个 .ui，把 QWidget 提升为 SmallWidget，运行后读取 value。再把两个组件放到不同页面，确认数值独立。若需要对外通知变化，可添加 valueChanged(int) 信号，并只在真正变化时发出。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>如何避免互相 setValue 时无限循环？</strong></p>
+<p>优先让 setter 检查数值是否变化。必要时用 QSignalBlocker 在同步期间暂时阻断回发，不能仅仅假定所有自定义 setter 都和 QSpinBox 一样。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/designer-using-custom-widgets.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter33"><h1>第 33 章 堆叠页面与窗口切换</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/44_stacked_pages">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QStackedWidget 在同一容器里管理多个页面，一次显示其中一页。addWidget 返回该页索引；setCurrentIndex(0) 切到第一页，索引从 0 开始，也可用 setCurrentWidget 按指针切换。切换不会删除其他页面，输入状态通常仍保留。</p>
+<p>这与 hide 一个顶层窗口、show 另一个顶层窗口不同。用堆叠控件实现“登录页面—主页”能够共享同一个顶层窗口，方便统一管理退出和生命期。多窗口方案也可用，但要管理返回路径、对象所有权，以及隐藏主窗口后子窗口关闭导致程序无可见窗口的情况。</p>
+<h2>页面属于一个窗口 生命周期仍然存在</h2>
+<p>QStackedWidget 在视觉上一次显示一页，但其他页面的对象通常仍存在，因此输入状态也可保留。这适合向导、设置页和简单导航。切换页面不会自动执行登录验证，也不会自动清除敏感信息或刷新数据；这些都需要明确的进入与退出逻辑。</p>
+<h2>按执行顺序拆解</h2>
+<p>第 44 步用两个按钮充当最小页面，便于看清索引。先 addWidget，后 connect 切换。学习后可以把按钮换成各自具有布局的 QWidget 页面，再把导航按钮留在容器外，保持导航与页面内容的职责分离。</p>
+<h2>参数与行为边界</h2>
+<p>currentIndex 从零开始，空容器可能没有有效当前页。setCurrentWidget 比硬编码数字更能表达意图，但仍要求页面已经加入。removeWidget 不等于 delete：移除后对象是否继续使用、重新设 parent 还是释放，需要自己决定。</p>
+<h2>易错点与排查</h2>
+<p>改变当前页不等于验证了身份。此例只演示页面导航，没有账号认证。每页有自己的布局，页面必须先 addWidget 再切换到相应索引。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;44 堆叠页面与窗口切换&quot;);
+    auto *stack = new QStackedWidget;
+    stack-&gt;setObjectName(&quot;pages&quot;);
+    auto *login = new QPushButton(&quot;进入主页（仅演示导航）&quot;);
+    login-&gt;setObjectName(&quot;run&quot;);
+    auto *home = new QPushButton(&quot;返回登录页&quot;);
+    home-&gt;setObjectName(&quot;back&quot;);
+    stack-&gt;addWidget(login);
+    stack-&gt;addWidget(home);
+    w.setCentralWidget(stack);
+    QObject::connect(login, &amp;QPushButton::clicked, stack, [stack]() { stack-&gt;setCurrentIndex(1); });
+    QObject::connect(home, &amp;QPushButton::clicked, stack, [stack]() { stack-&gt;setCurrentIndex(0); });
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>44_stacked_pages.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 44_stacked_pages
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/44_stacked_pages/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/44_stacked_pages/screenshots/03_result.png" alt="堆叠页面与窗口切换 03_result"></a></p>
+<h2>自己动手</h2>
+<p>增加第三页“关于”，提供返回按钮。让第一页有一个 QLineEdit，切走再回来观察内容是否保持。再为切换后“清空输入”写一段明确代码，理解状态变化与显示切换并非自动绑定。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>什么时候应该使用多个顶层窗口？</strong></p>
+<p>当任务确实需要独立并行工作区时可以选择多窗口；同时要设计返回与退出路径，避免主窗口隐藏后只剩已经关闭的子窗口。简单内部导航通常先用堆叠页面。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qstackedwidget.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter34"><h1>第 34 章 关闭事件与尺寸变化</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/45_close_resize">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>事件是 QEvent 的对象，由事件系统送到目标 QObject。QWidget 的 event() 会根据类型分派到 closeEvent、resizeEvent 等专用处理函数；按钮 clicked 则是较高层的信号通知。二者经常配合，但不是同一个概念。</p>
+<p>在头文件 protected 区声明 void closeEvent(QCloseEvent *event) override，源文件实现。accept 允许关闭，ignore 拒绝关闭；不要调用 close() 重新触发自己。resizeEvent 的 size 是新尺寸，oldSize 是旧尺寸，首次事件的旧尺寸可能无效。resizeEvent 中尽量避免无条件再次 resize，以免递归。</p>
+<h2>关闭请求和尺寸通知是不同事件</h2>
+<p>closeEvent 收到的是关闭请求，ignore 可以让窗口继续存在；resizeEvent 通知的是尺寸已经变化，不是拿来询问是否允许缩放。不要在 closeEvent 里再次调用 close 引发递归，也不要在 resizeEvent 中无条件再次 resize 制造事件循环。</p>
+<h2>按执行顺序拆解</h2>
+<p>第 45 步用 QMessageBox 的 No/Yes 控制 ignore/accept。对照第 49 步，确认“用户同意保存”和“保存已完成”之间还存在文件错误处理。resizeEvent 中使用 event-&gt;size() 与 oldSize()，首次旧尺寸可能无效，因此不要直接按其计算有意义的比例。</p>
+<h2>参数与行为边界</h2>
+<p>事件参数只在当前调用中有效，不要把 QCloseEvent* 或 QResizeEvent* 保存到异步回调后再使用。若要异步询问关闭，可以先 ignore，本次事件结束后显示异步对话框，确认后设置状态并重新发起关闭请求。</p>
+<h2>易错点与排查</h2>
+<p>override 用于检查是否真正覆盖了基类虚函数。保留原有处理通常要调用基类对应函数，但关闭拦截中拒绝后不要再调用会重新接受关闭的默认处理。本例自动验证会分别选择 No 与 Yes。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+class EventArea : public QLabel
+{
+  public:
+    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
+    {
+        setMouseTracking(true);
+        setFocusPolicy(Qt::StrongFocus);
+        setAlignment(Qt::AlignCenter);
+        setText(&quot;移动鼠标，点击后按键盘；拖动主窗口观察大小变化。&quot;);
+    }
+
+  protected:
+    void resizeEvent(QResizeEvent *event) override
+    {
+        setText(QString(&quot;区域大小 %1 × %2&quot;).arg(event-&gt;size().width()).arg(event-&gt;size().height()));
+        QLabel::resizeEvent(event);
+    }
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        setText(QString(&quot;鼠标位置 %1，%2&quot;).arg(event-&gt;position().x()).arg(event-&gt;position().y()));
+        QLabel::mouseMoveEvent(event);
+    }
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        setFocus();
+        setText(event-&gt;button() == Qt::LeftButton ? &quot;左键按下&quot; : &quot;其他鼠标键按下&quot;);
+        QLabel::mousePressEvent(event);
+    }
+    bool event(QEvent *event) override
+    {
+        if (event-&gt;type() == QEvent::KeyPress)
+        {
+            auto *key = static_cast&lt;QKeyEvent *&gt;(event);
+            if (key-&gt;key() == Qt::Key_Tab)
+            {
+                setText(&quot;event 已处理 Tab，阻止默认焦点切换&quot;);
+                return true;
+            }
+        }
+        return QLabel::event(event);
+    }
+};
+class CloseWindow : public QMainWindow
+{
+  protected:
+    void closeEvent(QCloseEvent *event) override
+    {
+        auto choice = QMessageBox::question(this, &quot;关闭确认&quot;, &quot;确定关闭窗口吗？&quot;,
+                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (choice == QMessageBox::Yes)
+            event-&gt;accept();
+        else
+            event-&gt;ignore();
+    }
+};
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    CloseWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;45 关闭事件与尺寸变化&quot;);
+    w.setCentralWidget(new EventArea);
+    w.statusBar()-&gt;showMessage(&quot;拖动边缘改变尺寸；关闭窗口会询问确认。&quot;);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>45_close_resize.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 45_close_resize
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/45_close_resize/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/45_close_resize/screenshots/03_result.png" alt="关闭事件与尺寸变化 03_result"></a></p>
+<h2>自己动手</h2>
+<p>第一次关闭选 No，确认窗口仍显示；第二次选 Yes，确认窗口退出。改变窗口大小后记录旧新尺寸。再思考怎样让编辑器修改未保存时才询问，而不是每次关闭都询问。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>在拒绝关闭后还调用默认 closeEvent 有何问题？</strong></p>
+<p>默认实现可能接受这次关闭请求，覆盖你的拒绝决策。需要保留的基类行为必须结合事件种类判断，不能机械地在每个函数末尾调用。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qwidget.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter35"><h1>第 35 章 鼠标按键 坐标和跟踪</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/46_mouse_events">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>mousePressEvent 处理按下，mouseReleaseEvent 处理释放，mouseMoveEvent 处理移动。button() 描述本次发生变化的按键；buttons() 是当前仍按下的按键集合，例如移动时判断是否正在拖动要查看 buttons()。</p>
+<p>默认不按键移动时不一定收到移动事件，setMouseTracking(true) 允许无按键移动跟踪。Qt 6 推荐 position() 获取相对接收控件的浮点坐标，用 globalPosition() 获取屏幕坐标。坐标属于接收事件的控件，不是任意父窗口。</p>
+<h2>本次变化的按键和当前按下集合</h2>
+<p>鼠标 button() 表示触发本次按下或释放的按键，buttons() 表示当前仍保持按下的集合。mouseMoveEvent 的 button 常是 NoButton，因此拖拽判断应使用 buttons() &amp; Qt::LeftButton。position 是相对接收控件的坐标，globalPosition 是屏幕坐标，二者不能混用。</p>
+<h2>按执行顺序拆解</h2>
+<p>本例把事件处理放在 QLabel 子类 EventArea 上，因为鼠标实际上位于这个标签。设置 mouseTracking(true) 后，即使没有按键也收到移动事件。点击时 setFocus，后面的键盘观察才有明确目标。只在主窗口上重写鼠标函数，不保证能看到被子控件处理掉的事件。</p>
+<h2>参数与行为边界</h2>
+<p>默认把某些事件交给基类处理，有助于保留原控件行为。事件传播不是任意祖先都会收到一份副本；是否处理、是否接受、控件默认行为都会影响链路。需要观察已有子控件而不改继承时，下一节的事件过滤器更合适。</p>
+<h2>易错点与排查</h2>
+<p>鼠标位于某个子控件上时，事件通常发给那个子控件。若想观察 QLabel 上的事件，应继承 QLabel 重写，而不是只在主窗口上重写后期待捕获所有子控件事件。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+class EventArea : public QLabel
+{
+  public:
+    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
+    {
+        setMouseTracking(true);
+        setFocusPolicy(Qt::StrongFocus);
+        setAlignment(Qt::AlignCenter);
+        setText(&quot;移动鼠标，点击后按键盘；拖动主窗口观察大小变化。&quot;);
+    }
+
+  protected:
+    void resizeEvent(QResizeEvent *event) override
+    {
+        setText(QString(&quot;区域大小 %1 × %2&quot;).arg(event-&gt;size().width()).arg(event-&gt;size().height()));
+        QLabel::resizeEvent(event);
+    }
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        setText(QString(&quot;鼠标位置 %1，%2&quot;).arg(event-&gt;position().x()).arg(event-&gt;position().y()));
+        QLabel::mouseMoveEvent(event);
+    }
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        setFocus();
+        setText(event-&gt;button() == Qt::LeftButton ? &quot;左键按下&quot; : &quot;其他鼠标键按下&quot;);
+        QLabel::mousePressEvent(event);
+    }
+    bool event(QEvent *event) override
+    {
+        if (event-&gt;type() == QEvent::KeyPress)
+        {
+            auto *key = static_cast&lt;QKeyEvent *&gt;(event);
+            if (key-&gt;key() == Qt::Key_Tab)
+            {
+                setText(&quot;event 已处理 Tab，阻止默认焦点切换&quot;);
+                return true;
+            }
+        }
+        return QLabel::event(event);
+    }
+};
+class CloseWindow : public QMainWindow
+{
+  protected:
+    void closeEvent(QCloseEvent *event) override
+    {
+        auto choice = QMessageBox::question(this, &quot;关闭确认&quot;, &quot;确定关闭窗口吗？&quot;,
+                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (choice == QMessageBox::Yes)
+            event-&gt;accept();
+        else
+            event-&gt;ignore();
+    }
+};
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;46 鼠标按键 坐标和跟踪&quot;);
+    w.setCentralWidget(new EventArea);
+    w.statusBar()-&gt;showMessage(&quot;本步用 QLabel 子类显示鼠标位置，Qt 6 使用 position()。&quot;);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>46_mouse_events.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 46_mouse_events
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/46_mouse_events/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/46_mouse_events/screenshots/03_result.png" alt="鼠标按键 坐标和跟踪 03_result"></a></p>
+<h2>自己动手</h2>
+<p>在 mouseMoveEvent 中只有左键拖动时显示“拖动”，无按键时显示“悬停”。用 position 记录相对位置，再把标签放进带边距的布局中，确认坐标原点跟随标签而非主窗口。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>Qt 5 示例中的 x/y 可以照搬吗？</strong></p>
+<p>部分旧接口仍可能存在但不适合新代码。Qt 6 使用 position 的浮点位置更准确，必要时再有意识转换成整数 QPoint。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qmouseevent.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter36"><h1>第 36 章 重写 event 拦截 Tab</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/47_event_tab">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>event(QEvent *) 返回 bool，表示是否处理这个事件。先检查 type 再把通用指针转换到对应事件类型；未经类型判断的强制转换可能访问错误的数据。处理感兴趣的事件后返回 true；其余事件必须 return 基类::event(event)，避免破坏默认行为。</p>
+<p>Tab 常被控件系统用来切换焦点，因此只在 keyPressEvent 中写代码可能不够。要改变这个行为，可以在目标控件的 event 中拦截 KeyPress，识别 Qt::Key_Tab。键盘事件发给有焦点的对象，先确保目标控件有适当 focusPolicy 并获得焦点。</p>
+<h2>事件分发 事件处理和事件过滤</h2>
+<p>特定处理函数适合某一类事件；重写 event 适合介入目标对象的分发；eventFilter 适合在不改被观察对象继承关系时提前观察或消费事件。第 51 步在 QLineEdit 上安装过滤器，识别回车并更新标签，不需要创建 QLineEdit 子类。</p>
+<h2>按执行顺序拆解</h2>
+<p>事件类型确定后才能安全转换到 QKeyEvent。第 47 步在 event 中识别 KeyPress 和 Tab，返回 true 消费这个事件；其余必须交给 QLabel::event。第 51 步则先进入过滤器；过滤器返回 true 会阻止继续送到被观察对象，返回 false 或基类结果则允许默认流程继续。</p>
+<h2>参数与行为边界</h2>
+<p>键盘事件以焦点为中心。focusPolicy 决定能否通过 Tab 或点击等方式获得焦点，setFocus 才是当前请求。QEvent::accept 与 event 返回值并不是所有事件中都可机械等同的通用开关。sendEvent 同步送达，postEvent 排队稍后送达且由 Qt 接管事件对象。</p>
+<h2>易错点与排查</h2>
+<p>返回 true 不是“所有事件继续向下传递”。不要在末尾无条件 return true。QEvent::accept() 与 event() 返回值有关但不能在所有事件种类下简单当成同一开关。原例中 Ctrl、Tab 等专用按键应使用 Qt 枚举。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+class EventArea : public QLabel
+{
+  public:
+    explicit EventArea(QWidget *p = nullptr) : QLabel(p)
+    {
+        setMouseTracking(true);
+        setFocusPolicy(Qt::StrongFocus);
+        setAlignment(Qt::AlignCenter);
+        setText(&quot;移动鼠标，点击后按键盘；拖动主窗口观察大小变化。&quot;);
+    }
+
+  protected:
+    void resizeEvent(QResizeEvent *event) override
+    {
+        setText(QString(&quot;区域大小 %1 × %2&quot;).arg(event-&gt;size().width()).arg(event-&gt;size().height()));
+        QLabel::resizeEvent(event);
+    }
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        setText(QString(&quot;鼠标位置 %1，%2&quot;).arg(event-&gt;position().x()).arg(event-&gt;position().y()));
+        QLabel::mouseMoveEvent(event);
+    }
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        setFocus();
+        setText(event-&gt;button() == Qt::LeftButton ? &quot;左键按下&quot; : &quot;其他鼠标键按下&quot;);
+        QLabel::mousePressEvent(event);
+    }
+    bool event(QEvent *event) override
+    {
+        if (event-&gt;type() == QEvent::KeyPress)
+        {
+            auto *key = static_cast&lt;QKeyEvent *&gt;(event);
+            if (key-&gt;key() == Qt::Key_Tab)
+            {
+                setText(&quot;event 已处理 Tab，阻止默认焦点切换&quot;);
+                return true;
+            }
+        }
+        return QLabel::event(event);
+    }
+};
+class CloseWindow : public QMainWindow
+{
+  protected:
+    void closeEvent(QCloseEvent *event) override
+    {
+        auto choice = QMessageBox::question(this, &quot;关闭确认&quot;, &quot;确定关闭窗口吗？&quot;,
+                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (choice == QMessageBox::Yes)
+            event-&gt;accept();
+        else
+            event-&gt;ignore();
+    }
+};
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;47 重写 event 拦截 Tab&quot;);
+    w.setCentralWidget(new EventArea);
+    w.centralWidget()-&gt;setFocus();
+    w.statusBar()-&gt;showMessage(&quot;点击中央区域后按 Tab，观察默认焦点切换被拦截。&quot;);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>47_event_tab.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 47_event_tab
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/47_event_tab/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/47_event_tab/screenshots/03_result.png" alt="重写 event 拦截 Tab 03_result"></a></p>
+<h2>自己动手</h2>
+<p>给输入框安装第 51 步过滤器，输入中文后回车观察结果。再把 true 改为基类返回，观察输入框自己的 returnPressed 是否仍可触发。不要同时把所有事件无条件吞掉。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>过滤器能保存传入的 event 指针以后再用吗？</strong></p>
+<p>不能假定它仍存活。需要延后处理时先复制所需数据，例如 key、文本或坐标，再通过信号或排队调用传递这些值。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/eventsandfilters.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="chapter37"><h1>第 37 章 QPainter 与绘图设备</h1>
+<p>本章项目：<a href="docs/chapters/../../examples/48_painter">完整源码</a>。先运行项目观察行为，再按以下顺序阅读。</p>
+<h2>本章要解决的问题</h2>
+<p>QPainter 执行画线、矩形、椭圆、图片和文本等操作；QPaintDevice 是可被绘制的设备基类；QPaintEngine 提供设备对应的绘制实现，入门通常不用直接操作。原笔记中的 QPainterDevice 应改为 QPaintDevice。</p>
+<p>对 QWidget 绘制应在 paintEvent 或其调用链中完成。先创建 QPainter(this)，设置 QPen 控制边线颜色宽度，设置 QBrush 控制填充，再调用 drawLine、drawRect、drawEllipse。要改变图形，更新成员状态后调用 update() 请求重新绘制，而不是把绘图只放进按钮槽临时画一次。</p>
+<p>QPixmap 常用于界面显示，QImage 便于像素访问，QBitmap 是一位深度位图，QPicture 记录与重放绘图命令。它们不是全部绘图设备，QWidget 也是 QPaintDevice 的子类。</p>
+<h2>图形应该从持久状态重建</h2>
+<p>绘制结果是窗口某一时刻的像素，不是可靠的应用状态。遮挡、缩放、主题变化等都可能触发重绘。把“画一个红椭圆”只写在按钮槽里而不保留颜色状态，下一次重绘可能消失。第 52 步将 color_ 放在 DrawingArea 成员中，按钮只更新颜色并 update，paintEvent 每次根据状态重建图形。</p>
+<h2>按执行顺序拆解</h2>
+<p>QPainter 在 paintEvent 中绑定 this，设置抗锯齿、画笔和画刷，再画椭圆。QPen 控制轮廓，QBrush 控制填充。update 请求未来合适时机重绘，可能合并多次请求；repaint 更直接，日常状态更新通常优先 update。不要从 paintEvent 里无条件再 update，造成持续无效绘制。</p>
+<h2>参数与行为边界</h2>
+<p>QWidget 是屏幕控件，QImage 便于像素操作，QPixmap 为界面显示优化，QBitmap 是一位位图，QPicture 记录绘制命令。逻辑坐标、像素坐标与设备像素比需要区分。painter.save/restore 可隔离画笔与坐标变换状态，复杂绘制中比反复手动恢复属性更可靠。</p>
+<h2>易错点与排查</h2>
+<p>QPicture 不是普通像素图片。QImage、QPixmap 上的离屏绘制可以在适当代码位置进行，不要求它们自己的 paintEvent。一个设备同时只应有一个活动画家；使用局部 QPainter 作用域可自动结束绘制。</p>
+<p>遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。</p>
+<h2>完整示例与配套文件</h2>
+<p>以下为本步完整程序。若存在 .ui、qrc 或额外头文件，必须把同一目录中的文件一起下载。构建期生成的 ui_*.h、moc 文件不需要手动维护。</p>
+<h3>main.cpp</h3>
+<pre><code>#include &lt;QtWidgets&gt;
+#include &lt;QMouseEvent&gt;
+#include &lt;QKeyEvent&gt;
+class Canvas : public QWidget
+{
+  protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.fillRect(rect(), Qt::white);
+        painter.setPen(QPen(Qt::darkGray, 2));
+        painter.drawLine(35, 35, 500, 270);
+        painter.setPen(QPen(Qt::red, 3));
+        painter.drawRect(60, 70, 360, 180);
+        painter.setPen(QPen(Qt::blue, 5));
+        painter.drawEllipse(60, 70, 360, 180);
+        painter.setPen(Qt::black);
+        painter.drawText(50, 320, &quot;QPainter 在 paintEvent 中绘制，缩放和遮挡后仍可重绘。&quot;);
+        QImage image(180, 80, QImage::Format_ARGB32);
+        image.fill(QColor(&quot;#dbeafe&quot;));
+        {
+            QPainter imagePainter(&amp;image);
+            imagePainter.setPen(Qt::darkBlue);
+            imagePainter.drawText(image.rect(), Qt::AlignCenter, &quot;QImage 离屏绘图&quot;);
+        }
+        painter.drawImage(50, 360, image);
+    }
+};
+
+#include &quot;verify.h&quot;
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    QMainWindow w;
+    w.resize(800, 580);
+    w.setWindowTitle(&quot;48 QPainter 与绘图设备&quot;);
+    w.setCentralWidget(new Canvas);
+    w.statusBar()-&gt;showMessage(&quot;红矩形 蓝椭圆 灰直线；下方是 QImage 离屏绘图。&quot;);
+    w.show();
+    scheduleVerification(&amp;w);
+    return app.exec();
+}
+
+</code></pre>
+<h3>48_painter.pro</h3>
+<pre><code>QT += widgets
+CONFIG += c++17
+TEMPLATE = app
+TARGET = 48_painter
+SOURCES += main.cpp
+HEADERS += verify.h
+
+</code></pre>
+<p>自动检查用的 verify.h 已在项目目录中提供；普通运行没有 --verify 参数时，不会执行自动操作。</p>
+<h2>运行截图与观察</h2>
+<p><a href="docs/chapters/../../examples/48_painter/screenshots/03_result.png"><img loading="lazy" src="docs/chapters/../../examples/48_painter/screenshots/03_result.png" alt="QPainter 与绘图设备 03_result"></a></p>
+<h2>自己动手</h2>
+<p>运行第 52 步，切换颜色后缩放窗口并遮挡再恢复，确认颜色仍保持。把椭圆位置从固定 QRect 改为基于当前 rect 调整后的区域。再把画刷改为 NoBrush，比较只画轮廓与填充的区别。</p>
+<p>先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。</p>
+<h2>自测与答案</h2>
+<p><strong>为什么 QImage 上绘制不需要 paintEvent？</strong></p>
+<p>paintEvent 是 QWidget 的屏幕重绘入口。离屏图像本身是绘图设备，可以在适当函数中创建局部 QPainter 绘制；结束后再交给 QLabel 或其他控件显示。</p>
+<h2>继续阅读</h2>
+<p>- <a href="https://doc.qt.io/qt-6/qpainter.html">Qt 官方文档</a><br>- <a href="docs/chapters/../getting-started.md">项目构建方法</a><br>- <a href="docs/chapters/../validation.md">自动检查范围</a></p></section><section id="practices"><h1>四个完整操作闭环</h1>
+<p>这四步将后半部分分散的知识点组合起来。建议完成第 20—37 章后再练习，每一步都能独立运行。</p>
+<h2>49 UTF-8 文本编辑器</h2>
+<p><a href="docs/../examples/49_text_editor/main.cpp">完整代码</a></p>
+<p>这个例子真正执行打开、编辑和保存，不仅显示一个文件路径。核心状态是当前路径与 QTextDocument 的 modified 标记。打开新文档前和关闭窗口时共用 confirmDiscard：没有修改则直接继续，有修改则分别处理保存、不保存、取消。</p>
+<p>读取先检查 QFile::open，读取完成再检查错误，成功后才替换界面文本；保存先将 QString 转成 UTF-8，再写 QSaveFile，检查写入字节数并 commit。只有确认保存成功，才清除修改标记。路径对话框取消或磁盘写入失败，都应该保留原文档。</p>
+<p>本例按 UTF-8 解释文本，并使用 readAll，适合小型文本学习。大文件、编码检测、异步读取与多文档管理可作为后续扩展。</p>
+<p>练习顺序：输入两行中文 → 另存为自己的测试文件 → 关闭重新打开 → 修改后关闭并点取消 → 再关闭选择保存。自动检查在 QTemporaryDir 内验证 UTF-8 写入、读回和修改状态，不操作用户已有文件。</p>
+<p><a href="docs/../examples/49_text_editor/screenshots/result.png"><img loading="lazy" src="docs/../examples/49_text_editor/screenshots/result.png" alt="文本编辑器运行结果"></a></p>
+<h2>50 对话框三种调用方式</h2>
+<p><a href="docs/../examples/50_dialog_modes/main.cpp">完整代码</a></p>
+<p>分别点击 show、open、exec，然后观察调用前、调用后与结果通知的先后顺序。show 和 open 会立即返回，exec 等到关闭后返回结果；但 exec 内部仍在处理事件，因此按钮可以点击，自动检查中的 QTimer 也能工作。</p>
+<p>异步对象通过 parent 与 WA_DeleteOnClose 管理，exec 示例使用栈对象，函数返回后自动析构。两者都不是“new 永远更好”或“栈永远不能用”，关键是对象必须活到最后一次使用结束。</p>
+<p>练习：对每种入口分别点确定和取消，写出 Accepted/Rejected 出现的位置；在非模态 show 打开时尝试操作父窗口，在 open 打开时再尝试一次。</p>
+<p><a href="docs/../examples/50_dialog_modes/screenshots/result.png"><img loading="lazy" src="docs/../examples/50_dialog_modes/screenshots/result.png" alt="对话框顺序验证"></a></p>
+<h2>51 不继承输入框也能处理事件</h2>
+<p><a href="docs/../examples/51_event_filter/main.cpp">完整代码</a></p>
+<p>ReturnFilter 继承 QObject，安装在普通 QLineEdit 上。收到事件时先判断 KeyPress，再读取键值；识别 Return 或小键盘 Enter 后更新结果标签并返回 true，消费事件。其余情况交给 QObject::eventFilter。</p>
+<p>过滤器与目标控件放在同一窗口管理下。这里的 QLabel 指针在过滤器工作期间持续有效；如果将过滤器移到另一个更长寿的对象上，需要重新检查结果标签的生命期。</p>
+<p>练习：同时给输入框连接 returnPressed，然后比较过滤器返回 true 与返回基类结果时，原信号是否还能触发。这样可以实际观察“消费事件”的含义。</p>
+<p><a href="docs/../examples/51_event_filter/screenshots/result.png"><img loading="lazy" src="docs/../examples/51_event_filter/screenshots/result.png" alt="事件过滤器运行结果"></a></p>
+<h2>52 交互绘图在重绘后保持状态</h2>
+<p><a href="docs/../examples/52_interactive_paint/main.cpp">完整代码</a></p>
+<p>DrawingArea 只保存 color_，按钮调用 setColor 改状态并 update；paintEvent 根据当前颜色和当前 rect 重新绘图。没有把 QPainter 保存成长期成员，也没有让按钮直接在屏幕上临时画一次。</p>
+<p>QPen 控制轮廓，带透明度的 QColor 作为画刷控制填充。绘制区域从窗口矩形缩进得到，因此缩放时仍能适应。自动检查既确认成员颜色变红，也检查真实渲染图像中存在红色轮廓像素，避免只修改数据而没有更新显示。</p>
+<p>练习：增加线宽输入框，用同样的“修改状态 → update → paintEvent”流程更新线宽。切换颜色后遮挡窗口并恢复，确认结果仍然正确。</p>
+<p><a href="docs/../examples/52_interactive_paint/screenshots/result.png"><img loading="lazy" src="docs/../examples/52_interactive_paint/screenshots/result.png" alt="交互绘图运行结果"></a></p></section></main></html>

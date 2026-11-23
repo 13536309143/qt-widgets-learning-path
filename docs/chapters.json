@@ -1,0 +1,110 @@
+[
+  {
+    "chapter": 20,
+    "title": "主窗口与中心部件",
+    "slug": "31_mainwindow",
+    "file": "20-mainwindow.md"
+  },
+  {
+    "chapter": 21,
+    "title": "菜单 动作与工具栏",
+    "slug": "32_menu_toolbar",
+    "file": "21-menu_toolbar.md"
+  },
+  {
+    "chapter": 22,
+    "title": "状态栏和停靠面板",
+    "slug": "33_status_dock",
+    "file": "22-status_dock.md"
+  },
+  {
+    "chapter": 23,
+    "title": "资源路径 图片与背景",
+    "slug": "34_resources",
+    "file": "23-resources.md"
+  },
+  {
+    "chapter": 24,
+    "title": "Designer 与 setupUi",
+    "slug": "35_designer",
+    "file": "24-designer.md"
+  },
+  {
+    "chapter": 25,
+    "title": "模态 非模态与对象生命期",
+    "slug": "36_dialog",
+    "file": "25-dialog.md"
+  },
+  {
+    "chapter": 26,
+    "title": "单文件 多文件与取消",
+    "slug": "37_file_dialog",
+    "file": "26-file_dialog.md"
+  },
+  {
+    "chapter": 27,
+    "title": "选择颜色与字体",
+    "slug": "38_color_font",
+    "file": "27-color_font.md"
+  },
+  {
+    "chapter": 28,
+    "title": "消息框与三种选择结果",
+    "slug": "39_messagebox",
+    "file": "28-messagebox.md"
+  },
+  {
+    "chapter": 29,
+    "title": "水平 垂直 网格与表单布局",
+    "slug": "40_layout",
+    "file": "29-layout.md"
+  },
+  {
+    "chapter": 30,
+    "title": "QLabel 文本 图片与动画",
+    "slug": "41_label_movie",
+    "file": "30-label_movie.md"
+  },
+  {
+    "chapter": 31,
+    "title": "QLineEdit 输入与显示模式",
+    "slug": "42_lineedit",
+    "file": "31-lineedit.md"
+  },
+  {
+    "chapter": 32,
+    "title": "组合控件与 Designer 提升",
+    "slug": "43_custom_widget",
+    "file": "32-custom_widget.md"
+  },
+  {
+    "chapter": 33,
+    "title": "堆叠页面与窗口切换",
+    "slug": "44_stacked_pages",
+    "file": "33-stacked_pages.md"
+  },
+  {
+    "chapter": 34,
+    "title": "关闭事件与尺寸变化",
+    "slug": "45_close_resize",
+    "file": "34-close_resize.md"
+  },
+  {
+    "chapter": 35,
+    "title": "鼠标按键 坐标和跟踪",
+    "slug": "46_mouse_events",
+    "file": "35-mouse_events.md"
+  },
+  {
+    "chapter": 36,
+    "title": "重写 event 拦截 Tab",
+    "slug": "47_event_tab",
+    "file": "36-event_tab.md"
+  },
+  {
+    "chapter": 37,
+    "title": "QPainter 与绘图设备",
+    "slug": "48_painter",
+    "file": "37-painter.md"
+  }
+]

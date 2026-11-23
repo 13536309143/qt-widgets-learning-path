@@ -1,0 +1,269 @@
+{
+  "date": "2026-11-23",
+  "platform": "Windows",
+  "qt": "6.12.0",
+  "compiler": "MinGW 13.1",
+  "configuration": "Release",
+  "results": [
+    {
+      "name": "01_first_window",
+      "status": "passed",
+      "seconds": 1.35564
+    },
+    {
+      "name": "02_window_size",
+      "status": "passed",
+      "seconds": 1.43937
+    },
+    {
+      "name": "03_buttons_coordinates",
+      "status": "passed",
+      "seconds": 1.36626
+    },
+    {
+      "name": "04_object_tree",
+      "status": "passed",
+      "seconds": 1.68508
+    },
+    {
+      "name": "05_stack_lifetime",
+      "status": "passed",
+      "seconds": 1.43293
+    },
+    {
+      "name": "06_close_connection",
+      "status": "passed",
+      "seconds": 1.47892
+    },
+    {
+      "name": "07_custom_signal",
+      "status": "passed",
+      "seconds": 1.59183
+    },
+    {
+      "name": "08_signal_to_signal",
+      "status": "passed",
+      "seconds": 1.52846
+    },
+    {
+      "name": "09_overloaded_signal",
+      "status": "passed",
+      "seconds": 1.36941
+    },
+    {
+      "name": "10_disconnect",
+      "status": "passed",
+      "seconds": 1.41327
+    },
+    {
+      "name": "11_multiple_slots",
+      "status": "passed",
+      "seconds": 1.46589
+    },
+    {
+      "name": "12_function_to_lambda",
+      "status": "passed",
+      "seconds": 1.39882
+    },
+    {
+      "name": "13_define_and_call",
+      "status": "passed",
+      "seconds": 1.56517
+    },
+    {
+      "name": "14_capture_and_parameter",
+      "status": "passed",
+      "seconds": 1.58584
+    },
+    {
+      "name": "15_value_capture",
+      "status": "passed",
+      "seconds": 1.4657
+    },
+    {
+      "name": "16_reference_capture",
+      "status": "passed",
+      "seconds": 1.44634
+    },
+    {
+      "name": "17_mixed_capture",
+      "status": "passed",
+      "seconds": 1.5612
+    },
+    {
+      "name": "18_pointer_capture",
+      "status": "passed",
+      "seconds": 1.43131
+    },
+    {
+      "name": "19_mutable_original",
+      "status": "passed",
+      "seconds": 1.43507
+    },
+    {
+      "name": "20_mutable_state",
+      "status": "passed",
+      "seconds": 1.39497
+    },
+    {
+      "name": "21_this_member",
+      "status": "passed",
+      "seconds": 1.33719
+    },
+    {
+      "name": "22_empty_capture_button",
+      "status": "passed",
+      "seconds": 1.41094
+    },
+    {
+      "name": "23_signal_parameter",
+      "status": "passed",
+      "seconds": 1.47283
+    },
+    {
+      "name": "24_lambda_adapter",
+      "status": "passed",
+      "seconds": 1.63432
+    },
+    {
+      "name": "25_loop_capture",
+      "status": "passed",
+      "seconds": 1.4278
+    },
+    {
+      "name": "26_safe_delayed_state",
+      "status": "passed",
+      "seconds": 1.4825
+    },
+    {
+      "name": "27_lambda_keeps_copy",
+      "status": "passed",
+      "seconds": 1.56823
+    },
+    {
+      "name": "28_complete_counter",
+      "status": "passed",
+      "seconds": 1.56858
+    },
+    {
+      "name": "29_member_slot",
+      "status": "passed",
+      "seconds": 1.56624
+    },
+    {
+      "name": "30_self_test",
+      "status": "passed",
+      "seconds": 1.31619
+    },
+    {
+      "name": "31_mainwindow",
+      "status": "passed",
+      "seconds": 1.70093
+    },
+    {
+      "name": "32_menu_toolbar",
+      "status": "passed",
+      "seconds": 1.62021
+    },
+    {
+      "name": "33_status_dock",
+      "status": "passed",
+      "seconds": 1.46319
+    },
+    {
+      "name": "34_resources",
+      "status": "passed",
+      "seconds": 1.34087
+    },
+    {
+      "name": "35_designer",
+      "status": "passed",
+      "seconds": 1.3819
+    },
+    {
+      "name": "36_dialog",
+      "status": "passed",
+      "seconds": 1.50236
+    },
+    {
+      "name": "37_file_dialog",
+      "status": "passed",
+      "seconds": 2.11362
+    },
+    {
+      "name": "38_color_font",
+      "status": "passed",
+      "seconds": 1.60764
+    },
+    {
+      "name": "39_messagebox",
+      "status": "passed",
+      "seconds": 1.55725
+    },
+    {
+      "name": "40_layout",
+      "status": "passed",
+      "seconds": 1.42116
+    },
+    {
+      "name": "41_label_movie",
+      "status": "passed",
+      "seconds": 1.26498
+    },
+    {
+      "name": "42_lineedit",
+      "status": "passed",
+      "seconds": 1.56546
+    },
+    {
+      "name": "43_custom_widget",
+      "status": "passed",
+      "seconds": 1.4346
+    },
+    {
+      "name": "44_stacked_pages",
+      "status": "passed",
+      "seconds": 1.61711
+    },
+    {
+      "name": "45_close_resize",
+      "status": "passed",
+      "seconds": 1.81249
+    },
+    {
+      "name": "46_mouse_events",
+      "status": "passed",
+      "seconds": 1.9642
+    },
+    {
+      "name": "47_event_tab",
+      "status": "passed",
+      "seconds": 1.79823
+    },
+    {
+      "name": "48_painter",
+      "status": "passed",
+      "seconds": 1.64093
+    },
+    {
+      "name": "49_text_editor",
+      "status": "passed",
+      "seconds": 1.17893
+    },
+    {
+      "name": "50_dialog_modes",
+      "status": "passed",
+      "seconds": 1.51932
+    },
+    {
+      "name": "51_event_filter",
+      "status": "passed",
+      "seconds": 1.06648
+    },
+    {
+      "name": "52_interactive_paint",
+      "status": "passed",
+      "seconds": 1.36125
+    }
+  ]
+}
