@@ -1,6 +1,6 @@
-# 第 24 章 Designer 与 setupUi
+# 2.6 Designer 与 setupUi
 
-本章项目：[完整源码](../../examples/35_designer)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/35_designer)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 

@@ -1,4 +1,6 @@
-# 26 避免引用已消失的局部变量
+# 示例 26 避免引用已消失的局部变量
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [26_safe_delayed_state.pro](26_safe_delayed_state.pro)，选择 Kit 后构建运行。
 

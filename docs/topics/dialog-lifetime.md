@@ -1,6 +1,6 @@
-# 第 25 章 模态 非模态与对象生命期
+# 7.1 模态 非模态与对象生命期
 
-本章项目：[完整源码](../../examples/36_dialog)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/36_dialog)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -14,7 +14,7 @@
 
 ## 按执行顺序拆解
 
-mainwindow.ui 提供入口按钮；dialog.ui 提供自定义 Dialog 的标签与标准按钮。点击入口后 new Dialog(this)，其构造函数加载自己的 .ui；设置 WA_DeleteOnClose 后调用 open。第 50 步进一步对照 show/open/exec，区分窗口模态和调用是否等待。
+mainwindow.ui 提供入口按钮；dialog.ui 提供自定义 Dialog 的标签与标准按钮。点击入口后 new Dialog(this)，其构造函数加载自己的 .ui；设置 WA_DeleteOnClose 后调用 open。示例 50进一步对照 show/open/exec，区分窗口模态和调用是否等待。
 
 ## 参数与行为边界
 
@@ -296,7 +296,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 ## 自己动手
 
-打开第 50 步，按 show、open、exec 分别测试确定和取消，观察日志顺序。再把 open 改成 show，比较父窗口是否可操作。不要对设置 DeleteOnClose 的对象关闭后继续调用成员。
+打开示例 50，按 show、open、exec 分别测试确定和取消，观察日志顺序。再把 open 改成 show，比较父窗口是否可操作。不要对设置 DeleteOnClose 的对象关闭后继续调用成员。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

@@ -1,4 +1,6 @@
-# 40 水平 垂直 网格与表单布局
+# 示例 40 水平 垂直 网格与表单布局
+
+归属：[第八章 布局管理器](../../docs/chapters/08-layouts.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [40_layout.pro](40_layout.pro)，选择 Kit 后构建运行。
 

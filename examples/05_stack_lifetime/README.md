@@ -1,4 +1,6 @@
-# 05 栈对象安全的构造顺序
+# 示例 05 栈对象安全的构造顺序
+
+归属：[第四章 按钮的创建和属性设置](../../docs/chapters/04-buttons.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [05_stack_lifetime.pro](05_stack_lifetime.pro)，选择 Kit 后构建运行。
 

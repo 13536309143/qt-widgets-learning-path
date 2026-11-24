@@ -1,4 +1,6 @@
-# 33 状态栏和停靠面板
+# 示例 33 状态栏和停靠面板
+
+归属：[第六章 QMainWindow](../../docs/chapters/06-mainwindow.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [33_status_dock.pro](33_status_dock.pro)，选择 Kit 后构建运行。
 

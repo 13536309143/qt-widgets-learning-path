@@ -1,4 +1,6 @@
-# 43 组合控件与 Designer 提升
+# 示例 43 组合控件与 Designer 提升
+
+归属：[第九章 常用控件](../../docs/chapters/09-widgets.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [43_custom_widget.pro](43_custom_widget.pro)，选择 Kit 后构建运行。
 

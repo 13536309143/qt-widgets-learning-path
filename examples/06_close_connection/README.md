@@ -1,4 +1,6 @@
-# 06 点击按钮关闭窗口
+# 示例 06 点击按钮关闭窗口
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [06_close_connection.pro](06_close_connection.pro)，选择 Kit 后构建运行。
 

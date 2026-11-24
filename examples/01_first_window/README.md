@@ -1,4 +1,6 @@
-# 01 第一个空白窗口
+# 示例 01 第一个空白窗口
+
+归属：[第二章 创建Qt项目](../../docs/chapters/02-create-project.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [01_first_window.pro](01_first_window.pro)，选择 Kit 后构建运行。
 

@@ -1,4 +1,6 @@
-# 04 对象树与析构日志
+# 示例 04 对象树与析构日志
+
+归属：[第四章 按钮的创建和属性设置](../../docs/chapters/04-buttons.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [04_object_tree.pro](04_object_tree.pro)，选择 Kit 后构建运行。
 

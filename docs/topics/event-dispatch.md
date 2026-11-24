@@ -1,6 +1,6 @@
-# 第 36 章 重写 event 拦截 Tab
+# 10.4 重写 event 拦截 Tab
 
-本章项目：[完整源码](../../examples/47_event_tab)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/47_event_tab)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -10,11 +10,11 @@ Tab 常被控件系统用来切换焦点，因此只在 keyPressEvent 中写代�
 
 ## 事件分发 事件处理和事件过滤
 
-特定处理函数适合某一类事件；重写 event 适合介入目标对象的分发；eventFilter 适合在不改被观察对象继承关系时提前观察或消费事件。第 51 步在 QLineEdit 上安装过滤器，识别回车并更新标签，不需要创建 QLineEdit 子类。
+特定处理函数适合某一类事件；重写 event 适合介入目标对象的分发；eventFilter 适合在不改被观察对象继承关系时提前观察或消费事件。示例 51在 QLineEdit 上安装过滤器，识别回车并更新标签，不需要创建 QLineEdit 子类。
 
 ## 按执行顺序拆解
 
-在 mainwindow.ui 查看 EventArea 提升信息，在 eventarea.h 中找到 event 声明。eventarea.cpp 先判断 KeyPress，再读取 Tab 键并返回 true；其他情况调用 QLabel::event。第 51 步则把过滤器安装在普通 QLineEdit 上，便于对比两种方式。
+在 mainwindow.ui 查看 EventArea 提升信息，在 eventarea.h 中找到 event 声明。eventarea.cpp 先判断 KeyPress，再读取 Tab 键并返回 true；其他情况调用 QLabel::event。示例 51则把过滤器安装在普通 QLineEdit 上，便于对比两种方式。
 
 ## 参数与行为边界
 
@@ -221,7 +221,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 ## 自己动手
 
-给输入框安装第 51 步过滤器，输入中文后回车观察结果。再把 true 改为基类返回，观察输入框自己的 returnPressed 是否仍可触发。不要同时把所有事件无条件吞掉。
+给输入框安装示例 51过滤器，输入中文后回车观察结果。再把 true 改为基类返回，观察输入框自己的 returnPressed 是否仍可触发。不要同时把所有事件无条件吞掉。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

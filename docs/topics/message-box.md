@@ -1,6 +1,6 @@
-# 第 28 章 消息框与三种选择结果
+# 7.5 消息框与三种选择结果
 
-本章项目：[完整源码](../../examples/39_messagebox)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/39_messagebox)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -14,7 +14,7 @@ information、warning、critical 分别用于信息、警告和错误提示；qu
 
 ## 按执行顺序拆解
 
-mainwindow.ui 中的 run 按钮触发消息框，结果写入 resultEdit。查看 mainwindow.cpp 如何明确比较 Yes/No/Cancel。第 49 步将这些选择接入 closeEvent 与 confirmDiscard，只有保存成功或用户明确放弃修改时才允许继续。
+mainwindow.ui 中的 run 按钮触发消息框，结果写入 resultEdit。查看 mainwindow.cpp 如何明确比较 Yes/No/Cancel。示例 49将这些选择接入 closeEvent 与 confirmDiscard，只有保存成功或用户明确放弃修改时才允许继续。
 
 ## 参数与行为边界
 
@@ -194,7 +194,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 ## 自己动手
 
-修改第 39 步默认按钮，按 Enter 测试哪个分支被触发。再到第 49 步编辑文本后关闭，选择 Yes 后取消保存路径，确认编辑器仍然打开且文本未丢失。
+修改示例 39默认按钮，按 Enter 测试哪个分支被触发。再到示例 49编辑文本后关闭，选择 Yes 后取消保存路径，确认编辑器仍然打开且文本未丢失。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

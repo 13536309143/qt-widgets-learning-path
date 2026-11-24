@@ -1,4 +1,6 @@
-# 51 事件过滤器处理输入
+# 示例 51 事件过滤器处理输入
+
+归属：[第十章 Qt消息机制和事件](../../docs/chapters/10-events.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [51_event_filter.pro](51_event_filter.pro)，选择 Kit 后构建运行。
 

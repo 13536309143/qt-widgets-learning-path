@@ -1,4 +1,6 @@
-# 52 状态驱动的交互绘图
+# 示例 52 状态驱动的交互绘图
+
+归属：[第十一章 绘图和绘图设备](../../docs/chapters/11-painting.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [52_interactive_paint.pro](52_interactive_paint.pro)，选择 Kit 后构建运行。
 

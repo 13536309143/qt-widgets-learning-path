@@ -1,4 +1,6 @@
-# 22 空捕获的按钮回调
+# 示例 22 空捕获的按钮回调
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [22_empty_capture_button.pro](22_empty_capture_button.pro)，选择 Kit 后构建运行。
 

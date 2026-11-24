@@ -1,4 +1,6 @@
-# 44 堆叠页面与窗口切换
+# 示例 44 堆叠页面与窗口切换
+
+归属：[第九章 常用控件](../../docs/chapters/09-widgets.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [44_stacked_pages.pro](44_stacked_pages.pro)，选择 Kit 后构建运行。
 

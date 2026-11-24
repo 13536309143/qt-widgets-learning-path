@@ -1,4 +1,6 @@
-# 21 this 与窗口成员
+# 示例 21 this 与窗口成员
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [21_this_member.pro](21_this_member.pro)，选择 Kit 后构建运行。
 

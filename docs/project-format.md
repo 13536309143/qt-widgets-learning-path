@@ -1,3 +1,5 @@
+[返回十一章目录](README.md)
+
 # 统一项目模板：从 Designer 到 C++
 
 全部 52 个示例采用 Qt Creator 标准 Widgets 项目结构。普通窗口使用 Widget，带菜单、工具栏和状态栏的窗口使用 MainWindow。每个项目都有可编辑的 .ui；自定义对话框和组合控件也有自己的 .ui。
@@ -50,23 +52,23 @@ ui 指向的辅助对象由窗口类负责 delete。按钮、输入框等 QWidge
 
 固定按钮、标签、输入框、页面、菜单、QAction 和布局放入 .ui。Lambda 的定义和调用、运行时状态、文件读写、事件处理与 QPainter 绘制留在 .cpp。
 
-Qt 标准文件、颜色和字体对话框由 Qt 提供，不需要复制它们内部的 .ui。第 36 和 50 步的自定义对话框使用 dialog.ui。QStatusBar 的普通/永久状态控件需要调用 addWidget / addPermanentWidget，演示代码保留了这部分动态添加操作。
+Qt 标准文件、颜色和字体对话框由 Qt 提供，不需要复制它们内部的 .ui。示例 36 和 50的自定义对话框使用 dialog.ui。QStatusBar 的普通/永久状态控件需要调用 addWidget / addPermanentWidget，演示代码保留了这部分动态添加操作。
 
-第 01—30 步使用 geometry 放置演示控件，便于观察坐标和 Lambda 输出；第 40 步集中学习布局，后续项目采用可随窗口变化的布局。没有为早期固定坐标练习偷偷添加布局，因为布局会覆盖手工位置。
+示例 01—30使用 geometry 放置演示控件，便于观察坐标和 Lambda 输出；示例 40集中学习布局，后续项目采用可随窗口变化的布局。没有为早期固定坐标练习偷偷添加布局，因为布局会覆盖手工位置。
 
 ## 两种连接方式分别在哪里
 
 大多数示例显式调用 connect，便于追踪信号、接收对象和 Lambda。访问成员 ui 时使用 [this]；它捕获当前窗口指针，不会复制整个界面。
 
-第 35 步单独示范 Designer 常见的自动连接：objectName 为 runButton 的按钮，对应声明在 private slots 下的 on_runButton_clicked()。setupUi 最后调用 connectSlotsByName。不要再为同一个槽重复写 connect，否则会执行两次。改变 objectName 后也必须同步改槽名。
+示例 35单独示范 Designer 常见的自动连接：objectName 为 runButton 的按钮，对应声明在 private slots 下的 on_runButton_clicked()。setupUi 最后调用 connectSlotsByName。不要再为同一个槽重复写 connect，否则会执行两次。改变 objectName 后也必须同步改槽名。
 
 第 36、50 步 dialog.ui 的“信号/槽编辑器”连接 buttonBox 的 accepted() → Dialog::accept()、rejected() → Dialog::reject()，可以直接在 Designer 中查看。
 
 ## 自定义控件如何在 Designer 中显示
 
-第 43 步在 mainwindow.ui 中放置两个 QWidget 占位，分别提升为 SmallWidget，提升头文件为 smallwidget.h。SmallWidget 内部的 QSpinBox、QSlider 则在 smallwidget.ui 中设计。两个实例各自拥有自己的 Ui 和数值。
+示例 43在 mainwindow.ui 中放置两个 QWidget 占位，分别提升为 SmallWidget，提升头文件为 smallwidget.h。SmallWidget 内部的 QSpinBox、QSlider 则在 smallwidget.ui 中设计。两个实例各自拥有自己的 Ui 和数值。
 
-第 45—47 步将 QLabel 提升为 EventArea，头文件 eventarea.h。第 48 步将 QWidget 提升为 Canvas，头文件 canvas.h；第 52 步将 QWidget 提升为 DrawingArea，头文件 drawingarea.h。提升信息已经保存在对应 .ui 的 customwidgets 中。
+示例 45—47将 QLabel 提升为 EventArea，头文件 eventarea.h。示例 48将 QWidget 提升为 Canvas，头文件 canvas.h；示例 52将 QWidget 提升为 DrawingArea，头文件 drawingarea.h。提升信息已经保存在对应 .ui 的 customwidgets 中。
 
 从空模板重做时，在占位控件上右键选择“提升为”，输入准确的类名和头文件名，添加后点击提升。自定义类必须提供接受 QWidget *parent 的构造函数，并在 .pro 的 SOURCES/HEADERS 中加入实现。Designer 中显示占位区域是正常的，自己的 paintEvent 会在运行后绘制。
 

@@ -1,4 +1,6 @@
-# 38 选择颜色与字体
+# 示例 38 选择颜色与字体
+
+归属：[第七章 对话框QDialog](../../docs/chapters/07-dialogs.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [38_color_font.pro](38_color_font.pro)，选择 Kit 后构建运行。
 

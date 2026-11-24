@@ -1,4 +1,6 @@
-# 46 鼠标按键 坐标和跟踪
+# 示例 46 鼠标按键 坐标和跟踪
+
+归属：[第十章 Qt消息机制和事件](../../docs/chapters/10-events.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [46_mouse_events.pro](46_mouse_events.pro)，选择 Kit 后构建运行。
 

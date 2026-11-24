@@ -1,4 +1,6 @@
-# 37 单文件 多文件与取消
+# 示例 37 单文件 多文件与取消
+
+归属：[第七章 对话框QDialog](../../docs/chapters/07-dialogs.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [37_file_dialog.pro](37_file_dialog.pro)，选择 Kit 后构建运行。
 

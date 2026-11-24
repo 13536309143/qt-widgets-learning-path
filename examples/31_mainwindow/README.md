@@ -1,4 +1,6 @@
-# 31 主窗口与中心部件
+# 示例 31 主窗口与中心部件
+
+归属：[第六章 QMainWindow](../../docs/chapters/06-mainwindow.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [31_mainwindow.pro](31_mainwindow.pro)，选择 Kit 后构建运行。
 

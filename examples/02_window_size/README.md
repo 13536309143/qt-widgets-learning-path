@@ -1,4 +1,6 @@
-# 02 标题与窗口大小
+# 示例 02 标题与窗口大小
+
+归属：[第三章 设置窗口属性](../../docs/chapters/03-window-properties.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [02_window_size.pro](02_window_size.pro)，选择 Kit 后构建运行。
 

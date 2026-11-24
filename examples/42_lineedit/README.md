@@ -1,4 +1,6 @@
-# 42 QLineEdit 输入与显示模式
+# 示例 42 QLineEdit 输入与显示模式
+
+归属：[第九章 常用控件](../../docs/chapters/09-widgets.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [42_lineedit.pro](42_lineedit.pro)，选择 Kit 后构建运行。
 

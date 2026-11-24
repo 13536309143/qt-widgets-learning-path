@@ -1,4 +1,6 @@
-# 08 信号连接另一个信号
+# 示例 08 信号连接另一个信号
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [08_signal_to_signal.pro](08_signal_to_signal.pro)，选择 Kit 后构建运行。
 

@@ -1,4 +1,6 @@
-# 34 资源路径 图片与背景
+# 示例 34 资源路径 图片与背景
+
+归属：[第三章 设置窗口属性](../../docs/chapters/03-window-properties.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [34_resources.pro](34_resources.pro)，选择 Kit 后构建运行。
 

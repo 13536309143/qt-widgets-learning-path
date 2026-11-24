@@ -1,110 +1,130 @@
 [
   {
-    "chapter": 20,
-    "title": "主窗口与中心部件",
-    "slug": "31_mainwindow",
-    "file": "20-mainwindow.md"
+    "chapter": 1,
+    "title": "Qt概述",
+    "file": "01-overview.md",
+    "projects": []
   },
   {
-    "chapter": 21,
-    "title": "菜单 动作与工具栏",
-    "slug": "32_menu_toolbar",
-    "file": "21-menu_toolbar.md"
+    "chapter": 2,
+    "title": "创建Qt项目",
+    "file": "02-create-project.md",
+    "projects": [
+      "01_first_window",
+      "35_designer"
+    ]
   },
   {
-    "chapter": 22,
-    "title": "状态栏和停靠面板",
-    "slug": "33_status_dock",
-    "file": "22-status_dock.md"
+    "chapter": 3,
+    "title": "设置窗口属性",
+    "file": "03-window-properties.md",
+    "projects": [
+      "02_window_size",
+      "34_resources"
+    ]
   },
   {
-    "chapter": 23,
-    "title": "资源路径 图片与背景",
-    "slug": "34_resources",
-    "file": "23-resources.md"
+    "chapter": 4,
+    "title": "按钮的创建和属性设置",
+    "file": "04-buttons.md",
+    "projects": [
+      "03_buttons_coordinates",
+      "04_object_tree",
+      "05_stack_lifetime"
+    ]
   },
   {
-    "chapter": 24,
-    "title": "Designer 与 setupUi",
-    "slug": "35_designer",
-    "file": "24-designer.md"
+    "chapter": 5,
+    "title": "信号和槽机制（Lambda）",
+    "file": "05-signals-slots-lambda.md",
+    "projects": [
+      "06_close_connection",
+      "07_custom_signal",
+      "08_signal_to_signal",
+      "09_overloaded_signal",
+      "10_disconnect",
+      "11_multiple_slots",
+      "12_function_to_lambda",
+      "13_define_and_call",
+      "14_capture_and_parameter",
+      "15_value_capture",
+      "16_reference_capture",
+      "17_mixed_capture",
+      "18_pointer_capture",
+      "19_mutable_original",
+      "20_mutable_state",
+      "21_this_member",
+      "22_empty_capture_button",
+      "23_signal_parameter",
+      "24_lambda_adapter",
+      "25_loop_capture",
+      "26_safe_delayed_state",
+      "27_lambda_keeps_copy",
+      "28_complete_counter",
+      "29_member_slot",
+      "30_self_test"
+    ]
   },
   {
-    "chapter": 25,
-    "title": "模态 非模态与对象生命期",
-    "slug": "36_dialog",
-    "file": "25-dialog.md"
+    "chapter": 6,
+    "title": "QMainWindow",
+    "file": "06-mainwindow.md",
+    "projects": [
+      "31_mainwindow",
+      "32_menu_toolbar",
+      "33_status_dock"
+    ]
   },
   {
-    "chapter": 26,
-    "title": "单文件 多文件与取消",
-    "slug": "37_file_dialog",
-    "file": "26-file_dialog.md"
+    "chapter": 7,
+    "title": "对话框QDialog",
+    "file": "07-dialogs.md",
+    "projects": [
+      "36_dialog",
+      "50_dialog_modes",
+      "37_file_dialog",
+      "38_color_font",
+      "39_messagebox",
+      "49_text_editor"
+    ]
   },
   {
-    "chapter": 27,
-    "title": "选择颜色与字体",
-    "slug": "38_color_font",
-    "file": "27-color_font.md"
+    "chapter": 8,
+    "title": "布局管理器",
+    "file": "08-layouts.md",
+    "projects": [
+      "40_layout"
+    ]
   },
   {
-    "chapter": 28,
-    "title": "消息框与三种选择结果",
-    "slug": "39_messagebox",
-    "file": "28-messagebox.md"
+    "chapter": 9,
+    "title": "常用控件",
+    "file": "09-widgets.md",
+    "projects": [
+      "41_label_movie",
+      "42_lineedit",
+      "43_custom_widget",
+      "44_stacked_pages"
+    ]
   },
   {
-    "chapter": 29,
-    "title": "水平 垂直 网格与表单布局",
-    "slug": "40_layout",
-    "file": "29-layout.md"
+    "chapter": 10,
+    "title": "Qt消息机制和事件",
+    "file": "10-events.md",
+    "projects": [
+      "45_close_resize",
+      "46_mouse_events",
+      "47_event_tab",
+      "51_event_filter"
+    ]
   },
   {
-    "chapter": 30,
-    "title": "QLabel 文本 图片与动画",
-    "slug": "41_label_movie",
-    "file": "30-label_movie.md"
-  },
-  {
-    "chapter": 31,
-    "title": "QLineEdit 输入与显示模式",
-    "slug": "42_lineedit",
-    "file": "31-lineedit.md"
-  },
-  {
-    "chapter": 32,
-    "title": "组合控件与 Designer 提升",
-    "slug": "43_custom_widget",
-    "file": "32-custom_widget.md"
-  },
-  {
-    "chapter": 33,
-    "title": "堆叠页面与窗口切换",
-    "slug": "44_stacked_pages",
-    "file": "33-stacked_pages.md"
-  },
-  {
-    "chapter": 34,
-    "title": "关闭事件与尺寸变化",
-    "slug": "45_close_resize",
-    "file": "34-close_resize.md"
-  },
-  {
-    "chapter": 35,
-    "title": "鼠标按键 坐标和跟踪",
-    "slug": "46_mouse_events",
-    "file": "35-mouse_events.md"
-  },
-  {
-    "chapter": 36,
-    "title": "重写 event 拦截 Tab",
-    "slug": "47_event_tab",
-    "file": "36-event_tab.md"
-  },
-  {
-    "chapter": 37,
-    "title": "QPainter 与绘图设备",
-    "slug": "48_painter",
-    "file": "37-painter.md"
+    "chapter": 11,
+    "title": "绘图和绘图设备",
+    "file": "11-painting.md",
+    "projects": [
+      "48_painter",
+      "52_interactive_paint"
+    ]
   }
 ]

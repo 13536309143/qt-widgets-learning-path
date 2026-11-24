@@ -1,4 +1,6 @@
-# 48 QPainter 与绘图设备
+# 示例 48 QPainter 与绘图设备
+
+归属：[第十一章 绘图和绘图设备](../../docs/chapters/11-painting.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [48_painter.pro](48_painter.pro)，选择 Kit 后构建运行。
 

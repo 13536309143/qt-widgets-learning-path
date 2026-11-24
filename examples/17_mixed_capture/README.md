@@ -1,4 +1,6 @@
-# 17 显式混合捕获
+# 示例 17 显式混合捕获
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [17_mixed_capture.pro](17_mixed_capture.pro)，选择 Kit 后构建运行。
 

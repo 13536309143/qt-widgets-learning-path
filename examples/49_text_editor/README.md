@@ -1,4 +1,6 @@
-# 49 UTF-8 文件读取与安全保存
+# 示例 49 UTF-8 文件读取与安全保存
+
+归属：[第七章 对话框QDialog](../../docs/chapters/07-dialogs.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [49_text_editor.pro](49_text_editor.pro)，选择 Kit 后构建运行。
 

@@ -1,4 +1,6 @@
-# 36 模态 非模态与对象生命期
+# 示例 36 模态 非模态与对象生命期
+
+归属：[第七章 对话框QDialog](../../docs/chapters/07-dialogs.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [36_dialog.pro](36_dialog.pro)，选择 Kit 后构建运行。
 

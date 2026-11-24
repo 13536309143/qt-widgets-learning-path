@@ -1,4 +1,6 @@
-# 16 引用捕获修改原变量
+# 示例 16 引用捕获修改原变量
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [16_reference_capture.pro](16_reference_capture.pro)，选择 Kit 后构建运行。
 

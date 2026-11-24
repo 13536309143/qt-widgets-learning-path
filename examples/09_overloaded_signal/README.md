@@ -1,4 +1,6 @@
-# 09 带参数的重载信号与槽
+# 示例 09 带参数的重载信号与槽
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [09_overloaded_signal.pro](09_overloaded_signal.pro)，选择 Kit 后构建运行。
 

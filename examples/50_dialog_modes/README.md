@@ -1,4 +1,6 @@
-# 50 show open exec 三种调用对比
+# 示例 50 show open exec 三种调用对比
+
+归属：[第七章 对话框QDialog](../../docs/chapters/07-dialogs.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [50_dialog_modes.pro](50_dialog_modes.pro)，选择 Kit 后构建运行。
 

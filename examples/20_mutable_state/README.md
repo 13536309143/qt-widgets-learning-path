@@ -1,4 +1,6 @@
-# 20 同一个 Lambda 会保留副本
+# 示例 20 同一个 Lambda 会保留副本
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [20_mutable_state.pro](20_mutable_state.pro)，选择 Kit 后构建运行。
 

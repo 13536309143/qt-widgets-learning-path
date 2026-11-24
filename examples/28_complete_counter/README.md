@@ -1,4 +1,6 @@
-# 28 完整练习 计数与清零
+# 示例 28 完整练习 计数与清零
+
+归属：[第五章 信号和槽机制（Lambda）](../../docs/chapters/05-signals-slots-lambda.md)。
 
 这是独立可运行的 Qt Creator Widgets 项目，按统一模板组织。打开 [28_complete_counter.pro](28_complete_counter.pro)，选择 Kit 后构建运行。
 
