@@ -1,272 +1,270 @@
 {
-  "date": "2026-11-23",
+  "date": "2026-11-24",
   "platform": "Windows",
   "qt": "6.12.0",
   "compiler": "MinGW 13.1",
-  "configuration": "Release",
-  "edition": "Qt Creator template with Designer forms",
   "total": 52,
   "passed": 52,
   "results": [
     {
-      "name": "01_first_window",
+      "name": "02_01_first_window",
       "status": "passed",
-      "seconds": 0.623057
+      "seconds": 0.62791
     },
     {
-      "name": "02_window_size",
+      "name": "02_02_designer",
       "status": "passed",
-      "seconds": 0.820844
+      "seconds": 0.874552
     },
     {
-      "name": "03_buttons_coordinates",
+      "name": "03_01_window_size",
       "status": "passed",
-      "seconds": 0.869853
+      "seconds": 0.714318
     },
     {
-      "name": "04_object_tree",
+      "name": "03_02_resources",
       "status": "passed",
-      "seconds": 0.816975
+      "seconds": 0.863912
     },
     {
-      "name": "05_stack_lifetime",
+      "name": "04_01_buttons_coordinates",
       "status": "passed",
-      "seconds": 0.832588
+      "seconds": 0.678782
     },
     {
-      "name": "06_close_connection",
+      "name": "04_02_object_tree",
       "status": "passed",
-      "seconds": 0.820889
+      "seconds": 0.66281
     },
     {
-      "name": "07_custom_signal",
+      "name": "04_03_stack_lifetime",
       "status": "passed",
-      "seconds": 0.836806
+      "seconds": 0.697603
     },
     {
-      "name": "08_signal_to_signal",
+      "name": "05_01_close_connection",
       "status": "passed",
-      "seconds": 0.851324
+      "seconds": 0.643762
     },
     {
-      "name": "09_overloaded_signal",
+      "name": "05_02_custom_signal",
       "status": "passed",
-      "seconds": 0.847673
+      "seconds": 0.699336
     },
     {
-      "name": "10_disconnect",
+      "name": "05_03_signal_to_signal",
       "status": "passed",
-      "seconds": 0.835908
+      "seconds": 0.695632
     },
     {
-      "name": "11_multiple_slots",
+      "name": "05_04_overloaded_signal",
       "status": "passed",
-      "seconds": 0.843658
+      "seconds": 0.681557
     },
     {
-      "name": "12_function_to_lambda",
+      "name": "05_05_disconnect",
       "status": "passed",
-      "seconds": 0.816147
+      "seconds": 0.670453
     },
     {
-      "name": "13_define_and_call",
+      "name": "05_06_multiple_slots",
       "status": "passed",
-      "seconds": 0.867358
+      "seconds": 0.695433
     },
     {
-      "name": "14_capture_and_parameter",
+      "name": "05_07_function_to_lambda",
       "status": "passed",
-      "seconds": 0.865731
+      "seconds": 0.656384
     },
     {
-      "name": "15_value_capture",
+      "name": "05_08_define_and_call",
       "status": "passed",
-      "seconds": 0.807645
+      "seconds": 0.711188
     },
     {
-      "name": "16_reference_capture",
+      "name": "05_09_capture_and_parameter",
       "status": "passed",
-      "seconds": 0.826052
+      "seconds": 0.673168
     },
     {
-      "name": "17_mixed_capture",
+      "name": "05_10_value_capture",
       "status": "passed",
-      "seconds": 0.830386
+      "seconds": 0.66339
     },
     {
-      "name": "18_pointer_capture",
+      "name": "05_11_reference_capture",
       "status": "passed",
-      "seconds": 0.827919
+      "seconds": 0.656427
     },
     {
-      "name": "19_mutable_original",
+      "name": "05_12_mixed_capture",
       "status": "passed",
-      "seconds": 0.797968
+      "seconds": 0.653693
     },
     {
-      "name": "20_mutable_state",
+      "name": "05_13_pointer_capture",
       "status": "passed",
-      "seconds": 0.798776
+      "seconds": 0.653459
     },
     {
-      "name": "21_this_member",
+      "name": "05_14_mutable_original",
       "status": "passed",
-      "seconds": 0.842116
+      "seconds": 0.650775
     },
     {
-      "name": "22_empty_capture_button",
+      "name": "05_15_mutable_state",
       "status": "passed",
-      "seconds": 0.852024
+      "seconds": 0.657698
     },
     {
-      "name": "23_signal_parameter",
+      "name": "05_16_this_member",
       "status": "passed",
-      "seconds": 0.859147
+      "seconds": 0.67125
     },
     {
-      "name": "24_lambda_adapter",
+      "name": "05_17_empty_capture_button",
       "status": "passed",
-      "seconds": 0.863744
+      "seconds": 0.671105
     },
     {
-      "name": "25_loop_capture",
+      "name": "05_18_signal_parameter",
       "status": "passed",
-      "seconds": 0.877929
+      "seconds": 0.686407
     },
     {
-      "name": "26_safe_delayed_state",
+      "name": "05_19_lambda_adapter",
       "status": "passed",
-      "seconds": 0.902247
+      "seconds": 0.677958
     },
     {
-      "name": "27_lambda_keeps_copy",
+      "name": "05_20_loop_capture",
       "status": "passed",
-      "seconds": 0.896024
+      "seconds": 0.702178
     },
     {
-      "name": "28_complete_counter",
+      "name": "05_21_safe_delayed_state",
       "status": "passed",
-      "seconds": 0.889678
+      "seconds": 0.71371
     },
     {
-      "name": "29_member_slot",
+      "name": "05_22_lambda_keeps_copy",
       "status": "passed",
-      "seconds": 0.906509
+      "seconds": 0.673017
     },
     {
-      "name": "30_self_test",
+      "name": "05_23_complete_counter",
       "status": "passed",
-      "seconds": 0.859524
+      "seconds": 0.690174
     },
     {
-      "name": "31_mainwindow",
+      "name": "05_24_member_slot",
       "status": "passed",
-      "seconds": 1.01692
+      "seconds": 0.695345
     },
     {
-      "name": "32_menu_toolbar",
+      "name": "05_25_self_test",
       "status": "passed",
-      "seconds": 1.03923
+      "seconds": 0.651461
     },
     {
-      "name": "33_status_dock",
+      "name": "06_01_mainwindow",
       "status": "passed",
-      "seconds": 1.04218
+      "seconds": 0.865971
     },
     {
-      "name": "34_resources",
+      "name": "06_02_menu_toolbar",
       "status": "passed",
-      "seconds": 1.00091
+      "seconds": 0.902882
     },
     {
-      "name": "35_designer",
+      "name": "06_03_status_dock",
       "status": "passed",
-      "seconds": 1.10768
+      "seconds": 0.884963
     },
     {
-      "name": "36_dialog",
+      "name": "07_01_dialog",
       "status": "passed",
-      "seconds": 1.03397
+      "seconds": 0.902491
     },
     {
-      "name": "37_file_dialog",
+      "name": "07_02_dialog_modes",
       "status": "passed",
-      "seconds": 1.45103
+      "seconds": 0.759876
     },
     {
-      "name": "38_color_font",
+      "name": "07_03_file_dialog",
       "status": "passed",
-      "seconds": 1.29705
+      "seconds": 1.12882
     },
     {
-      "name": "39_messagebox",
+      "name": "07_04_color_font",
       "status": "passed",
-      "seconds": 1.15299
+      "seconds": 1.10509
     },
     {
-      "name": "40_layout",
+      "name": "07_05_messagebox",
       "status": "passed",
-      "seconds": 1.0059
+      "seconds": 0.951596
     },
     {
-      "name": "41_label_movie",
+      "name": "07_06_text_editor",
       "status": "passed",
-      "seconds": 0.927945
+      "seconds": 0.65952
     },
     {
-      "name": "42_lineedit",
+      "name": "08_01_layout",
       "status": "passed",
-      "seconds": 0.962337
+      "seconds": 0.906757
     },
     {
-      "name": "43_custom_widget",
+      "name": "09_01_label_movie",
       "status": "passed",
-      "seconds": 0.907575
+      "seconds": 0.90159
     },
     {
-      "name": "44_stacked_pages",
+      "name": "09_02_lineedit",
       "status": "passed",
-      "seconds": 0.957681
+      "seconds": 0.872111
     },
     {
-      "name": "45_close_resize",
+      "name": "09_03_custom_widget",
       "status": "passed",
-      "seconds": 1.24507
+      "seconds": 0.861877
     },
     {
-      "name": "46_mouse_events",
+      "name": "09_04_stacked_pages",
       "status": "passed",
-      "seconds": 0.928639
+      "seconds": 0.860969
     },
     {
-      "name": "47_event_tab",
+      "name": "10_01_close_resize",
       "status": "passed",
-      "seconds": 0.93368
+      "seconds": 1.07242
     },
     {
-      "name": "48_painter",
+      "name": "10_02_mouse_events",
       "status": "passed",
-      "seconds": 0.91643
+      "seconds": 0.930079
     },
     {
-      "name": "49_text_editor",
+      "name": "10_03_event_tab",
       "status": "passed",
-      "seconds": 0.826141
+      "seconds": 0.919292
     },
     {
-      "name": "50_dialog_modes",
+      "name": "10_04_event_filter",
       "status": "passed",
-      "seconds": 1.00059
+      "seconds": 0.569443
     },
     {
-      "name": "51_event_filter",
+      "name": "11_01_painter",
       "status": "passed",
-      "seconds": 0.610149
+      "seconds": 0.892846
     },
     {
-      "name": "52_interactive_paint",
+      "name": "11_02_interactive_paint",
       "status": "passed",
-      "seconds": 0.767089
+      "seconds": 0.691052
     }
   ]
 }

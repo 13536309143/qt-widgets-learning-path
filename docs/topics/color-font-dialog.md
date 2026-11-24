@@ -1,6 +1,6 @@
-# 7.4 选择颜色与字体
+# 7.4 确认颜色或字体后再应用 理论补充
 
-对应示例：[完整源码](../../examples/38_color_font)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/07_04_color_font)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ QPlainTextEdit 整体字体与富文本局部字符格式是不同层级。设�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/38_color_font/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/07_04_color_font/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -174,7 +174,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 38_color_font.pro
+### 07_04_color_font.pro
 
 ```qmake
 QT += widgets
@@ -201,15 +201,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/38_color_font/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/07_04_color_font/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![选择颜色与字体 02_dialog](../../examples/38_color_font/screenshots/02_dialog.png)
+![选择颜色与字体 02_dialog](../../examples/07_04_color_font/screenshots/02_dialog.png)
 
-![选择颜色与字体 02_font_dialog](../../examples/38_color_font/screenshots/02_font_dialog.png)
+![选择颜色与字体 02_font_dialog](../../examples/07_04_color_font/screenshots/02_font_dialog.png)
 
-![选择颜色与字体 03_result](../../examples/38_color_font/screenshots/03_result.png)
+![选择颜色与字体 03_result](../../examples/07_04_color_font/screenshots/03_result.png)
 
 ## 自己动手
 

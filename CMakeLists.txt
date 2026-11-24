@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt6 6.2 REQUIRED COMPONENTS Widgets)
 include(CTest)
 
-# 默认构建全部；也可 -DQT_LESSON=49_text_editor 只构建一个项目。
+# 默认构建全部；也可 -DQT_LESSON=07_06_text_editor 只构建一个项目。
 set(QT_LESSON "" CACHE STRING "Single example directory name, or empty for all")
 file(GLOB lesson_directories LIST_DIRECTORIES true "${CMAKE_CURRENT_SOURCE_DIR}/examples/[0-9][0-9]_*")
 list(SORT lesson_directories)

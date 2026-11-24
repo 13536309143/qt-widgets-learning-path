@@ -1,6 +1,6 @@
-# 10.2 关闭事件与尺寸变化
+# 10.1 关闭请求与尺寸通知 理论补充
 
-对应示例：[完整源码](../../examples/45_close_resize)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/10_01_close_resize)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ override 用于检查是否真正覆盖了基类虚函数。保留原有处理�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/45_close_resize/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/10_01_close_resize/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -189,7 +189,7 @@ protected:
 #endif // EVENTAREA_H
 ```
 
-### 45_close_resize.pro
+### 10_01_close_resize.pro
 
 ```qmake
 QT += widgets
@@ -218,11 +218,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/45_close_resize/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/10_01_close_resize/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![关闭事件与尺寸变化 03_result](../../examples/45_close_resize/screenshots/03_result.png)
+![关闭事件与尺寸变化 03_result](../../examples/10_01_close_resize/screenshots/03_result.png)
 
 ## 自己动手
 

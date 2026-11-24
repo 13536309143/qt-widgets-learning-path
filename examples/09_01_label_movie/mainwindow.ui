@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>580</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>9.1 QLabel 文本 图片与动画</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QLabel" name="plainLabel">
+      <property name="text">
+       <string>普通文字</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="richLabel">
+      <property name="text">
+       <string>&lt;h2&gt;Qt 富文本&lt;/h2&gt;&lt;p&gt;&lt;b&gt;粗体&lt;/b&gt;与颜色演示&lt;/p&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="imageLabel" />
+    </item>
+    <item>
+     <widget class="QLabel" name="animationLabel" />
+    </item>
+    <item>
+     <widget class="QPushButton" name="run">
+      <property name="text">
+       <string>停止动画</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="assets.qrc" />
+ </resources>
+ <connections />
+</ui>

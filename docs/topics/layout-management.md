@@ -1,6 +1,6 @@
-# 8.1 水平 垂直 网格与表单布局
+# 8.1 四种布局的嵌套 理论补充
 
-对应示例：[完整源码](../../examples/40_layout)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/08_01_layout)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ contentsMargins 是容器内缘留白，spacing 是相邻项目间隔，addSpaci
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/40_layout/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/08_01_layout/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -244,7 +244,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 40_layout.pro
+### 08_01_layout.pro
 
 ```qmake
 QT += widgets
@@ -271,11 +271,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/40_layout/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/08_01_layout/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![水平 垂直 网格与表单布局 03_result](../../examples/40_layout/screenshots/03_result.png)
+![水平 垂直 网格与表单布局 03_result](../../examples/08_01_layout/screenshots/03_result.png)
 
 ## 自己动手
 

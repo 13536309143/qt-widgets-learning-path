@@ -1,7 +1,7 @@
 @echo off
 setlocal
 if "%~1"=="" (
-  echo Usage: scripts\run.cmd 49_text_editor
+  echo Usage: scripts\run.cmd 07_06_text_editor
   exit /b 1
 )
 if exist "%~dp0..\.qt-env.cmd" call "%~dp0..\.qt-env.cmd"

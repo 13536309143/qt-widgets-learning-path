@@ -5,313 +5,313 @@
   "qmake_configure_passed": 52,
   "results": [
     {
-      "project": "01_first_window",
+      "project": "02_01_first_window",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "02_window_size",
+      "project": "03_01_window_size",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "03_buttons_coordinates",
+      "project": "04_01_buttons_coordinates",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "04_object_tree",
+      "project": "04_02_object_tree",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "05_stack_lifetime",
+      "project": "04_03_stack_lifetime",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "06_close_connection",
+      "project": "05_01_close_connection",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "07_custom_signal",
+      "project": "05_02_custom_signal",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "08_signal_to_signal",
+      "project": "05_03_signal_to_signal",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "09_overloaded_signal",
+      "project": "05_04_overloaded_signal",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "10_disconnect",
+      "project": "05_05_disconnect",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "11_multiple_slots",
+      "project": "05_06_multiple_slots",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "12_function_to_lambda",
+      "project": "05_07_function_to_lambda",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "13_define_and_call",
+      "project": "05_08_define_and_call",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "14_capture_and_parameter",
+      "project": "05_09_capture_and_parameter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "15_value_capture",
+      "project": "05_10_value_capture",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "16_reference_capture",
+      "project": "05_11_reference_capture",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "17_mixed_capture",
+      "project": "05_12_mixed_capture",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "18_pointer_capture",
+      "project": "05_13_pointer_capture",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "19_mutable_original",
+      "project": "05_14_mutable_original",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "20_mutable_state",
+      "project": "05_15_mutable_state",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "21_this_member",
+      "project": "05_16_this_member",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "22_empty_capture_button",
+      "project": "05_17_empty_capture_button",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "23_signal_parameter",
+      "project": "05_18_signal_parameter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "24_lambda_adapter",
+      "project": "05_19_lambda_adapter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "25_loop_capture",
+      "project": "05_20_loop_capture",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "26_safe_delayed_state",
+      "project": "05_21_safe_delayed_state",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "27_lambda_keeps_copy",
+      "project": "05_22_lambda_keeps_copy",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "28_complete_counter",
+      "project": "05_23_complete_counter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "29_member_slot",
+      "project": "05_24_member_slot",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "30_self_test",
+      "project": "05_25_self_test",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "31_mainwindow",
+      "project": "06_01_mainwindow",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "32_menu_toolbar",
+      "project": "06_02_menu_toolbar",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "33_status_dock",
+      "project": "06_03_status_dock",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "34_resources",
+      "project": "03_02_resources",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "35_designer",
+      "project": "02_02_designer",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "36_dialog",
+      "project": "07_01_dialog",
       "forms": 2,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "37_file_dialog",
+      "project": "07_03_file_dialog",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "38_color_font",
+      "project": "07_04_color_font",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "39_messagebox",
+      "project": "07_05_messagebox",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "40_layout",
+      "project": "08_01_layout",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "41_label_movie",
+      "project": "09_01_label_movie",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "42_lineedit",
+      "project": "09_02_lineedit",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "43_custom_widget",
+      "project": "09_03_custom_widget",
       "forms": 2,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "44_stacked_pages",
+      "project": "09_04_stacked_pages",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "45_close_resize",
+      "project": "10_01_close_resize",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "46_mouse_events",
+      "project": "10_02_mouse_events",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "47_event_tab",
+      "project": "10_03_event_tab",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "48_painter",
+      "project": "11_01_painter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "49_text_editor",
+      "project": "07_06_text_editor",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "50_dialog_modes",
+      "project": "07_02_dialog_modes",
       "forms": 2,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "51_event_filter",
+      "project": "10_04_event_filter",
       "forms": 1,
       "template": true,
       "qmake_configure": true
     },
     {
-      "project": "52_interactive_paint",
+      "project": "11_02_interactive_paint",
       "forms": 1,
       "template": true,
       "qmake_configure": true

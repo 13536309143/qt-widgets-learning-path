@@ -1,6 +1,6 @@
-# 7.3 单文件 多文件与取消
+# 7.3 文件选择与取消处理 理论补充
 
-对应示例：[完整源码](../../examples/37_file_dialog)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/07_03_file_dialog)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -14,7 +14,7 @@ getOpenFileName 返回 QString，getOpenFileNames 返回 QStringList；取消时
 
 ## 按执行顺序拆解
 
-先在 mainwindow.ui 确认 run 按钮和 resultEdit。点击后创建 QFileDialog，设置多选、过滤器、自动删除属性，再连接 filesSelected；选择文件后才将结果列表写入 resultEdit。取消不会进入选择结果逻辑。示例 49继续实现真正的文件读取和保存。
+先在 mainwindow.ui 确认 run 按钮和 resultEdit。点击后创建 QFileDialog，设置多选、过滤器、自动删除属性，再连接 filesSelected；选择文件后才将结果列表写入 resultEdit。取消不会进入选择结果逻辑。项目 7.6继续实现真正的文件读取和保存。
 
 ## 参数与行为边界
 
@@ -28,7 +28,7 @@ getOpenFileName 取消返回空字符串，getOpenFileNames 返回空列表；ge
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/37_file_dialog/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/07_03_file_dialog/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -155,7 +155,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 37_file_dialog.pro
+### 07_03_file_dialog.pro
 
 ```qmake
 QT += widgets
@@ -184,15 +184,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/37_file_dialog/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/07_03_file_dialog/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![单文件 多文件与取消 03_result](../../examples/37_file_dialog/screenshots/03_result.png)
+![单文件 多文件与取消 03_result](../../examples/07_03_file_dialog/screenshots/03_result.png)
 
 ## 自己动手
 
-用示例 49创建含中文和换行的文本，另存到自己的测试目录，关闭后重新打开。再选择不可写目录观察错误。对未保存内容发起打开或关闭，分别选择保存、不保存和取消，确认取消不会丢掉当前内容。
+用项目 7.6创建含中文和换行的文本，另存到自己的测试目录，关闭后重新打开。再选择不可写目录观察错误。对未保存内容发起打开或关闭，分别选择保存、不保存和取消，确认取消不会丢掉当前内容。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

@@ -1,6 +1,6 @@
-# 9.2 QLineEdit 输入与显示模式
+# 9.2 输入内容与显示模式 理论补充
 
-对应示例：[完整源码](../../examples/42_lineedit)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/09_02_lineedit)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ setMaxLength 限制长度；QValidator 可以约束可接受输入；inputMask �
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/42_lineedit/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/09_02_lineedit/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -175,7 +175,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 42_lineedit.pro
+### 09_02_lineedit.pro
 
 ```qmake
 QT += widgets
@@ -202,11 +202,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/42_lineedit/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/09_02_lineedit/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![QLineEdit 输入与显示模式 03_result](../../examples/42_lineedit/screenshots/03_result.png)
+![QLineEdit 输入与显示模式 03_result](../../examples/09_02_lineedit/screenshots/03_result.png)
 
 ## 自己动手
 

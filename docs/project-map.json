@@ -1,262 +1,418 @@
 [
   {
-    "project": "01_first_window",
+    "old": "01_first_window",
+    "project": "02_01_first_window",
     "chapter": 2,
-    "title": "第一个空白窗口"
+    "section": "2.1",
+    "title": "第一个空白窗口",
+    "knowledge": "应用入口与事件循环"
   },
   {
-    "project": "02_window_size",
-    "chapter": 3,
-    "title": "标题与窗口大小"
-  },
-  {
-    "project": "03_buttons_coordinates",
-    "chapter": 4,
-    "title": "按钮与父控件坐标"
-  },
-  {
-    "project": "04_object_tree",
-    "chapter": 4,
-    "title": "对象树与析构日志"
-  },
-  {
-    "project": "05_stack_lifetime",
-    "chapter": 4,
-    "title": "栈对象安全的构造顺序"
-  },
-  {
-    "project": "06_close_connection",
-    "chapter": 5,
-    "title": "点击按钮关闭窗口"
-  },
-  {
-    "project": "07_custom_signal",
-    "chapter": 5,
-    "title": "自定义信号与槽"
-  },
-  {
-    "project": "08_signal_to_signal",
-    "chapter": 5,
-    "title": "信号连接另一个信号"
-  },
-  {
-    "project": "09_overloaded_signal",
-    "chapter": 5,
-    "title": "带参数的重载信号与槽"
-  },
-  {
-    "project": "10_disconnect",
-    "chapter": 5,
-    "title": "保存句柄并断开连接"
-  },
-  {
-    "project": "11_multiple_slots",
-    "chapter": 5,
-    "title": "一个信号连接多个处理函数"
-  },
-  {
-    "project": "12_function_to_lambda",
-    "chapter": 5,
-    "title": "普通函数改写为 Lambda"
-  },
-  {
-    "project": "13_define_and_call",
-    "chapter": 5,
-    "title": "定义与调用的区别"
-  },
-  {
-    "project": "14_capture_and_parameter",
-    "chapter": 5,
-    "title": "捕获列表与参数列表"
-  },
-  {
-    "project": "15_value_capture",
-    "chapter": 5,
-    "title": "值捕获保存旧值"
-  },
-  {
-    "project": "16_reference_capture",
-    "chapter": 5,
-    "title": "引用捕获修改原变量"
-  },
-  {
-    "project": "17_mixed_capture",
-    "chapter": 5,
-    "title": "显式混合捕获"
-  },
-  {
-    "project": "18_pointer_capture",
-    "chapter": 5,
-    "title": "复制指针仍可改变目标"
-  },
-  {
-    "project": "19_mutable_original",
-    "chapter": 5,
-    "title": "逐步复现原笔记的 mutable"
-  },
-  {
-    "project": "20_mutable_state",
-    "chapter": 5,
-    "title": "同一个 Lambda 会保留副本"
-  },
-  {
-    "project": "21_this_member",
-    "chapter": 5,
-    "title": "this 与窗口成员"
-  },
-  {
-    "project": "22_empty_capture_button",
-    "chapter": 5,
-    "title": "空捕获的按钮回调"
-  },
-  {
-    "project": "23_signal_parameter",
-    "chapter": 5,
-    "title": "Lambda 接收信号参数"
-  },
-  {
-    "project": "24_lambda_adapter",
-    "chapter": 5,
-    "title": "Lambda 转换业务参数"
-  },
-  {
-    "project": "25_loop_capture",
-    "chapter": 5,
-    "title": "循环中保存按钮编号"
-  },
-  {
-    "project": "26_safe_delayed_state",
-    "chapter": 5,
-    "title": "避免引用已消失的局部变量"
-  },
-  {
-    "project": "27_lambda_keeps_copy",
-    "chapter": 5,
-    "title": "值捕获也能保存回调自身状态"
-  },
-  {
-    "project": "28_complete_counter",
-    "chapter": 5,
-    "title": "完整练习 计数与清零"
-  },
-  {
-    "project": "29_member_slot",
-    "chapter": 5,
-    "title": "改为连接普通成员函数"
-  },
-  {
-    "project": "30_self_test",
-    "chapter": 5,
-    "title": "Lambda 自测结果对照"
-  },
-  {
-    "project": "31_mainwindow",
-    "chapter": 6,
-    "title": "主窗口与中心部件"
-  },
-  {
-    "project": "32_menu_toolbar",
-    "chapter": 6,
-    "title": "菜单 动作与工具栏"
-  },
-  {
-    "project": "33_status_dock",
-    "chapter": 6,
-    "title": "状态栏和停靠面板"
-  },
-  {
-    "project": "34_resources",
-    "chapter": 3,
-    "title": "资源路径 图片与背景"
-  },
-  {
-    "project": "35_designer",
+    "old": "35_designer",
+    "project": "02_02_designer",
     "chapter": 2,
-    "title": "Designer 与 setupUi"
+    "section": "2.2",
+    "title": "Designer 与 setupUi",
+    "knowledge": "Designer自动连接"
   },
   {
-    "project": "36_dialog",
+    "old": "02_window_size",
+    "project": "03_01_window_size",
+    "chapter": 3,
+    "section": "3.1",
+    "title": "标题与窗口大小",
+    "knowledge": "初始大小与固定大小"
+  },
+  {
+    "old": "34_resources",
+    "project": "03_02_resources",
+    "chapter": 3,
+    "section": "3.2",
+    "title": "资源路径 图片与背景",
+    "knowledge": "资源路径与图像加载"
+  },
+  {
+    "old": "03_buttons_coordinates",
+    "project": "04_01_buttons_coordinates",
+    "chapter": 4,
+    "section": "4.1",
+    "title": "按钮与父控件坐标",
+    "knowledge": "按钮坐标与父控件"
+  },
+  {
+    "old": "04_object_tree",
+    "project": "04_02_object_tree",
+    "chapter": 4,
+    "section": "4.2",
+    "title": "对象树与析构日志",
+    "knowledge": "对象树的级联销毁"
+  },
+  {
+    "old": "05_stack_lifetime",
+    "project": "04_03_stack_lifetime",
+    "chapter": 4,
+    "section": "4.3",
+    "title": "栈对象安全的构造顺序",
+    "knowledge": "栈对象的构造与析构顺序"
+  },
+  {
+    "old": "06_close_connection",
+    "project": "05_01_close_connection",
+    "chapter": 5,
+    "section": "5.1",
+    "title": "点击按钮关闭窗口",
+    "knowledge": "连接按钮与成员函数"
+  },
+  {
+    "old": "07_custom_signal",
+    "project": "05_02_custom_signal",
+    "chapter": 5,
+    "section": "5.2",
+    "title": "自定义信号与槽",
+    "knowledge": "自定义信号槽的调用链"
+  },
+  {
+    "old": "08_signal_to_signal",
+    "project": "05_03_signal_to_signal",
+    "chapter": 5,
+    "section": "5.3",
+    "title": "信号连接另一个信号",
+    "knowledge": "信号转发"
+  },
+  {
+    "old": "09_overloaded_signal",
+    "project": "05_04_overloaded_signal",
+    "chapter": 5,
+    "section": "5.4",
+    "title": "带参数的重载信号与槽",
+    "knowledge": "选择带参数的重载"
+  },
+  {
+    "old": "10_disconnect",
+    "project": "05_05_disconnect",
+    "chapter": 5,
+    "section": "5.5",
+    "title": "保存句柄并断开连接",
+    "knowledge": "保存连接句柄并断开"
+  },
+  {
+    "old": "11_multiple_slots",
+    "project": "05_06_multiple_slots",
+    "chapter": 5,
+    "section": "5.6",
+    "title": "一个信号连接多个处理函数",
+    "knowledge": "一个信号连接多个处理函数"
+  },
+  {
+    "old": "12_function_to_lambda",
+    "project": "05_07_function_to_lambda",
+    "chapter": 5,
+    "section": "5.7",
+    "title": "普通函数改写为 Lambda",
+    "knowledge": "Lambda的定义与调用"
+  },
+  {
+    "old": "13_define_and_call",
+    "project": "05_08_define_and_call",
+    "chapter": 5,
+    "section": "5.8",
+    "title": "定义与调用的区别",
+    "knowledge": "定义阶段与执行阶段"
+  },
+  {
+    "old": "14_capture_and_parameter",
+    "project": "05_09_capture_and_parameter",
+    "chapter": 5,
+    "section": "5.9",
+    "title": "捕获列表与参数列表",
+    "knowledge": "捕获值与函数参数的来源"
+  },
+  {
+    "old": "15_value_capture",
+    "project": "05_10_value_capture",
+    "chapter": 5,
+    "section": "5.10",
+    "title": "值捕获保存旧值",
+    "knowledge": "值捕获保存创建时的副本"
+  },
+  {
+    "old": "16_reference_capture",
+    "project": "05_11_reference_capture",
+    "chapter": 5,
+    "section": "5.11",
+    "title": "引用捕获修改原变量",
+    "knowledge": "引用捕获访问原变量"
+  },
+  {
+    "old": "17_mixed_capture",
+    "project": "05_12_mixed_capture",
+    "chapter": 5,
+    "section": "5.12",
+    "title": "显式混合捕获",
+    "knowledge": "显式混合捕获"
+  },
+  {
+    "old": "18_pointer_capture",
+    "project": "05_13_pointer_capture",
+    "chapter": 5,
+    "section": "5.13",
+    "title": "复制指针仍可改变目标",
+    "knowledge": "指针捕获复制地址"
+  },
+  {
+    "old": "19_mutable_original",
+    "project": "05_14_mutable_original",
+    "chapter": 5,
+    "section": "5.14",
+    "title": "逐步复现原笔记的 mutable",
+    "knowledge": "mutable修改捕获副本"
+  },
+  {
+    "old": "20_mutable_state",
+    "project": "05_15_mutable_state",
+    "chapter": 5,
+    "section": "5.15",
+    "title": "同一个 Lambda 会保留副本",
+    "knowledge": "闭包副本的状态保留"
+  },
+  {
+    "old": "21_this_member",
+    "project": "05_16_this_member",
+    "chapter": 5,
+    "section": "5.16",
+    "title": "this 与窗口成员",
+    "knowledge": "通过this访问窗口成员"
+  },
+  {
+    "old": "22_empty_capture_button",
+    "project": "05_17_empty_capture_button",
+    "chapter": 5,
+    "section": "5.17",
+    "title": "空捕获的按钮回调",
+    "knowledge": "空捕获回调"
+  },
+  {
+    "old": "23_signal_parameter",
+    "project": "05_18_signal_parameter",
+    "chapter": 5,
+    "section": "5.18",
+    "title": "Lambda 接收信号参数",
+    "knowledge": "信号实参与捕获数据同时使用"
+  },
+  {
+    "old": "24_lambda_adapter",
+    "project": "05_19_lambda_adapter",
+    "chapter": 5,
+    "section": "5.19",
+    "title": "Lambda 转换业务参数",
+    "knowledge": "Lambda适配业务参数"
+  },
+  {
+    "old": "25_loop_capture",
+    "project": "05_20_loop_capture",
+    "chapter": 5,
+    "section": "5.20",
+    "title": "循环中保存按钮编号",
+    "knowledge": "循环回调保存各自编号"
+  },
+  {
+    "old": "26_safe_delayed_state",
+    "project": "05_21_safe_delayed_state",
+    "chapter": 5,
+    "section": "5.21",
+    "title": "避免引用已消失的局部变量",
+    "knowledge": "长期回调使用窗口状态"
+  },
+  {
+    "old": "27_lambda_keeps_copy",
+    "project": "05_22_lambda_keeps_copy",
+    "chapter": 5,
+    "section": "5.22",
+    "title": "值捕获也能保存回调自身状态",
+    "knowledge": "回调内部保存独立计数"
+  },
+  {
+    "old": "28_complete_counter",
+    "project": "05_23_complete_counter",
+    "chapter": 5,
+    "section": "5.23",
+    "title": "完整练习 计数与清零",
+    "knowledge": "成员状态与界面统一刷新"
+  },
+  {
+    "old": "29_member_slot",
+    "project": "05_24_member_slot",
+    "chapter": 5,
+    "section": "5.24",
+    "title": "改为连接普通成员函数",
+    "knowledge": "连接普通成员函数"
+  },
+  {
+    "old": "30_self_test",
+    "project": "05_25_self_test",
+    "chapter": 5,
+    "section": "5.25",
+    "title": "Lambda 自测结果对照",
+    "knowledge": "用输出验证捕获规则"
+  },
+  {
+    "old": "31_mainwindow",
+    "project": "06_01_mainwindow",
+    "chapter": 6,
+    "section": "6.1",
+    "title": "主窗口与中心部件",
+    "knowledge": "QMainWindow中心工作区"
+  },
+  {
+    "old": "32_menu_toolbar",
+    "project": "06_02_menu_toolbar",
+    "chapter": 6,
+    "section": "6.2",
+    "title": "菜单 动作与工具栏",
+    "knowledge": "QAction共享命令入口"
+  },
+  {
+    "old": "33_status_dock",
+    "project": "06_03_status_dock",
+    "chapter": 6,
+    "section": "6.3",
+    "title": "状态栏和停靠面板",
+    "knowledge": "临时状态与停靠区域"
+  },
+  {
+    "old": "36_dialog",
+    "project": "07_01_dialog",
     "chapter": 7,
-    "title": "模态 非模态与对象生命期"
+    "section": "7.1",
+    "title": "模态 非模态与对象生命期",
+    "knowledge": "异步对话框的生命周期"
   },
   {
-    "project": "37_file_dialog",
+    "old": "50_dialog_modes",
+    "project": "07_02_dialog_modes",
     "chapter": 7,
-    "title": "单文件 多文件与取消"
+    "section": "7.2",
+    "title": "show open exec 三种调用对比",
+    "knowledge": "show open exec的返回时机"
   },
   {
-    "project": "38_color_font",
+    "old": "37_file_dialog",
+    "project": "07_03_file_dialog",
     "chapter": 7,
-    "title": "选择颜色与字体"
+    "section": "7.3",
+    "title": "单文件 多文件与取消",
+    "knowledge": "文件选择与取消处理"
   },
   {
-    "project": "39_messagebox",
+    "old": "38_color_font",
+    "project": "07_04_color_font",
     "chapter": 7,
-    "title": "消息框与三种选择结果"
+    "section": "7.4",
+    "title": "选择颜色与字体",
+    "knowledge": "确认颜色或字体后再应用"
   },
   {
-    "project": "40_layout",
+    "old": "39_messagebox",
+    "project": "07_05_messagebox",
+    "chapter": 7,
+    "section": "7.5",
+    "title": "消息框与三种选择结果",
+    "knowledge": "消息框返回值与控制分支"
+  },
+  {
+    "old": "49_text_editor",
+    "project": "07_06_text_editor",
+    "chapter": 7,
+    "section": "7.6",
+    "title": "UTF-8 文件读取与安全保存",
+    "knowledge": "打开编辑保存的完整流程"
+  },
+  {
+    "old": "40_layout",
+    "project": "08_01_layout",
     "chapter": 8,
-    "title": "水平 垂直 网格与表单布局"
+    "section": "8.1",
+    "title": "水平 垂直 网格与表单布局",
+    "knowledge": "四种布局的嵌套"
   },
   {
-    "project": "41_label_movie",
+    "old": "41_label_movie",
+    "project": "09_01_label_movie",
     "chapter": 9,
-    "title": "QLabel 文本 图片与动画"
+    "section": "9.1",
+    "title": "QLabel 文本 图片与动画",
+    "knowledge": "标签的文本图像与动画接口"
   },
   {
-    "project": "42_lineedit",
+    "old": "42_lineedit",
+    "project": "09_02_lineedit",
     "chapter": 9,
-    "title": "QLineEdit 输入与显示模式"
+    "section": "9.2",
+    "title": "QLineEdit 输入与显示模式",
+    "knowledge": "输入内容与显示模式"
   },
   {
-    "project": "43_custom_widget",
+    "old": "43_custom_widget",
+    "project": "09_03_custom_widget",
     "chapter": 9,
-    "title": "组合控件与 Designer 提升"
+    "section": "9.3",
+    "title": "组合控件与 Designer 提升",
+    "knowledge": "可复用组合控件与提升"
   },
   {
-    "project": "44_stacked_pages",
+    "old": "44_stacked_pages",
+    "project": "09_04_stacked_pages",
     "chapter": 9,
-    "title": "堆叠页面与窗口切换"
+    "section": "9.4",
+    "title": "堆叠页面与窗口切换",
+    "knowledge": "堆叠页面与状态保留"
   },
   {
-    "project": "45_close_resize",
+    "old": "45_close_resize",
+    "project": "10_01_close_resize",
     "chapter": 10,
-    "title": "关闭事件与尺寸变化"
+    "section": "10.1",
+    "title": "关闭事件与尺寸变化",
+    "knowledge": "关闭请求与尺寸通知"
   },
   {
-    "project": "46_mouse_events",
+    "old": "46_mouse_events",
+    "project": "10_02_mouse_events",
     "chapter": 10,
-    "title": "鼠标按键 坐标和跟踪"
+    "section": "10.2",
+    "title": "鼠标按键 坐标和跟踪",
+    "knowledge": "鼠标事件的坐标与按键"
   },
   {
-    "project": "47_event_tab",
+    "old": "47_event_tab",
+    "project": "10_03_event_tab",
     "chapter": 10,
-    "title": "重写 event 拦截 Tab"
+    "section": "10.3",
+    "title": "重写 event 拦截 Tab",
+    "knowledge": "event中拦截Tab"
   },
   {
-    "project": "48_painter",
+    "old": "51_event_filter",
+    "project": "10_04_event_filter",
+    "chapter": 10,
+    "section": "10.4",
+    "title": "事件过滤器处理输入",
+    "knowledge": "为现有控件安装事件过滤器"
+  },
+  {
+    "old": "48_painter",
+    "project": "11_01_painter",
     "chapter": 11,
-    "title": "QPainter 与绘图设备"
+    "section": "11.1",
+    "title": "QPainter 与绘图设备",
+    "knowledge": "paintEvent与绘图设备"
   },
   {
-    "project": "49_text_editor",
-    "chapter": 7,
-    "title": "UTF-8 文件读取与安全保存"
-  },
-  {
-    "project": "50_dialog_modes",
-    "chapter": 7,
-    "title": "show open exec 三种调用对比"
-  },
-  {
-    "project": "51_event_filter",
-    "chapter": 10,
-    "title": "事件过滤器处理输入"
-  },
-  {
-    "project": "52_interactive_paint",
+    "old": "52_interactive_paint",
+    "project": "11_02_interactive_paint",
     "chapter": 11,
-    "title": "状态驱动的交互绘图"
+    "section": "11.2",
+    "title": "状态驱动的交互绘图",
+    "knowledge": "状态更新与重绘分离"
   }
 ]

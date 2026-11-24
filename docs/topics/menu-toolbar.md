@@ -1,6 +1,6 @@
-# 6.2 菜单 动作与工具栏
+# 6.2 QAction共享命令入口 理论补充
 
-对应示例：[完整源码](../../examples/32_menu_toolbar)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/06_02_menu_toolbar)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ triggered(bool) 通知触发，toggled(bool) 通知勾选状态变化。需要�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/32_menu_toolbar/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/06_02_menu_toolbar/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -165,7 +165,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 32_menu_toolbar.pro
+### 06_02_menu_toolbar.pro
 
 ```qmake
 QT += widgets
@@ -192,11 +192,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/32_menu_toolbar/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/06_02_menu_toolbar/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![菜单 动作与工具栏 03_result](../../examples/32_menu_toolbar/screenshots/03_result.png)
+![菜单 动作与工具栏 03_result](../../examples/06_02_menu_toolbar/screenshots/03_result.png)
 
 ## 自己动手
 

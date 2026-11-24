@@ -1,6 +1,6 @@
-# 2.6 Designer 与 setupUi
+# 2.2 Designer自动连接 理论补充
 
-对应示例：[完整源码](../../examples/35_designer)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/02_02_designer)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ Qt Creator 向导常用 Ui::MainWindow *ui；new 出来的包装器需要 delete
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/35_designer/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/02_02_designer/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -170,7 +170,7 @@ void MainWindow::on_runButton_clicked()
 </ui>
 ```
 
-### 35_designer.pro
+### 02_02_designer.pro
 
 ```qmake
 QT += widgets
@@ -197,11 +197,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/35_designer/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/02_02_designer/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![Designer 与 setupUi 03_result](../../examples/35_designer/screenshots/03_result.png)
+![Designer 与 setupUi 03_result](../../examples/02_02_designer/screenshots/03_result.png)
 
 ## 自己动手
 

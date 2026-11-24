@@ -1,78 +1,92 @@
-# Qt学习笔记 十一章目录
+# 按章节与知识点学习
 
-正文按十一章学习；示例 01—52 保留独立项目编号。章节与示例是两套索引，后续内容请继续归入对应章节的小节。
+项目编号就是章节中的知识点编号：例如 05_03 表示第五章的第三个项目。文件夹按名称排序即可依次学习。
 
-| 正文章节 | 主要内容 | 对应示例 |
-|---|---|---|
-| [第一章 Qt概述](chapters/01-overview.md) | Qt与开发工具的区别、基础类、学习方法 | 概念导读 |
-| [第二章 创建Qt项目](chapters/02-create-project.md) | 新建项目、Kit、默认模板、setupUi、构建与调试 | 01、35 |
-| [第三章 设置窗口属性](chapters/03-window-properties.md) | 标题、尺寸、固定窗口、图标与资源 | 02、34 |
-| [第四章 按钮的创建和属性设置](chapters/04-buttons.md) | Designer按钮、代码创建、属性、坐标、对象树 | 03、04、05 |
-| [第五章 信号和槽机制（Lambda）](chapters/05-signals-slots-lambda.md) | connect、自定义信号、重载、捕获、mutable、this、生命周期 | 06—30 |
-| [第六章 QMainWindow](chapters/06-mainwindow.md) | 中心部件、菜单、QAction、工具栏、状态栏与停靠 | 31、32、33 |
-| [第七章 对话框QDialog](chapters/07-dialogs.md) | 模态与调用时机、标准对话框、保存确认与文本编辑器 | 36、50、37、38、39、49 |
-| [第八章 布局管理器](chapters/08-layouts.md) | 水平、垂直、网格、表单、间距与伸缩 | 40 |
-| [第九章 常用控件](chapters/09-widgets.md) | QLabel、QMovie、QLineEdit、组合控件与页面 | 41、42、43、44 |
-| [第十章 Qt消息机制和事件](chapters/10-events.md) | 事件循环、关闭、尺寸、鼠标、event与过滤器 | 45、46、47、51 |
-| [第十一章 绘图和绘图设备](chapters/11-painting.md) | QPainter、绘图设备、paintEvent、update与状态 | 48、52 |
+## [第 1 章 Qt概述](chapters/01-overview.md)
 
-## 怎样开始
+概念导读，认识框架与工具。
 
-先读第一章建立整体认识，再按第二章运行第一个项目。每一步都有完整源码、.pro、.ui、运行截图和项目 README 中的 Designer 操作清单。遇到源文件分工问题，查[统一模板](project-format.md)；遇到构建问题，查[安装与运行](getting-started.md)。
 
-## 全部示例归属
+## [第 2 章 创建Qt项目](chapters/02-create-project.md)
 
-| 示例 | 内容 | 所属正文章节 |
-|---|---|---|
-| [示例 01](../examples/01_first_window/README.md) | 第一个空白窗口 | [第二章](chapters/02-create-project.md) |
-| [示例 02](../examples/02_window_size/README.md) | 标题与窗口大小 | [第三章](chapters/03-window-properties.md) |
-| [示例 03](../examples/03_buttons_coordinates/README.md) | 按钮与父控件坐标 | [第四章](chapters/04-buttons.md) |
-| [示例 04](../examples/04_object_tree/README.md) | 对象树与析构日志 | [第四章](chapters/04-buttons.md) |
-| [示例 05](../examples/05_stack_lifetime/README.md) | 栈对象安全的构造顺序 | [第四章](chapters/04-buttons.md) |
-| [示例 06](../examples/06_close_connection/README.md) | 点击按钮关闭窗口 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 07](../examples/07_custom_signal/README.md) | 自定义信号与槽 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 08](../examples/08_signal_to_signal/README.md) | 信号连接另一个信号 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 09](../examples/09_overloaded_signal/README.md) | 带参数的重载信号与槽 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 10](../examples/10_disconnect/README.md) | 保存句柄并断开连接 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 11](../examples/11_multiple_slots/README.md) | 一个信号连接多个处理函数 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 12](../examples/12_function_to_lambda/README.md) | 普通函数改写为 Lambda | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 13](../examples/13_define_and_call/README.md) | 定义与调用的区别 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 14](../examples/14_capture_and_parameter/README.md) | 捕获列表与参数列表 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 15](../examples/15_value_capture/README.md) | 值捕获保存旧值 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 16](../examples/16_reference_capture/README.md) | 引用捕获修改原变量 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 17](../examples/17_mixed_capture/README.md) | 显式混合捕获 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 18](../examples/18_pointer_capture/README.md) | 复制指针仍可改变目标 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 19](../examples/19_mutable_original/README.md) | 逐步复现原笔记的 mutable | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 20](../examples/20_mutable_state/README.md) | 同一个 Lambda 会保留副本 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 21](../examples/21_this_member/README.md) | this 与窗口成员 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 22](../examples/22_empty_capture_button/README.md) | 空捕获的按钮回调 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 23](../examples/23_signal_parameter/README.md) | Lambda 接收信号参数 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 24](../examples/24_lambda_adapter/README.md) | Lambda 转换业务参数 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 25](../examples/25_loop_capture/README.md) | 循环中保存按钮编号 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 26](../examples/26_safe_delayed_state/README.md) | 避免引用已消失的局部变量 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 27](../examples/27_lambda_keeps_copy/README.md) | 值捕获也能保存回调自身状态 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 28](../examples/28_complete_counter/README.md) | 完整练习 计数与清零 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 29](../examples/29_member_slot/README.md) | 改为连接普通成员函数 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 30](../examples/30_self_test/README.md) | Lambda 自测结果对照 | [第五章](chapters/05-signals-slots-lambda.md) |
-| [示例 31](../examples/31_mainwindow/README.md) | 主窗口与中心部件 | [第六章](chapters/06-mainwindow.md) |
-| [示例 32](../examples/32_menu_toolbar/README.md) | 菜单 动作与工具栏 | [第六章](chapters/06-mainwindow.md) |
-| [示例 33](../examples/33_status_dock/README.md) | 状态栏和停靠面板 | [第六章](chapters/06-mainwindow.md) |
-| [示例 34](../examples/34_resources/README.md) | 资源路径 图片与背景 | [第三章](chapters/03-window-properties.md) |
-| [示例 35](../examples/35_designer/README.md) | Designer 与 setupUi | [第二章](chapters/02-create-project.md) |
-| [示例 36](../examples/36_dialog/README.md) | 模态 非模态与对象生命期 | [第七章](chapters/07-dialogs.md) |
-| [示例 37](../examples/37_file_dialog/README.md) | 单文件 多文件与取消 | [第七章](chapters/07-dialogs.md) |
-| [示例 38](../examples/38_color_font/README.md) | 选择颜色与字体 | [第七章](chapters/07-dialogs.md) |
-| [示例 39](../examples/39_messagebox/README.md) | 消息框与三种选择结果 | [第七章](chapters/07-dialogs.md) |
-| [示例 40](../examples/40_layout/README.md) | 水平 垂直 网格与表单布局 | [第八章](chapters/08-layouts.md) |
-| [示例 41](../examples/41_label_movie/README.md) | QLabel 文本 图片与动画 | [第九章](chapters/09-widgets.md) |
-| [示例 42](../examples/42_lineedit/README.md) | QLineEdit 输入与显示模式 | [第九章](chapters/09-widgets.md) |
-| [示例 43](../examples/43_custom_widget/README.md) | 组合控件与 Designer 提升 | [第九章](chapters/09-widgets.md) |
-| [示例 44](../examples/44_stacked_pages/README.md) | 堆叠页面与窗口切换 | [第九章](chapters/09-widgets.md) |
-| [示例 45](../examples/45_close_resize/README.md) | 关闭事件与尺寸变化 | [第十章](chapters/10-events.md) |
-| [示例 46](../examples/46_mouse_events/README.md) | 鼠标按键 坐标和跟踪 | [第十章](chapters/10-events.md) |
-| [示例 47](../examples/47_event_tab/README.md) | 重写 event 拦截 Tab | [第十章](chapters/10-events.md) |
-| [示例 48](../examples/48_painter/README.md) | QPainter 与绘图设备 | [第十一章](chapters/11-painting.md) |
-| [示例 49](../examples/49_text_editor/README.md) | UTF-8 文件读取与安全保存 | [第七章](chapters/07-dialogs.md) |
-| [示例 50](../examples/50_dialog_modes/README.md) | show open exec 三种调用对比 | [第七章](chapters/07-dialogs.md) |
-| [示例 51](../examples/51_event_filter/README.md) | 事件过滤器处理输入 | [第十章](chapters/10-events.md) |
-| [示例 52](../examples/52_interactive_paint/README.md) | 状态驱动的交互绘图 | [第十一章](chapters/11-painting.md) |
+- [2.1 应用入口与事件循环](knowledge/02_01_first_window.md) · [完整项目](../examples/02_01_first_window/README.md)
+- [2.2 Designer自动连接](knowledge/02_02_designer.md) · [完整项目](../examples/02_02_designer/README.md)
+
+## [第 3 章 设置窗口属性](chapters/03-window-properties.md)
+
+- [3.1 初始大小与固定大小](knowledge/03_01_window_size.md) · [完整项目](../examples/03_01_window_size/README.md)
+- [3.2 资源路径与图像加载](knowledge/03_02_resources.md) · [完整项目](../examples/03_02_resources/README.md)
+
+## [第 4 章 按钮的创建和属性设置](chapters/04-buttons.md)
+
+- [4.1 按钮坐标与父控件](knowledge/04_01_buttons_coordinates.md) · [完整项目](../examples/04_01_buttons_coordinates/README.md)
+- [4.2 对象树的级联销毁](knowledge/04_02_object_tree.md) · [完整项目](../examples/04_02_object_tree/README.md)
+- [4.3 栈对象的构造与析构顺序](knowledge/04_03_stack_lifetime.md) · [完整项目](../examples/04_03_stack_lifetime/README.md)
+
+## [第 5 章 信号和槽机制（Lambda）](chapters/05-signals-slots-lambda.md)
+
+- [5.1 连接按钮与成员函数](knowledge/05_01_close_connection.md) · [完整项目](../examples/05_01_close_connection/README.md)
+- [5.2 自定义信号槽的调用链](knowledge/05_02_custom_signal.md) · [完整项目](../examples/05_02_custom_signal/README.md)
+- [5.3 信号转发](knowledge/05_03_signal_to_signal.md) · [完整项目](../examples/05_03_signal_to_signal/README.md)
+- [5.4 选择带参数的重载](knowledge/05_04_overloaded_signal.md) · [完整项目](../examples/05_04_overloaded_signal/README.md)
+- [5.5 保存连接句柄并断开](knowledge/05_05_disconnect.md) · [完整项目](../examples/05_05_disconnect/README.md)
+- [5.6 一个信号连接多个处理函数](knowledge/05_06_multiple_slots.md) · [完整项目](../examples/05_06_multiple_slots/README.md)
+- [5.7 Lambda的定义与调用](knowledge/05_07_function_to_lambda.md) · [完整项目](../examples/05_07_function_to_lambda/README.md)
+- [5.8 定义阶段与执行阶段](knowledge/05_08_define_and_call.md) · [完整项目](../examples/05_08_define_and_call/README.md)
+- [5.9 捕获值与函数参数的来源](knowledge/05_09_capture_and_parameter.md) · [完整项目](../examples/05_09_capture_and_parameter/README.md)
+- [5.10 值捕获保存创建时的副本](knowledge/05_10_value_capture.md) · [完整项目](../examples/05_10_value_capture/README.md)
+- [5.11 引用捕获访问原变量](knowledge/05_11_reference_capture.md) · [完整项目](../examples/05_11_reference_capture/README.md)
+- [5.12 显式混合捕获](knowledge/05_12_mixed_capture.md) · [完整项目](../examples/05_12_mixed_capture/README.md)
+- [5.13 指针捕获复制地址](knowledge/05_13_pointer_capture.md) · [完整项目](../examples/05_13_pointer_capture/README.md)
+- [5.14 mutable修改捕获副本](knowledge/05_14_mutable_original.md) · [完整项目](../examples/05_14_mutable_original/README.md)
+- [5.15 闭包副本的状态保留](knowledge/05_15_mutable_state.md) · [完整项目](../examples/05_15_mutable_state/README.md)
+- [5.16 通过this访问窗口成员](knowledge/05_16_this_member.md) · [完整项目](../examples/05_16_this_member/README.md)
+- [5.17 空捕获回调](knowledge/05_17_empty_capture_button.md) · [完整项目](../examples/05_17_empty_capture_button/README.md)
+- [5.18 信号实参与捕获数据同时使用](knowledge/05_18_signal_parameter.md) · [完整项目](../examples/05_18_signal_parameter/README.md)
+- [5.19 Lambda适配业务参数](knowledge/05_19_lambda_adapter.md) · [完整项目](../examples/05_19_lambda_adapter/README.md)
+- [5.20 循环回调保存各自编号](knowledge/05_20_loop_capture.md) · [完整项目](../examples/05_20_loop_capture/README.md)
+- [5.21 长期回调使用窗口状态](knowledge/05_21_safe_delayed_state.md) · [完整项目](../examples/05_21_safe_delayed_state/README.md)
+- [5.22 回调内部保存独立计数](knowledge/05_22_lambda_keeps_copy.md) · [完整项目](../examples/05_22_lambda_keeps_copy/README.md)
+- [5.23 成员状态与界面统一刷新](knowledge/05_23_complete_counter.md) · [完整项目](../examples/05_23_complete_counter/README.md)
+- [5.24 连接普通成员函数](knowledge/05_24_member_slot.md) · [完整项目](../examples/05_24_member_slot/README.md)
+- [5.25 用输出验证捕获规则](knowledge/05_25_self_test.md) · [完整项目](../examples/05_25_self_test/README.md)
+
+## [第 6 章 QMainWindow](chapters/06-mainwindow.md)
+
+- [6.1 QMainWindow中心工作区](knowledge/06_01_mainwindow.md) · [完整项目](../examples/06_01_mainwindow/README.md)
+- [6.2 QAction共享命令入口](knowledge/06_02_menu_toolbar.md) · [完整项目](../examples/06_02_menu_toolbar/README.md)
+- [6.3 临时状态与停靠区域](knowledge/06_03_status_dock.md) · [完整项目](../examples/06_03_status_dock/README.md)
+
+## [第 7 章 对话框QDialog](chapters/07-dialogs.md)
+
+- [7.1 异步对话框的生命周期](knowledge/07_01_dialog.md) · [完整项目](../examples/07_01_dialog/README.md)
+- [7.2 show open exec的返回时机](knowledge/07_02_dialog_modes.md) · [完整项目](../examples/07_02_dialog_modes/README.md)
+- [7.3 文件选择与取消处理](knowledge/07_03_file_dialog.md) · [完整项目](../examples/07_03_file_dialog/README.md)
+- [7.4 确认颜色或字体后再应用](knowledge/07_04_color_font.md) · [完整项目](../examples/07_04_color_font/README.md)
+- [7.5 消息框返回值与控制分支](knowledge/07_05_messagebox.md) · [完整项目](../examples/07_05_messagebox/README.md)
+- [7.6 打开编辑保存的完整流程](knowledge/07_06_text_editor.md) · [完整项目](../examples/07_06_text_editor/README.md)
+
+## [第 8 章 布局管理器](chapters/08-layouts.md)
+
+- [8.1 四种布局的嵌套](knowledge/08_01_layout.md) · [完整项目](../examples/08_01_layout/README.md)
+
+## [第 9 章 常用控件](chapters/09-widgets.md)
+
+- [9.1 标签的文本图像与动画接口](knowledge/09_01_label_movie.md) · [完整项目](../examples/09_01_label_movie/README.md)
+- [9.2 输入内容与显示模式](knowledge/09_02_lineedit.md) · [完整项目](../examples/09_02_lineedit/README.md)
+- [9.3 可复用组合控件与提升](knowledge/09_03_custom_widget.md) · [完整项目](../examples/09_03_custom_widget/README.md)
+- [9.4 堆叠页面与状态保留](knowledge/09_04_stacked_pages.md) · [完整项目](../examples/09_04_stacked_pages/README.md)
+
+## [项目 5.5 章 Qt消息机制和事件](chapters/10-events.md)
+
+- [10.1 关闭请求与尺寸通知](knowledge/10_01_close_resize.md) · [完整项目](../examples/10_01_close_resize/README.md)
+- [10.2 鼠标事件的坐标与按键](knowledge/10_02_mouse_events.md) · [完整项目](../examples/10_02_mouse_events/README.md)
+- [10.3 event中拦截Tab](knowledge/10_03_event_tab.md) · [完整项目](../examples/10_03_event_tab/README.md)
+- [10.4 为现有控件安装事件过滤器](knowledge/10_04_event_filter.md) · [完整项目](../examples/10_04_event_filter/README.md)
+
+## [项目 5.6 章 绘图和绘图设备](chapters/11-painting.md)
+
+- [11.1 paintEvent与绘图设备](knowledge/11_01_painter.md) · [完整项目](../examples/11_01_painter/README.md)
+- [11.2 状态更新与重绘分离](knowledge/11_02_interactive_paint.md) · [完整项目](../examples/11_02_interactive_paint/README.md)
+
+[新旧编号对照](project-renumbering.md) · [项目模板与 UI 操作](project-format.md) · [安装运行](getting-started.md)

@@ -1,6 +1,6 @@
-# 9.1 QLabel 文本 图片与动画
+# 9.1 标签的文本图像与动画接口 理论补充
 
-对应示例：[完整源码](../../examples/41_label_movie)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/09_01_label_movie)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ setText 接收文本，setPixmap 接收像素图，setMovie 接收动画对象�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/41_label_movie/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/09_01_label_movie/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -161,7 +161,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 41_label_movie.pro
+### 09_01_label_movie.pro
 
 ```qmake
 QT += widgets
@@ -196,11 +196,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 <RCC><qresource prefix="/images"><file alias="demo.png">assets/demo.png</file><file alias="demo.gif">assets/demo.gif</file></qresource></RCC>
 ```
 
-[verify.h](../../examples/41_label_movie/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/09_01_label_movie/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![QLabel 文本 图片与动画 03_result](../../examples/41_label_movie/screenshots/03_result.png)
+![QLabel 文本 图片与动画 03_result](../../examples/09_01_label_movie/screenshots/03_result.png)
 
 ## 自己动手
 

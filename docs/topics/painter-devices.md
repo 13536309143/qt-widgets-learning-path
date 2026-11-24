@@ -1,6 +1,6 @@
-# 11.1 QPainter 与绘图设备
+# 11.1 paintEvent与绘图设备 理论补充
 
-对应示例：[完整源码](../../examples/48_painter)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/11_01_painter)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -12,11 +12,11 @@ QPixmap 常用于界面显示，QImage 便于像素访问，QBitmap 是一位深
 
 ## 图形应该从持久状态重建
 
-绘制结果是窗口某一时刻的像素，不是可靠的应用状态。遮挡、缩放、主题变化等都可能触发重绘。把“画一个红椭圆”只写在按钮槽里而不保留颜色状态，下一次重绘可能消失。示例 52将 color_ 放在 DrawingArea 成员中，按钮只更新颜色并 update，paintEvent 每次根据状态重建图形。
+绘制结果是窗口某一时刻的像素，不是可靠的应用状态。遮挡、缩放、主题变化等都可能触发重绘。把“画一个红椭圆”只写在按钮槽里而不保留颜色状态，下一次重绘可能消失。项目 11.2将 color_ 放在 DrawingArea 成员中，按钮只更新颜色并 update，paintEvent 每次根据状态重建图形。
 
 ## 按执行顺序拆解
 
-mainwindow.ui 中 QWidget 已提升为 Canvas；mainwindow.cpp 只负责装载界面和状态提示。绘制逻辑独立在 canvas.cpp 的 paintEvent：创建局部 QPainter、设置画笔和画刷、绘制形状与文字，再绘制离屏 QImage。示例 52继续让绘制由成员状态驱动。
+mainwindow.ui 中 QWidget 已提升为 Canvas；mainwindow.cpp 只负责装载界面和状态提示。绘制逻辑独立在 canvas.cpp 的 paintEvent：创建局部 QPainter、设置画笔和画刷、绘制形状与文字，再绘制离屏 QImage。项目 11.2继续让绘制由成员状态驱动。
 
 ## 参数与行为边界
 
@@ -30,7 +30,7 @@ QPicture 不是普通像素图片。QImage、QPixmap 上的离屏绘制可以在
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/48_painter/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/11_01_painter/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -189,7 +189,7 @@ protected:
 #endif // CANVAS_H
 ```
 
-### 48_painter.pro
+### 11_01_painter.pro
 
 ```qmake
 QT += widgets
@@ -218,15 +218,15 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/48_painter/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/11_01_painter/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![QPainter 与绘图设备 03_result](../../examples/48_painter/screenshots/03_result.png)
+![QPainter 与绘图设备 03_result](../../examples/11_01_painter/screenshots/03_result.png)
 
 ## 自己动手
 
-运行示例 52，切换颜色后缩放窗口并遮挡再恢复，确认颜色仍保持。把椭圆位置从固定 QRect 改为基于当前 rect 调整后的区域。再把画刷改为 NoBrush，比较只画轮廓与填充的区别。
+运行项目 11.2，切换颜色后缩放窗口并遮挡再恢复，确认颜色仍保持。把椭圆位置从固定 QRect 改为基于当前 rect 调整后的区域。再把画刷改为 NoBrush，比较只画轮廓与填充的区别。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

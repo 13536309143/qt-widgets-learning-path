@@ -1,6 +1,6 @@
-# 9.3 组合控件与 Designer 提升
+# 9.3 可复用组合控件与提升 理论补充
 
-对应示例：[完整源码](../../examples/43_custom_widget)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/09_03_custom_widget)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ Designer 中先放 QWidget 占位，提升类名填 SmallWidget，头文件填 s
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/43_custom_widget/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/09_03_custom_widget/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -268,7 +268,7 @@ private:
 </ui>
 ```
 
-### 43_custom_widget.pro
+### 09_03_custom_widget.pro
 
 ```qmake
 QT += widgets
@@ -298,11 +298,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/43_custom_widget/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/09_03_custom_widget/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![组合控件与 Designer 提升 03_result](../../examples/43_custom_widget/screenshots/03_result.png)
+![组合控件与 Designer 提升 03_result](../../examples/09_03_custom_widget/screenshots/03_result.png)
 
 ## 自己动手
 

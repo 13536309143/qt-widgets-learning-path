@@ -1,6 +1,6 @@
-# 6.3 状态栏和停靠面板
+# 6.3 临时状态与停靠区域 理论补充
 
-对应示例：[完整源码](../../examples/33_status_dock)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/06_03_status_dock)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ QDockWidget 是可停靠面板的外壳，用 setWidget() 设置它内部的控�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/33_status_dock/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/06_03_status_dock/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -169,7 +169,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 33_status_dock.pro
+### 06_03_status_dock.pro
 
 ```qmake
 QT += widgets
@@ -196,11 +196,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/33_status_dock/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/06_03_status_dock/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![状态栏和停靠面板 03_result](../../examples/33_status_dock/screenshots/03_result.png)
+![状态栏和停靠面板 03_result](../../examples/06_03_status_dock/screenshots/03_result.png)
 
 ## 自己动手
 

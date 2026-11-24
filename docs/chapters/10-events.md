@@ -1,170 +1,284 @@
-# 第十章 Qt消息机制和事件
+# 项目 5.5 章 Qt消息机制和事件
 
-先从事件循环理解输入与消息的处理，再学习特定事件函数、event 分发和事件过滤器，区分它们与信号槽的关系。
+本章按项目逐个学习，每个项目对应一个知识点。先运行再读关键代码，最后做一次修改验证。[理论补充与复习](../foundations/10-events.md)保留更完整的背景说明。
 
-本章对应的完整项目：
+## 10.1 关闭请求与尺寸通知
 
-- [示例 45 close_resize](../../examples/45_close_resize/README.md)
-- [示例 46 mouse_events](../../examples/46_mouse_events/README.md)
-- [示例 47 event_tab](../../examples/47_event_tab/README.md)
-- [示例 51 event_filter](../../examples/51_event_filter/README.md)
+[单独阅读本知识点](../knowledge/10_01_close_resize.md) · [打开完整项目](../../examples/10_01_close_resize/README.md)
 
-## 10.1 事件循环与对象通知
+### 本项目要掌握什么
 
-QApplication::exec() 进入事件循环后，程序持续处理鼠标、键盘、尺寸变化和重绘等事件。QEvent 对象描述某次事件，事件系统把它交给目标 QObject；QWidget 的 event 会按类型分派到相应的处理函数。
+关闭请求与尺寸通知。这一节只围绕这个核心问题阅读和修改程序。
 
-信号槽用于对象之间通知和调用处理逻辑，事件机制处理输入和窗口等事件。一个用户动作可能先由控件处理事件，再由控件发出信号，但两者不是同一个接口。下面从具体事件进入，不需要自己建立轮询按钮的 while 循环。
+### 关键代码在哪里
 
-## 10.2 关闭事件与尺寸变化
+关键片段 1：[ mainwindow.cpp 第 23 行起](../../examples/10_01_close_resize/mainwindow.cpp#L23)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-对应示例：[完整源码](../../examples/45_close_resize)。先运行项目观察行为，再按以下顺序阅读。
+```cpp
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    auto choice = QMessageBox::question(this, "关闭确认", "确定关闭窗口吗？",
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (choice == QMessageBox::Yes)
+        event->accept();
+    else
+        event->ignore();
+}
+```
 
-### 10.2.1 本章要解决的问题
+关键片段 2：[ eventarea.cpp 第 15 行起](../../examples/10_01_close_resize/eventarea.cpp#L15)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-事件是 QEvent 的对象，由事件系统送到目标 QObject。QWidget 的 event() 会根据类型分派到 closeEvent、resizeEvent 等专用处理函数；按钮 clicked 则是较高层的信号通知。二者经常配合，但不是同一个概念。
+```cpp
+void EventArea::resizeEvent(QResizeEvent *event)
+{
+    setText(QString("区域大小 %1 × %2").arg(event->size().width()).arg(event->size().height()));
+    QLabel::resizeEvent(event);
+}
+```
 
-在头文件 protected 区声明 void closeEvent(QCloseEvent *event) override，源文件实现。accept 允许关闭，ignore 拒绝关闭；不要调用 close() 重新触发自己。resizeEvent 的 size 是新尺寸，oldSize 是旧尺寸，首次事件的旧尺寸可能无效。resizeEvent 中尽量避免无条件再次 resize，以免递归。
+### 逐段讲解
 
-### 10.2.2 关闭请求和尺寸通知是不同事件
+MainWindow::closeEvent 通过消息框决定 accept 或 ignore，ignore 允许窗口继续存在；EventArea::resizeEvent 接收区域已改变的尺寸。
 
-closeEvent 收到的是关闭请求，ignore 可以让窗口继续存在；resizeEvent 通知的是尺寸已经变化，不是拿来询问是否允许缩放。不要在 closeEvent 里再次调用 close 引发递归，也不要在 resizeEvent 中无条件再次 resize 制造事件循环。
+两个处理函数属于不同对象：关闭决策在主窗口，尺寸显示在中央区域。事件指针仅在本次处理时使用。
 
-### 10.2.3 按执行顺序拆解
+### 按执行顺序阅读
 
-mainwindow.ui 的中央标签提升为 EventArea，eventarea.cpp 的 resizeEvent 显示区域尺寸。mainwindow.h 声明主窗口 closeEvent，mainwindow.cpp 根据 Yes/No 决定 accept/ignore。关闭逻辑在主窗口，尺寸显示逻辑在中央区域，职责分开。
+窗口初始化先准备对象和连接；用户输入、尺寸变化或重绘请求到达后，才进入上述处理函数。依次追踪事件或信号的目标、类型判断、状态变化和结果更新，再观察是否把剩余处理交回基类。
 
-### 10.2.4 参数与行为边界
+### 容易出错的地方与动手验证
 
-事件参数只在当前调用中有效，不要把 QCloseEvent* 或 QResizeEvent* 保存到异步回调后再使用。若要异步询问关闭，可以先 ignore，本次事件结束后显示异步对话框，确认后设置状态并重新发起关闭请求。
+先拒绝关闭再确认关闭；不要在 closeEvent 内再调用 close，也不要在 resizeEvent 无条件调用 resize 造成递归。
 
-### 10.2.5 易错点与排查
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
 
-override 用于检查是否真正覆盖了基类虚函数。保留原有处理通常要调用基类对应函数，但关闭拦截中拒绝后不要再调用会重新接受关闭的默认处理。本例自动验证会分别选择 No 与 Yes。
+### 运行结果
 
-遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。
+![项目 10.1 运行结果](../../examples/10_01_close_resize/screenshots/03_result.png)
 
-### 完整代码与界面操作
+### 完整项目与界面文件
 
-[本节完整源码与深入讲解](../topics/close-resize.md) · [独立项目与 Designer 步骤](../../examples/45_close_resize/README.md)
+- [10_01_close_resize.pro](../../examples/10_01_close_resize/10_01_close_resize.pro)
+- [eventarea.cpp](../../examples/10_01_close_resize/eventarea.cpp)
+- [eventarea.h](../../examples/10_01_close_resize/eventarea.h)
+- [main.cpp](../../examples/10_01_close_resize/main.cpp)
+- [mainwindow.cpp](../../examples/10_01_close_resize/mainwindow.cpp)
+- [mainwindow.h](../../examples/10_01_close_resize/mainwindow.h)
+- [mainwindow.ui](../../examples/10_01_close_resize/mainwindow.ui)
+- [verify.h](../../examples/10_01_close_resize/verify.h)
 
-![关闭事件与尺寸变化运行结果](../../examples/45_close_resize/screenshots/03_result.png)
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
 
-### 动手练习
 
-第一次关闭选 No，确认窗口仍显示；第二次选 Yes，确认窗口退出。改变窗口大小后记录旧新尺寸。再思考怎样让编辑器修改未保存时才询问，而不是每次关闭都询问。
+## 10.2 鼠标事件的坐标与按键
 
-先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
+[单独阅读本知识点](../knowledge/10_02_mouse_events.md) · [打开完整项目](../../examples/10_02_mouse_events/README.md)
 
-### 自测与答案
+### 本项目要掌握什么
 
-**在拒绝关闭后还调用默认 closeEvent 有何问题？**
+鼠标事件的坐标与按键。这一节只围绕这个核心问题阅读和修改程序。
 
-默认实现可能接受这次关闭请求，覆盖你的拒绝决策。需要保留的基类行为必须结合事件种类判断，不能机械地在每个函数末尾调用。
+### 关键代码在哪里
 
-## 10.3 鼠标按键 坐标和跟踪
+关键片段 1：[ eventarea.cpp 第 15 行起](../../examples/10_02_mouse_events/eventarea.cpp#L15)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-对应示例：[完整源码](../../examples/46_mouse_events)。先运行项目观察行为，再按以下顺序阅读。
+```cpp
+void EventArea::mouseMoveEvent(QMouseEvent *event)
+{
+    setText(QString("鼠标位置 %1，%2").arg(event->position().x()).arg(event->position().y()));
+    QLabel::mouseMoveEvent(event);
+}
+```
 
-### 10.3.1 本章要解决的问题
+关键片段 2：[ eventarea.cpp 第 21 行起](../../examples/10_02_mouse_events/eventarea.cpp#L21)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-mousePressEvent 处理按下，mouseReleaseEvent 处理释放，mouseMoveEvent 处理移动。button() 描述本次发生变化的按键；buttons() 是当前仍按下的按键集合，例如移动时判断是否正在拖动要查看 buttons()。
+```cpp
+void EventArea::mousePressEvent(QMouseEvent *event)
+{
+    setFocus();
+    setText(event->button() == Qt::LeftButton ? "左键按下" : "其他鼠标键按下");
+    QLabel::mousePressEvent(event);
+}
+```
 
-默认不按键移动时不一定收到移动事件，setMouseTracking(true) 允许无按键移动跟踪。Qt 6 推荐 position() 获取相对接收控件的浮点坐标，用 globalPosition() 获取屏幕坐标。坐标属于接收事件的控件，不是任意父窗口。
+### 逐段讲解
 
-### 10.3.2 本次变化的按键和当前按下集合
+mouseMoveEvent 的 position 是相对当前 EventArea 的位置；mousePressEvent 的 button 表示本次发生变化的按键。
 
-鼠标 button() 表示触发本次按下或释放的按键，buttons() 表示当前仍保持按下的集合。mouseMoveEvent 的 button 常是 NoButton，因此拖拽判断应使用 buttons() & Qt::LeftButton。position 是相对接收控件的坐标，globalPosition 是屏幕坐标，二者不能混用。
+mouseTracking 使没有按键时也能收到移动事件；buttons 表示当前按下集合，与 button 不同。调用基类函数保留默认处理。
 
-### 10.3.3 按执行顺序拆解
+### 按执行顺序阅读
 
-mainwindow.ui 将中央 QLabel 提升为 EventArea。eventarea.cpp 中启用 mouseTracking，重写 mouseMoveEvent 和 mousePressEvent，读取 position/button 并设置焦点。只保留本步鼠标处理，键盘事件的实现留到下一步。
+窗口初始化先准备对象和连接；用户输入、尺寸变化或重绘请求到达后，才进入上述处理函数。依次追踪事件或信号的目标、类型判断、状态变化和结果更新，再观察是否把剩余处理交回基类。
 
-### 10.3.4 参数与行为边界
+### 容易出错的地方与动手验证
 
-默认把某些事件交给基类处理，有助于保留原控件行为。事件传播不是任意祖先都会收到一份副本；是否处理、是否接受、控件默认行为都会影响链路。需要观察已有子控件而不改继承时，下一节的事件过滤器更合适。
+比较悬停与按键拖动，并把区域移进布局；不要把控件坐标当作全屏坐标。
 
-### 10.3.5 易错点与排查
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
 
-鼠标位于某个子控件上时，事件通常发给那个子控件。若想观察 QLabel 上的事件，应继承 QLabel 重写，而不是只在主窗口上重写后期待捕获所有子控件事件。
+### 运行结果
 
-遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。
+![项目 10.2 运行结果](../../examples/10_02_mouse_events/screenshots/03_result.png)
 
-### 完整代码与界面操作
+### 完整项目与界面文件
 
-[本节完整源码与深入讲解](../topics/mouse-events.md) · [独立项目与 Designer 步骤](../../examples/46_mouse_events/README.md)
+- [10_02_mouse_events.pro](../../examples/10_02_mouse_events/10_02_mouse_events.pro)
+- [eventarea.cpp](../../examples/10_02_mouse_events/eventarea.cpp)
+- [eventarea.h](../../examples/10_02_mouse_events/eventarea.h)
+- [main.cpp](../../examples/10_02_mouse_events/main.cpp)
+- [mainwindow.cpp](../../examples/10_02_mouse_events/mainwindow.cpp)
+- [mainwindow.h](../../examples/10_02_mouse_events/mainwindow.h)
+- [mainwindow.ui](../../examples/10_02_mouse_events/mainwindow.ui)
+- [verify.h](../../examples/10_02_mouse_events/verify.h)
 
-![鼠标按键 坐标和跟踪运行结果](../../examples/46_mouse_events/screenshots/03_result.png)
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
 
-### 动手练习
 
-在 mouseMoveEvent 中只有左键拖动时显示“拖动”，无按键时显示“悬停”。用 position 记录相对位置，再把标签放进带边距的布局中，确认坐标原点跟随标签而非主窗口。
+## 10.3 event中拦截Tab
 
-先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
+[单独阅读本知识点](../knowledge/10_03_event_tab.md) · [打开完整项目](../../examples/10_03_event_tab/README.md)
 
-### 自测与答案
+### 本项目要掌握什么
 
-**Qt 5 示例中的 x/y 可以照搬吗？**
+event中拦截Tab。这一节只围绕这个核心问题阅读和修改程序。
 
-部分旧接口仍可能存在但不适合新代码。Qt 6 使用 position 的浮点位置更准确，必要时再有意识转换成整数 QPoint。
+### 关键代码在哪里
 
-## 10.4 重写 event 拦截 Tab
+关键片段 1：[ eventarea.cpp 第 15 行起](../../examples/10_03_event_tab/eventarea.cpp#L15)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-对应示例：[完整源码](../../examples/47_event_tab)。先运行项目观察行为，再按以下顺序阅读。
+```cpp
+bool EventArea::event(QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_Tab)
+        {
+            setText("event 已处理 Tab，阻止默认焦点切换");
+            return true;
+        }
+    }
+    return QLabel::event(event);
+}
+```
 
-### 10.4.1 本章要解决的问题
+### 逐段讲解
 
-event(QEvent *) 返回 bool，表示是否处理这个事件。先检查 type 再把通用指针转换到对应事件类型；未经类型判断的强制转换可能访问错误的数据。处理感兴趣的事件后返回 true；其余事件必须 return 基类::event(event)，避免破坏默认行为。
+event 先判断 QEvent::KeyPress，再将指针转换为 QKeyEvent 并检查 Tab；识别后返回 true 表示本次已处理。
 
-Tab 常被控件系统用来切换焦点，因此只在 keyPressEvent 中写代码可能不够。要改变这个行为，可以在目标控件的 event 中拦截 KeyPress，识别 Qt::Key_Tab。键盘事件发给有焦点的对象，先确保目标控件有适当 focusPolicy 并获得焦点。
+其余情况调用 QLabel::event，保留默认事件分发。Tab 常参与焦点切换，需要在这里理解分发与特定处理函数的关系。
 
-### 10.4.2 事件分发 事件处理和事件过滤
+### 按执行顺序阅读
 
-特定处理函数适合某一类事件；重写 event 适合介入目标对象的分发；eventFilter 适合在不改被观察对象继承关系时提前观察或消费事件。示例 51在 QLineEdit 上安装过滤器，识别回车并更新标签，不需要创建 QLineEdit 子类。
+窗口初始化先准备对象和连接；用户输入、尺寸变化或重绘请求到达后，才进入上述处理函数。依次追踪事件或信号的目标、类型判断、状态变化和结果更新，再观察是否把剩余处理交回基类。
 
-### 10.4.3 按执行顺序拆解
+### 容易出错的地方与动手验证
 
-在 mainwindow.ui 查看 EventArea 提升信息，在 eventarea.h 中找到 event 声明。eventarea.cpp 先判断 KeyPress，再读取 Tab 键并返回 true；其他情况调用 QLabel::event。示例 51则把过滤器安装在普通 QLineEdit 上，便于对比两种方式。
+比较返回 true 与调用基类后的焦点行为；不要不判断类型就 static_cast，也不要无条件吞掉所有事件。
 
-### 10.4.4 参数与行为边界
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
 
-键盘事件以焦点为中心。focusPolicy 决定能否通过 Tab 或点击等方式获得焦点，setFocus 才是当前请求。QEvent::accept 与 event 返回值并不是所有事件中都可机械等同的通用开关。sendEvent 同步送达，postEvent 排队稍后送达且由 Qt 接管事件对象。
+### 运行结果
 
-### 10.4.5 易错点与排查
+![项目 10.3 运行结果](../../examples/10_03_event_tab/screenshots/03_result.png)
 
-返回 true 不是“所有事件继续向下传递”。不要在末尾无条件 return true。QEvent::accept() 与 event() 返回值有关但不能在所有事件种类下简单当成同一开关。原例中 Ctrl、Tab 等专用按键应使用 Qt 枚举。
+### 完整项目与界面文件
 
-遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。
+- [10_03_event_tab.pro](../../examples/10_03_event_tab/10_03_event_tab.pro)
+- [eventarea.cpp](../../examples/10_03_event_tab/eventarea.cpp)
+- [eventarea.h](../../examples/10_03_event_tab/eventarea.h)
+- [main.cpp](../../examples/10_03_event_tab/main.cpp)
+- [mainwindow.cpp](../../examples/10_03_event_tab/mainwindow.cpp)
+- [mainwindow.h](../../examples/10_03_event_tab/mainwindow.h)
+- [mainwindow.ui](../../examples/10_03_event_tab/mainwindow.ui)
+- [verify.h](../../examples/10_03_event_tab/verify.h)
 
-### 完整代码与界面操作
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
 
-[本节完整源码与深入讲解](../topics/event-dispatch.md) · [独立项目与 Designer 步骤](../../examples/47_event_tab/README.md)
 
-![重写 event 拦截 Tab运行结果](../../examples/47_event_tab/screenshots/03_result.png)
+## 10.4 为现有控件安装事件过滤器
 
-### 动手练习
+[单独阅读本知识点](../knowledge/10_04_event_filter.md) · [打开完整项目](../../examples/10_04_event_filter/README.md)
 
-给输入框安装示例 51过滤器，输入中文后回车观察结果。再把 true 改为基类返回，观察输入框自己的 returnPressed 是否仍可触发。不要同时把所有事件无条件吞掉。
+### 本项目要掌握什么
 
-先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
+为现有控件安装事件过滤器。这一节只围绕这个核心问题阅读和修改程序。
 
-### 自测与答案
+### 关键代码在哪里
 
-**过滤器能保存传入的 event 指针以后再用吗？**
+关键片段 1：[ widget.cpp 第 6 行起](../../examples/10_04_event_filter/widget.cpp#L6)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-不能假定它仍存活。需要延后处理时先复制所需数据，例如 key、文本或坐标，再通过信号或排队调用传递这些值。
+```cpp
+Widget::Widget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::Widget)
+{
+    ui->setupUi(this);
+    auto *filter = new ReturnFilter(ui->resultLabel, this);
+    ui->lineEdit->installEventFilter(filter);
+}
+```
 
-## 10.5 事件过滤器
+关键片段 2：[ returnfilter.cpp 第 12 行起](../../examples/10_04_event_filter/returnfilter.cpp#L12)。以下代码从本项目源文件提取，完整上下文见源文件。
 
-[完整项目与 UI 步骤](../../examples/51_event_filter/README.md) · [窗口逻辑](../../examples/51_event_filter/widget.cpp) · [界面表单](../../examples/51_event_filter/widget.ui)
+```cpp
+bool ReturnFilter::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter)
+        {
+            auto *line = qobject_cast<QLineEdit *>(watched);
+            if (line)
+            {
+                result_->setText("过滤器收到：" + line->text());
+                return true; // 消费回车，不再交给输入框默认处理。
+            }
+        }
+    }
+    return QObject::eventFilter(watched, event);
+}
+```
 
-输入框和结果标签在 widget.ui。returnfilter.h/.cpp 中的 ReturnFilter 继承 QObject，安装在普通 QLineEdit 上。收到事件时先判断 KeyPress，再读取键值；识别 Return 或小键盘 Enter 后更新结果标签并返回 true，消费事件。其余情况交给 QObject::eventFilter。
+### 逐段讲解
 
-过滤器与目标控件放在同一窗口管理下。这里的 QLabel 指针在过滤器工作期间持续有效；如果将过滤器移到另一个更长寿的对象上，需要重新检查结果标签的生命期。
+ReturnFilter 作为 QObject 安装在普通 QLineEdit 上；先判断 KeyPress，再检查 Return/Enter，取出输入更新标签。
 
-练习：同时给输入框连接 returnPressed，然后比较过滤器返回 true 与返回基类结果时，原信号是否还能触发。这样可以实际观察“消费事件”的含义。
+返回 true 消费该事件，原输入框不会继续按默认流程处理这次回车。其他事件交给 QObject::eventFilter。
 
-![事件过滤器运行结果](../../examples/51_event_filter/screenshots/result.png)
+### 关键分支再拆一步
 
----
+eventFilter 的 watched 是被观察的输入框，不是过滤器自己。先检查事件类型再转换，随后用 qobject_cast 检查 watched 是否为 QLineEdit；识别回车时读取 line->text。返回 true 后，这次按键不会继续进入输入框自己的默认回车处理，其他事件必须继续交回基类。
 
-[总目录](../README.md) · [上一章](09-widgets.md) · [下一章](11-painting.md)
+### 按执行顺序阅读
+
+窗口初始化先准备对象和连接；用户输入、尺寸变化或重绘请求到达后，才进入上述处理函数。依次追踪事件或信号的目标、类型判断、状态变化和结果更新，再观察是否把剩余处理交回基类。
+
+### 容易出错的地方与动手验证
+
+同时连接 returnPressed，比较过滤器返回 true 与基类结果；过滤器、输入框和标签的生命周期都要匹配。
+
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
+
+### 运行结果
+
+![项目 10.4 运行结果](../../examples/10_04_event_filter/screenshots/result.png)
+
+### 完整项目与界面文件
+
+- [10_04_event_filter.pro](../../examples/10_04_event_filter/10_04_event_filter.pro)
+- [main.cpp](../../examples/10_04_event_filter/main.cpp)
+- [returnfilter.cpp](../../examples/10_04_event_filter/returnfilter.cpp)
+- [returnfilter.h](../../examples/10_04_event_filter/returnfilter.h)
+- [verify.h](../../examples/10_04_event_filter/verify.h)
+- [widget.cpp](../../examples/10_04_event_filter/widget.cpp)
+- [widget.h](../../examples/10_04_event_filter/widget.h)
+- [widget.ui](../../examples/10_04_event_filter/widget.ui)
+
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
+
+
+
+[返回总目录](../README.md)

@@ -11,7 +11,7 @@
 ![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C?logo=cplusplus)
 ![Examples](https://img.shields.io/badge/examples-52-2563EB)
 
-[十一章学习目录](docs/README.md) · [项目模板与 UI 操作](docs/project-format.md) · [离线入口](开始学习.html) · [Word 教程](docs/print/Qt学习笔记_十一章整理版.docx) · [安装与运行](docs/getting-started.md) · [完整实战](docs/practices.md) · [验证记录](docs/validation.md)
+[十一章学习目录](docs/README.md) · [项目模板与 UI 操作](docs/project-format.md) · [离线入口](开始学习.html) · [Word 教程](docs/print/Qt项目知识点详解.docx) · [安装与运行](docs/getting-started.md) · [完整实战](docs/practices.md) · [验证记录](docs/validation.md)
 
 </div>
 
@@ -32,8 +32,8 @@
 
 <table>
 <tr>
-<td width="50%"><img src="examples/49_text_editor/screenshots/result.png" alt="UTF-8 文本编辑器"><br>文件读取、编辑与安全保存</td>
-<td width="50%"><img src="examples/52_interactive_paint/screenshots/result.png" alt="交互绘图"><br>修改状态后请求重绘</td>
+<td width="50%"><img src="examples/07_06_text_editor/screenshots/result.png" alt="UTF-8 文本编辑器"><br>文件读取、编辑与安全保存</td>
+<td width="50%"><img src="examples/11_02_interactive_paint/screenshots/result.png" alt="交互绘图"><br>修改状态后请求重绘</td>
 </tr>
 </table>
 
@@ -45,7 +45,7 @@
 git clone https://github.com/13536309143/qt-widgets-learning-path.git
 ```
 
-打开 `examples/01_first_window/01_first_window.pro`，选择与已安装 Qt 配套的 Kit，构建并运行。双击项目树中的 `widget.ui` 进入 Designer；按每个项目 README 的控件清单修改界面。想直接看完整应用交互，可以打开 `examples/49_text_editor/49_text_editor.pro`。
+打开 `examples/02_01_first_window/02_01_first_window.pro`，选择与已安装 Qt 配套的 Kit，构建并运行。双击项目树中的 `widget.ui` 进入 Designer；按每个项目 README 的控件清单修改界面。想直接看完整应用交互，可以打开 `examples/07_06_text_editor/07_06_text_editor.pro`。
 
 ### 用 CMake 构建全部项目
 
@@ -60,29 +60,27 @@ ctest --test-dir build --output-on-failure
 只构建一个示例：
 
 ```sh
-cmake -S . -B build-one -DQT_LESSON=49_text_editor -DCMAKE_PREFIX_PATH="你的 Qt 安装目录"
+cmake -S . -B build-one -DQT_LESSON=07_06_text_editor -DCMAKE_PREFIX_PATH="你的 Qt 安装目录"
 cmake --build build-one
 ```
 
 Windows 上注意 Qt 与编译器的 MinGW/MSVC、32/64 位及运行库匹配。详细配置与常见错误见 [安装与运行](docs/getting-started.md)。
 
-## 十一章学习路线
+## 章节与项目使用同一套编号
 
-| 正文章节 | 主要内容 | 对应示例 |
-|---|---|---|
-| [第一章 Qt概述](docs/chapters/01-overview.md) | Qt与开发工具的区别、基础类、学习方法 | 概念导读 |
-| [第二章 创建Qt项目](docs/chapters/02-create-project.md) | 新建项目、Kit、默认模板、setupUi、构建与调试 | 01、35 |
-| [第三章 设置窗口属性](docs/chapters/03-window-properties.md) | 标题、尺寸、固定窗口、图标与资源 | 02、34 |
-| [第四章 按钮的创建和属性设置](docs/chapters/04-buttons.md) | Designer按钮、代码创建、属性、坐标、对象树 | 03、04、05 |
-| [第五章 信号和槽机制（Lambda）](docs/chapters/05-signals-slots-lambda.md) | connect、自定义信号、重载、捕获、mutable、this、生命周期 | 06—30 |
-| [第六章 QMainWindow](docs/chapters/06-mainwindow.md) | 中心部件、菜单、QAction、工具栏、状态栏与停靠 | 31、32、33 |
-| [第七章 对话框QDialog](docs/chapters/07-dialogs.md) | 模态与调用时机、标准对话框、保存确认与文本编辑器 | 36、50、37、38、39、49 |
-| [第八章 布局管理器](docs/chapters/08-layouts.md) | 水平、垂直、网格、表单、间距与伸缩 | 40 |
-| [第九章 常用控件](docs/chapters/09-widgets.md) | QLabel、QMovie、QLineEdit、组合控件与页面 | 41、42、43、44 |
-| [第十章 Qt消息机制和事件](docs/chapters/10-events.md) | 事件循环、关闭、尺寸、鼠标、event与过滤器 | 45、46、47、51 |
-| [第十一章 绘图和绘图设备](docs/chapters/11-painting.md) | QPainter、绘图设备、paintEvent、update与状态 | 48、52 |
+- [第 1 章 Qt概述](docs/chapters/01-overview.md)：概念导读
+- [第 2 章 创建Qt项目](docs/chapters/02-create-project.md)：02.1, 02.2
+- [第 3 章 设置窗口属性](docs/chapters/03-window-properties.md)：03.1, 03.2
+- [第 4 章 按钮的创建和属性设置](docs/chapters/04-buttons.md)：04.1, 04.2, 04.3
+- [第 5 章 信号和槽机制（Lambda）](docs/chapters/05-signals-slots-lambda.md)：05.1, 05.2, 05.3, 05.4, 05.5, 05.6, 05.7, 05.8, 05.9, 05.10, 05.11, 05.12, 05.13, 05.14, 05.15, 05.16, 05.17, 05.18, 05.19, 05.20, 05.21, 05.22, 05.23, 05.24, 05.25
+- [第 6 章 QMainWindow](docs/chapters/06-mainwindow.md)：06.1, 06.2, 06.3
+- [第 7 章 对话框QDialog](docs/chapters/07-dialogs.md)：07.1, 07.2, 07.3, 07.4, 07.5, 07.6
+- [第 8 章 布局管理器](docs/chapters/08-layouts.md)：08.1
+- [第 9 章 常用控件](docs/chapters/09-widgets.md)：09.1, 09.2, 09.3, 09.4
+- [第 10 章 Qt消息机制和事件](docs/chapters/10-events.md)：10.1, 10.2, 10.3, 10.4
+- [第 11 章 绘图和绘图设备](docs/chapters/11-painting.md)：11.1, 11.2
 
-正文只使用十一章编号，示例继续使用 01—52。Lambda 的捕获、mutable、this、延后执行与自测都位于第五章。全部示例的归属见[学习目录](docs/README.md)。
+每个项目是一节独立知识点，包含从真实源码提取的关键片段、逐段讲解、执行顺序、常见错误与动手验证。[查看全部 52 个知识点](docs/README.md) · [查旧编号](docs/project-renumbering.md)。
 
 ## 每章不止一段代码
 
@@ -95,10 +93,10 @@ Windows 上注意 Qt 与编译器的 MinGW/MSVC、32/64 位及运行库匹配。
 ```text
 .
 ├── examples/                 # 52 个可独立构建的项目
-│   ├── 01_first_window/
-│   ├── 37_file_dialog/       # .pro、完整源码及 samples
-│   ├── 49_text_editor/       # 文件读写与保存闭环
-│   └── 52_interactive_paint/
+│   ├── 02_01_first_window/
+│   ├── 07_03_file_dialog/       # .pro、完整源码及 samples
+│   ├── 07_06_text_editor/       # 文件读写与保存闭环
+│   └── 11_02_interactive_paint/
 ├── docs/
 │   ├── chapters/            # 十一章正式教程
 │   ├── topics/              # 深入讲解与完整源码

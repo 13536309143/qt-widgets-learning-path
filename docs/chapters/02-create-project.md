@@ -1,43 +1,20 @@
-# 第二章 创建Qt项目
+# 第 2 章 创建Qt项目
 
-从新建项目、选择 Kit 开始，弄清默认模板里每个文件的职责，完成第一次构建运行。全部示例采用带 .ui 的统一模板。
+本章按项目逐个学习，每个项目对应一个知识点。先运行再读关键代码，最后做一次修改验证。[理论补充与复习](../foundations/02-create-project.md)保留更完整的背景说明。
 
-本章对应的完整项目：
+## 2.1 应用入口与事件循环
 
-- [示例 01 first_window](../../examples/01_first_window/README.md)
-- [示例 35 designer](../../examples/35_designer/README.md)
+[单独阅读本知识点](../knowledge/02_01_first_window.md) · [打开完整项目](../../examples/02_01_first_window/README.md)
 
-## 2.1 创建Qt Widgets项目
+### 本项目要掌握什么
 
-在 Qt Creator 的新建项目向导中选择 Qt Widgets Application，填写名称和位置，构建系统选择 qmake。初学普通窗口时，类名使用 Widget，基类选择 QWidget，并保留生成表单的选项，得到 widget.ui。学习第六章主窗口时，再使用 MainWindow 与 QMainWindow。
+应用入口与事件循环。这一节只围绕这个核心问题阅读和修改程序。
 
-向导的页面名称可能随版本变化，重点是选择 Widgets 项目、合适的基类、配套 Kit 和生成 .ui。完成后先构建运行，不要一开始同时修改多处配置。
+### 关键代码在哪里
 
-## 2.2 Kit与构建配置
-
-Kit 可以理解为一套配好的工具组合，包含 Qt 版本、编译器、调试器及目标设备等。Windows 上 MinGW 版 Qt 配套使用对应 MinGW 工具链，MSVC 版 Qt 配套使用相应 MSVC 工具链。
-
-Debug 便于调试，Release 通常启用更多优化。遇到库格式或链接错误，先检查 Kit 和 Qt 是否匹配，再查源文件是否缺失。
-
-## 2.3 默认模板文件的分工
-
-| 文件 | 负责什么 |
-|---|---|
-| .pro | 列出 Qt 模块、C++ 标准、源文件、头文件、FORMS 和资源 |
-| main.cpp | 创建应用与窗口，显示窗口并进入事件循环 |
-| widget.h / mainwindow.h | 声明窗口类、成员、槽和事件函数 |
-| widget.cpp / mainwindow.cpp | 初始化界面并实现行为 |
-| widget.ui / mainwindow.ui | 保存 Designer 中的控件、属性和布局 |
-
-新增 .h/.cpp 要加入 HEADERS/SOURCES，新增 .ui 要加入 FORMS。构建时 uic 生成 ui_*.h，moc 处理 Q_OBJECT 相关内容，生成文件由构建工具维护。
-
-## 2.4 程序入口的执行顺序
+关键片段 1：[ main.cpp 第 5 行起](../../examples/02_01_first_window/main.cpp#L5)。以下代码从本项目源文件提取，完整上下文见源文件。
 
 ```cpp
-#include "widget.h"
-
-#include <QApplication>
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -47,80 +24,88 @@ int main(int argc, char *argv[])
 }
 ```
 
-先创建 QApplication，再创建 Widget，这时执行窗口构造函数。show() 显示窗口，exec() 进入事件循环，程序才能继续响应点击、输入和重绘。若直接 return 0，程序很快结束；不需要自己写 while 循环来轮询按钮。
+### 逐段讲解
 
-## 2.5 setupUi与ui指针
+QApplication a 必须先于 QWidget 创建，负责 GUI 公共资源。Widget w 的构造函数建立界面，w.show() 负责显示。
+
+QApplication::exec() 开始处理输入、定时器和重绘，通常直到退出才返回；它不是主动执行每一个按钮槽。
+
+### 按执行顺序阅读
+
+先从 main.cpp 创建应用和窗口进入构造函数，再由 setupUi 根据 .ui 建立对象、属性与布局。对照上面的片段定位本节设置；show 后进入事件循环，界面才会持续响应操作。
+
+### 容易出错的地方与动手验证
+
+把 exec 改成 return 0 观察程序迅速结束，再恢复；不能在创建窗口后才创建 QApplication。
+
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
+
+### 运行结果
+
+![项目 2.1 运行结果](../../examples/02_01_first_window/screenshots/01_initial.png)
+
+### 完整项目与界面文件
+
+- [02_01_first_window.pro](../../examples/02_01_first_window/02_01_first_window.pro)
+- [main.cpp](../../examples/02_01_first_window/main.cpp)
+- [verify.h](../../examples/02_01_first_window/verify.h)
+- [widget.cpp](../../examples/02_01_first_window/widget.cpp)
+- [widget.h](../../examples/02_01_first_window/widget.h)
+- [widget.ui](../../examples/02_01_first_window/widget.ui)
+
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
+
+
+## 2.2 Designer自动连接
+
+[单独阅读本知识点](../knowledge/02_02_designer.md) · [打开完整项目](../../examples/02_02_designer/README.md)
+
+### 本项目要掌握什么
+
+Designer自动连接。这一节只围绕这个核心问题阅读和修改程序。
+
+### 关键代码在哪里
+
+关键片段 1：[ mainwindow.cpp 第 22 行起](../../examples/02_02_designer/mainwindow.cpp#L22)。以下代码从本项目源文件提取，完整上下文见源文件。
 
 ```cpp
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
+void MainWindow::on_runButton_clicked()
 {
-    ui->setupUi(this);
-}
-
-Widget::~Widget()
-{
-    delete ui;
+    ui->resultLabel->setText("你好，" + ui->nameEdit->text());
 }
 ```
 
-Ui::Widget 是生成的辅助类，不是窗口本身。setupUi(this) 执行后才建立控件和布局，因此访问 ui->控件 要放在它之后。delete ui 释放辅助对象；控件对象主要由 QObject 父子关系管理。
+### 逐段讲解
 
-控件的 objectName 决定生成的成员名，text 只是显示文字。修改 .ui 后应保存并重新构建，不要直接修改 ui_widget.h 或 ui_mainwindow.h。[统一模板与 Designer 操作](../project-format.md) 提供完整说明。
+Ui 辅助对象在初始化列表创建，setupUi 根据 .ui 建立 nameEdit、runButton 与 resultLabel，并按对象名和槽名自动连接。
 
-## 2.6 Designer 与 setupUi
+on_runButton_clicked 声明在 private slots 中，点击后读取输入框并设置标签。text 是显示文字，objectName 才参与连接规则。
 
-对应示例：[完整源码](../../examples/35_designer)。先运行项目观察行为，再按以下顺序阅读。
+### 按执行顺序阅读
 
-### 2.6.1 本章要解决的问题
+构造函数先准备界面与连接；交互发生后才进入回调。阅读时按“发送对象 → 信号或调用 → 回调里的数据 → 被修改对象 → 显示结果”追踪，不要把建立连接当成已经执行操作。
 
-Designer 将界面保存在 .ui XML 文件中，构建时 uic 生成 ui_mainwindow.h。mainwindow.h 用前向声明保存 Ui::MainWindow *ui；mainwindow.cpp 包含生成的头文件，在构造函数中创建辅助对象、调用 ui->setupUi(this)，在析构函数中 delete ui。
+### 容易出错的地方与动手验证
 
-objectName 是代码成员和自动连接所依赖的对象名，text 是显示文字。按钮名为 runButton，槽名为 on_runButton_clicked，且在 private slots 中声明，因此 setupUi 会自动完成连接。
+改按钮 text 不影响槽名；改 objectName 则要同步槽名。不要在自动连接之外再重复 connect。
 
-### 2.6.2 默认模板与自动连接
+先写下预测，再修改一个条件重新构建。记录实际结果，并用本节代码中的变量、对象和调用顺序解释原因；仅仅没有报错不代表已经验证了所有分支。
 
-本步 main.cpp 与 Qt Creator 默认模板一致，只启动 MainWindow。控件和布局都在 mainwindow.ui，行为写在 mainwindow.cpp。不要修改 ui_mainwindow.h，也不要对已自动连接的槽再 connect 一次。Designer 中“转到槽”会帮你生成相应声明和实现。
+### 运行结果
 
-### 2.6.3 按执行顺序拆解
+![项目 2.2 运行结果](../../examples/02_02_designer/screenshots/03_result.png)
 
-main.cpp 创建 MainWindow。mainwindow.h 声明 Ui::MainWindow *ui 和 on_runButton_clicked 槽；mainwindow.cpp 在初始化列表创建 Ui 辅助对象，再调用 ui->setupUi(this)。这个调用会建立 .ui 中的控件并自动连接 runButton 的 clicked 信号。点击后只执行对应槽，析构时 delete ui。
+### 完整项目与界面文件
 
-### 2.6.4 参数与行为边界
+- [02_02_designer.pro](../../examples/02_02_designer/02_02_designer.pro)
+- [main.cpp](../../examples/02_02_designer/main.cpp)
+- [mainwindow.cpp](../../examples/02_02_designer/mainwindow.cpp)
+- [mainwindow.h](../../examples/02_02_designer/mainwindow.h)
+- [mainwindow.ui](../../examples/02_02_designer/mainwindow.ui)
+- [verify.h](../../examples/02_02_designer/verify.h)
 
-Qt Creator 向导常用 Ui::MainWindow *ui；new 出来的包装器需要 delete ui。这个 delete 释放包装器，不是要求你手动逐个 delete 其所有子控件。ui_*.h 每次构建可能重新生成，不应手动修补它来解决错误。
-
-### 2.6.5 易错点与排查
-
-不要手动改 ui_mainwindow.h，重新构建会覆盖。应该改 mainwindow.ui 或自己的 .cpp。QMainWindow 的布局要放在 centralwidget 上。示例提供真实 .ui，可直接在 Qt Creator 中双击打开。
-
-遇到问题时先区分三个层次：编译错误检查声明、头文件与构建配置；界面无反应检查连接、接收对象与生存期；运行结果不对检查输入、返回值和分支是否真正执行。可以先在连接入口记录一条日志，再在结果处理处记录一条，定位中间哪一步没有到达。
-
-### 完整代码与界面操作
-
-[本节完整源码与深入讲解](../topics/designer.md) · [独立项目与 Designer 步骤](../../examples/35_designer/README.md)
-
-![Designer 与 setupUi运行结果](../../examples/35_designer/screenshots/03_result.png)
-
-### 动手练习
-
-在 mainwindow.ui 添加 clearButton，使用“转到槽”生成 on_clearButton_clicked，在槽中调用 ui->nameEdit->clear。修改按钮的显示文字，确认自动连接仍然有效；再修改 objectName，观察为什么槽名也需要同步修改。
-
-### 自测与答案
-
-**已经有 on_runButton_clicked，还需要再写 connect 吗？**
-
-不需要。setupUi 调用 connectSlotsByName，会按对象名和槽名自动连接。再添加相同的显式连接会让一次点击执行两次。要使用另一种连接方式，应先去掉旧的连接。
-
-## 2.7 构建运行与调试
-
-构建负责生成程序；运行负责启动程序；调试是在调试器控制下运行，可以设断点、单步执行和查看变量。运行按钮通常会先检查是否需要构建。Debug 便于调试，Release 通常启用更多优化。
-编译错误先看 Issues 与编译输出中的第一条相关错误；qDebug() 的输出通常看 Application Output。不要把程序输出和编译器报错混在一起。
-
-本章练习：先运行示例 01；再打开示例 35 的 mainwindow.ui，修改按钮显示文字，保存并运行。确认自己能够指出 main.cpp、窗口类和 .ui 各自的作用。
+打开本项目 .pro，选择匹配的 Kit，构建运行；修改界面请打开 .ui，保存后重新构建。verify.h 只在传入 --verify 时执行检查。
 
 
----
 
-[总目录](../README.md) · [上一章](01-overview.md) · [下一章](03-window-properties.md)
+[返回总目录](../README.md)

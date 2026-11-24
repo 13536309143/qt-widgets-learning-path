@@ -1,6 +1,6 @@
-# 3.3 资源路径 图片与背景
+# 3.2 资源路径与图像加载 理论补充
 
-对应示例：[完整源码](../../examples/34_resources)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/03_02_resources)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ Qt 6 中 QPalette::Window 是窗口背景角色。用图片刷填充可能出现
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/34_resources/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/03_02_resources/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -144,7 +144,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 34_resources.pro
+### 03_02_resources.pro
 
 ```qmake
 QT += widgets
@@ -179,11 +179,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 <RCC><qresource prefix="/images"><file alias="demo.png">assets/demo.png</file><file alias="demo.gif">assets/demo.gif</file></qresource></RCC>
 ```
 
-[verify.h](../../examples/34_resources/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/03_02_resources/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![资源路径 图片与背景 03_result](../../examples/34_resources/screenshots/03_result.png)
+![资源路径 图片与背景 03_result](../../examples/03_02_resources/screenshots/03_result.png)
 
 ## 自己动手
 

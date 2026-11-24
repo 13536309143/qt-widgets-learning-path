@@ -10,8 +10,8 @@
     "title": "创建Qt项目",
     "file": "02-create-project.md",
     "projects": [
-      "01_first_window",
-      "35_designer"
+      "02_01_first_window",
+      "02_02_designer"
     ]
   },
   {
@@ -19,8 +19,8 @@
     "title": "设置窗口属性",
     "file": "03-window-properties.md",
     "projects": [
-      "02_window_size",
-      "34_resources"
+      "03_01_window_size",
+      "03_02_resources"
     ]
   },
   {
@@ -28,9 +28,9 @@
     "title": "按钮的创建和属性设置",
     "file": "04-buttons.md",
     "projects": [
-      "03_buttons_coordinates",
-      "04_object_tree",
-      "05_stack_lifetime"
+      "04_01_buttons_coordinates",
+      "04_02_object_tree",
+      "04_03_stack_lifetime"
     ]
   },
   {
@@ -38,31 +38,31 @@
     "title": "信号和槽机制（Lambda）",
     "file": "05-signals-slots-lambda.md",
     "projects": [
-      "06_close_connection",
-      "07_custom_signal",
-      "08_signal_to_signal",
-      "09_overloaded_signal",
-      "10_disconnect",
-      "11_multiple_slots",
-      "12_function_to_lambda",
-      "13_define_and_call",
-      "14_capture_and_parameter",
-      "15_value_capture",
-      "16_reference_capture",
-      "17_mixed_capture",
-      "18_pointer_capture",
-      "19_mutable_original",
-      "20_mutable_state",
-      "21_this_member",
-      "22_empty_capture_button",
-      "23_signal_parameter",
-      "24_lambda_adapter",
-      "25_loop_capture",
-      "26_safe_delayed_state",
-      "27_lambda_keeps_copy",
-      "28_complete_counter",
-      "29_member_slot",
-      "30_self_test"
+      "05_01_close_connection",
+      "05_02_custom_signal",
+      "05_03_signal_to_signal",
+      "05_04_overloaded_signal",
+      "05_05_disconnect",
+      "05_06_multiple_slots",
+      "05_07_function_to_lambda",
+      "05_08_define_and_call",
+      "05_09_capture_and_parameter",
+      "05_10_value_capture",
+      "05_11_reference_capture",
+      "05_12_mixed_capture",
+      "05_13_pointer_capture",
+      "05_14_mutable_original",
+      "05_15_mutable_state",
+      "05_16_this_member",
+      "05_17_empty_capture_button",
+      "05_18_signal_parameter",
+      "05_19_lambda_adapter",
+      "05_20_loop_capture",
+      "05_21_safe_delayed_state",
+      "05_22_lambda_keeps_copy",
+      "05_23_complete_counter",
+      "05_24_member_slot",
+      "05_25_self_test"
     ]
   },
   {
@@ -70,9 +70,9 @@
     "title": "QMainWindow",
     "file": "06-mainwindow.md",
     "projects": [
-      "31_mainwindow",
-      "32_menu_toolbar",
-      "33_status_dock"
+      "06_01_mainwindow",
+      "06_02_menu_toolbar",
+      "06_03_status_dock"
     ]
   },
   {
@@ -80,12 +80,12 @@
     "title": "对话框QDialog",
     "file": "07-dialogs.md",
     "projects": [
-      "36_dialog",
-      "50_dialog_modes",
-      "37_file_dialog",
-      "38_color_font",
-      "39_messagebox",
-      "49_text_editor"
+      "07_01_dialog",
+      "07_02_dialog_modes",
+      "07_03_file_dialog",
+      "07_04_color_font",
+      "07_05_messagebox",
+      "07_06_text_editor"
     ]
   },
   {
@@ -93,7 +93,7 @@
     "title": "布局管理器",
     "file": "08-layouts.md",
     "projects": [
-      "40_layout"
+      "08_01_layout"
     ]
   },
   {
@@ -101,10 +101,10 @@
     "title": "常用控件",
     "file": "09-widgets.md",
     "projects": [
-      "41_label_movie",
-      "42_lineedit",
-      "43_custom_widget",
-      "44_stacked_pages"
+      "09_01_label_movie",
+      "09_02_lineedit",
+      "09_03_custom_widget",
+      "09_04_stacked_pages"
     ]
   },
   {
@@ -112,10 +112,10 @@
     "title": "Qt消息机制和事件",
     "file": "10-events.md",
     "projects": [
-      "45_close_resize",
-      "46_mouse_events",
-      "47_event_tab",
-      "51_event_filter"
+      "10_01_close_resize",
+      "10_02_mouse_events",
+      "10_03_event_tab",
+      "10_04_event_filter"
     ]
   },
   {
@@ -123,8 +123,8 @@
     "title": "绘图和绘图设备",
     "file": "11-painting.md",
     "projects": [
-      "48_painter",
-      "52_interactive_paint"
+      "11_01_painter",
+      "11_02_interactive_paint"
     ]
   }
 ]

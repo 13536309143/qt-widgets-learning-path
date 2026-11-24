@@ -1,6 +1,6 @@
-# 7.5 消息框与三种选择结果
+# 7.5 消息框返回值与控制分支 理论补充
 
-对应示例：[完整源码](../../examples/39_messagebox)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/07_05_messagebox)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -14,7 +14,7 @@ information、warning、critical 分别用于信息、警告和错误提示；qu
 
 ## 按执行顺序拆解
 
-mainwindow.ui 中的 run 按钮触发消息框，结果写入 resultEdit。查看 mainwindow.cpp 如何明确比较 Yes/No/Cancel。示例 49将这些选择接入 closeEvent 与 confirmDiscard，只有保存成功或用户明确放弃修改时才允许继续。
+mainwindow.ui 中的 run 按钮触发消息框，结果写入 resultEdit。查看 mainwindow.cpp 如何明确比较 Yes/No/Cancel。项目 7.6将这些选择接入 closeEvent 与 confirmDiscard，只有保存成功或用户明确放弃修改时才允许继续。
 
 ## 参数与行为边界
 
@@ -28,7 +28,7 @@ about 与 aboutQt 是说明信息，不是保存决策。示例问是否保存�
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/39_messagebox/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/07_05_messagebox/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -157,7 +157,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 39_messagebox.pro
+### 07_05_messagebox.pro
 
 ```qmake
 QT += widgets
@@ -184,17 +184,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/39_messagebox/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/07_05_messagebox/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![消息框与三种选择结果 02_dialog](../../examples/39_messagebox/screenshots/02_dialog.png)
+![消息框与三种选择结果 02_dialog](../../examples/07_05_messagebox/screenshots/02_dialog.png)
 
-![消息框与三种选择结果 03_result](../../examples/39_messagebox/screenshots/03_result.png)
+![消息框与三种选择结果 03_result](../../examples/07_05_messagebox/screenshots/03_result.png)
 
 ## 自己动手
 
-修改示例 39默认按钮，按 Enter 测试哪个分支被触发。再到示例 49编辑文本后关闭，选择 Yes 后取消保存路径，确认编辑器仍然打开且文本未丢失。
+修改项目 7.5默认按钮，按 Enter 测试哪个分支被触发。再到项目 7.6编辑文本后关闭，选择 Yes 后取消保存路径，确认编辑器仍然打开且文本未丢失。
 
 先写下预期行为，再修改代码、重新构建，最后对照实际结果。程序没有报错不等于逻辑已经正确，尤其要测试取消、空输入、重复操作和失败分支。
 

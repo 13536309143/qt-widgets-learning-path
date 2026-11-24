@@ -9,12 +9,12 @@
 ## 最直接的方式 用 Qt Creator 打开一个例子
 
 1. 下载仓库完整 ZIP 并解压，或克隆仓库。
-2. 在 Qt Creator 中选择“打开项目”，定位到 `examples/49_text_editor/49_text_editor.pro`。
+2. 在 Qt Creator 中选择“打开项目”，定位到 `examples/07_06_text_editor/07_06_text_editor.pro`。
 3. 选择与已安装 Qt 匹配的 Kit。
 4. 构建并运行。先尝试输入文本、另存为自己的测试文件，再重新打开。
 5. 双击 `mainwindow.ui` 进入设计模式；再阅读 `mainwindow.h` 与 `mainwindow.cpp`。`main.cpp` 只负责启动窗口。
 
-[统一模板与 Designer 操作](project-format.md) 解释各文件的分工、自动连接和控件提升。每个目录都是独立项目。打开第 49 步不需要先构建第 1 步；资源、头文件和 `.ui` 必须与本步源文件一起保留。
+[统一模板与 Designer 操作](project-format.md) 解释各文件的分工、自动连接和控件提升。每个目录都是独立项目。打开项目 7.6 不需要先构建项目 2.1；资源、头文件和 `.ui` 必须与本步源文件一起保留。
 
 ## 用 CMake 构建全部项目
 
@@ -31,13 +31,13 @@ ctest --test-dir build --output-on-failure
 只构建一个项目：
 
 ```sh
-cmake -S . -B build-one -DQT_LESSON=49_text_editor -DCMAKE_PREFIX_PATH="你的 Qt 安装目录"
+cmake -S . -B build-one -DQT_LESSON=07_06_text_editor -DCMAKE_PREFIX_PATH="你的 Qt 安装目录"
 cmake --build build-one
 ```
 
-Windows 单配置生成器的程序通常位于 `build/49_text_editor.exe`；多配置生成器可能位于 `build/Release/49_text_editor.exe`。运行时需要 Qt 动态库可被找到，例如在当前终端设置 `QT_BIN` 并加入 PATH，或通过 Qt Creator 运行。Qt 安装目录、编译器及其运行库应保持配套。
+Windows 单配置生成器的程序通常位于 `build/07_06_text_editor.exe`；多配置生成器可能位于 `build/Release/07_06_text_editor.exe`。运行时需要 Qt 动态库可被找到，例如在当前终端设置 `QT_BIN` 并加入 PATH，或通过 Qt Creator 运行。Qt 安装目录、编译器及其运行库应保持配套。
 
-`scripts/run.cmd 49_text_editor` 可以启动已在根目录 build 中构建的程序；它读取可选的 `QT_BIN`，不会改写系统环境变量。
+`scripts/run.cmd 07_06_text_editor` 可以启动已在根目录 build 中构建的程序；它读取可选的 `QT_BIN`，不会改写系统环境变量。
 
 ## qmake 命令行方式
 

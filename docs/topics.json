@@ -4,125 +4,125 @@
     "section": "6.1",
     "title": "主窗口与中心部件",
     "file": "mainwindow.md",
-    "project": "31_mainwindow"
+    "project": "06_01_mainwindow"
   },
   {
     "chapter": 6,
     "section": "6.2",
     "title": "菜单 动作与工具栏",
     "file": "menu-toolbar.md",
-    "project": "32_menu_toolbar"
+    "project": "06_02_menu_toolbar"
   },
   {
     "chapter": 6,
     "section": "6.3",
     "title": "状态栏和停靠面板",
     "file": "status-dock.md",
-    "project": "33_status_dock"
+    "project": "06_03_status_dock"
   },
   {
     "chapter": 3,
-    "section": "3.3",
+    "section": "3.2",
     "title": "资源路径 图片与背景",
     "file": "resources.md",
-    "project": "34_resources"
+    "project": "03_02_resources"
   },
   {
     "chapter": 2,
-    "section": "2.6",
+    "section": "2.2",
     "title": "Designer 与 setupUi",
     "file": "designer.md",
-    "project": "35_designer"
+    "project": "02_02_designer"
   },
   {
     "chapter": 7,
     "section": "7.1",
     "title": "模态 非模态与对象生命期",
     "file": "dialog-lifetime.md",
-    "project": "36_dialog"
+    "project": "07_01_dialog"
   },
   {
     "chapter": 7,
     "section": "7.3",
     "title": "单文件 多文件与取消",
     "file": "file-dialog.md",
-    "project": "37_file_dialog"
+    "project": "07_03_file_dialog"
   },
   {
     "chapter": 7,
     "section": "7.4",
     "title": "选择颜色与字体",
     "file": "color-font-dialog.md",
-    "project": "38_color_font"
+    "project": "07_04_color_font"
   },
   {
     "chapter": 7,
     "section": "7.5",
     "title": "消息框与三种选择结果",
     "file": "message-box.md",
-    "project": "39_messagebox"
+    "project": "07_05_messagebox"
   },
   {
     "chapter": 8,
     "section": "8.1",
     "title": "水平 垂直 网格与表单布局",
     "file": "layout-management.md",
-    "project": "40_layout"
+    "project": "08_01_layout"
   },
   {
     "chapter": 9,
     "section": "9.1",
     "title": "QLabel 文本 图片与动画",
     "file": "label-movie.md",
-    "project": "41_label_movie"
+    "project": "09_01_label_movie"
   },
   {
     "chapter": 9,
     "section": "9.2",
     "title": "QLineEdit 输入与显示模式",
     "file": "line-edit.md",
-    "project": "42_lineedit"
+    "project": "09_02_lineedit"
   },
   {
     "chapter": 9,
     "section": "9.3",
     "title": "组合控件与 Designer 提升",
     "file": "custom-widget.md",
-    "project": "43_custom_widget"
+    "project": "09_03_custom_widget"
   },
   {
     "chapter": 9,
     "section": "9.4",
     "title": "堆叠页面与窗口切换",
     "file": "stacked-pages.md",
-    "project": "44_stacked_pages"
+    "project": "09_04_stacked_pages"
+  },
+  {
+    "chapter": 10,
+    "section": "10.1",
+    "title": "关闭事件与尺寸变化",
+    "file": "close-resize.md",
+    "project": "10_01_close_resize"
   },
   {
     "chapter": 10,
     "section": "10.2",
-    "title": "关闭事件与尺寸变化",
-    "file": "close-resize.md",
-    "project": "45_close_resize"
+    "title": "鼠标按键 坐标和跟踪",
+    "file": "mouse-events.md",
+    "project": "10_02_mouse_events"
   },
   {
     "chapter": 10,
     "section": "10.3",
-    "title": "鼠标按键 坐标和跟踪",
-    "file": "mouse-events.md",
-    "project": "46_mouse_events"
-  },
-  {
-    "chapter": 10,
-    "section": "10.4",
     "title": "重写 event 拦截 Tab",
     "file": "event-dispatch.md",
-    "project": "47_event_tab"
+    "project": "10_03_event_tab"
   },
   {
     "chapter": 11,
     "section": "11.1",
     "title": "QPainter 与绘图设备",
     "file": "painter-devices.md",
-    "project": "48_painter"
+    "project": "11_01_painter"
   }
 ]

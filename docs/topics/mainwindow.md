@@ -1,6 +1,6 @@
-# 6.1 主窗口与中心部件
+# 6.1 QMainWindow中心工作区 理论补充
 
-对应示例：[完整源码](../../examples/31_mainwindow)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/06_01_mainwindow)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ menuBar() 和 statusBar() 可以取得或按需创建对应栏，取得后无需
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/31_mainwindow/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/06_01_mainwindow/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -145,7 +145,7 @@ MainWindow::~MainWindow()
 </ui>
 ```
 
-### 31_mainwindow.pro
+### 06_01_mainwindow.pro
 
 ```qmake
 QT += widgets
@@ -172,11 +172,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/31_mainwindow/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/06_01_mainwindow/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![主窗口与中心部件 03_result](../../examples/31_mainwindow/screenshots/03_result.png)
+![主窗口与中心部件 03_result](../../examples/06_01_mainwindow/screenshots/03_result.png)
 
 ## 自己动手
 

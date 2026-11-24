@@ -1,6 +1,6 @@
-# 10.3 鼠标按键 坐标和跟踪
+# 10.2 鼠标事件的坐标与按键 理论补充
 
-对应示例：[完整源码](../../examples/46_mouse_events)。先运行项目观察行为，再按以下顺序阅读。
+对应示例：[完整源码](../../examples/10_02_mouse_events)。先运行项目观察行为，再按以下顺序阅读。
 
 ## 本章要解决的问题
 
@@ -28,7 +28,7 @@ mainwindow.ui 将中央 QLabel 提升为 EventArea。eventarea.cpp 中启用 mou
 
 ## 完整示例与配套文件
 
-本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/46_mouse_events/README.md) 提供逐项 Designer 设置。
+本步按统一模板拆分文件。先打开 .ui 观察界面，再读窗口类；[项目 README](../../examples/10_02_mouse_events/README.md) 提供逐项 Designer 设置。
 
 ### main.cpp
 
@@ -183,7 +183,7 @@ protected:
 #endif // EVENTAREA_H
 ```
 
-### 46_mouse_events.pro
+### 10_02_mouse_events.pro
 
 ```qmake
 QT += widgets
@@ -212,11 +212,11 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 ```
 
-[verify.h](../../examples/46_mouse_events/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
+[verify.h](../../examples/10_02_mouse_events/verify.h) 是可选运行检查，普通启动不会执行。构建期生成的 ui_*.h 和 moc 文件不手写。
 
 ## 运行截图与观察
 
-![鼠标按键 坐标和跟踪 03_result](../../examples/46_mouse_events/screenshots/03_result.png)
+![鼠标按键 坐标和跟踪 03_result](../../examples/10_02_mouse_events/screenshots/03_result.png)
 
 ## 自己动手
 

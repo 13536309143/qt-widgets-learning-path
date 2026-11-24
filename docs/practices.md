@@ -1,10 +1,8 @@
-# 综合练习导航
+# 综合实践
 
-四个综合示例已经归入相应正文章节，按知识点学习后练习即可。
+综合项目同样归入正式章节，每个项目都有独立知识点讲解。
 
-| 综合示例 | 正文位置 | 完整项目 |
-|---|---|---|
-| UTF-8文本编辑器 | [第七章](chapters/07-dialogs.md) | [示例 49](../examples/49_text_editor/README.md) |
-| 对话框三种调用方式 | [第七章](chapters/07-dialogs.md) | [示例 50](../examples/50_dialog_modes/README.md) |
-| 事件过滤器 | [第十章](chapters/10-events.md) | [示例 51](../examples/51_event_filter/README.md) |
-| 交互绘图 | [第十一章](chapters/11-painting.md) | [示例 52](../examples/52_interactive_paint/README.md) |
+- [7.6 打开编辑保存的完整流程](knowledge/07_06_text_editor.md)
+- [7.2 show open exec的返回时机](knowledge/07_02_dialog_modes.md)
+- [10.4 为现有控件安装事件过滤器](knowledge/10_04_event_filter.md)
+- [11.2 状态更新与重绘分离](knowledge/11_02_interactive_paint.md)
